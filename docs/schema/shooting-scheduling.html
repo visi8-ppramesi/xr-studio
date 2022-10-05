@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="">
+    <head>
+        <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+        <style>
+            #sequence svg{
+                width: 150%
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+            <h1>Shooting Scheduling flow</h1>
+            <div class="mermaid">
+                flowchart TB
+                    A([start]) --> B[client navigate <br />to create shoot <br />request page]
+                    B --> C{client fill <br />shoot data}
+                    C --> D{client submit <br />shoot data}
+                    D --> E[shoot data <br />sent]
+                    E --> FA{admin process <br />shoot data}
+                    FA --> F{admin creates <br />proposal}
+                    F --> |admin sends proposal| G[client receives <br />proposal]
+                    G --> |client disagrees| F
+                    G --> |client agrees| H[shooting terms <br />agreed]
+                    G --> |no agreement <br />can be <br />reached| HB[everyone fucks <br />off]
+                    HB --> END
+                    H --> I{admin create <br />payment link}
+                    I --> J{admin send <br />payment link}
+                    J --> K[client receive <br />payment link]
+                    K --> L{client pays <br />for shooting}
+                    L --> M{shooting is <br />scheduled, status <br />paid}
+                    M --> N{notifications created <br />and email sent}
+                    N --> END[end]
+            </div>
+        </div>
+        <div>
+            <h1>Shooting Scheduling</h1>
+            <h3>After client (try to) purchase assets</h3>
+            <div class="mermaid" id="sequence">
+                sequenceDiagram
+                    participant Client
+                    participant ClientFrontEnd
+                    participant ShootingSchedulerManager
+                    participant PaymentGatewayManager
+                    participant 3rdPartyPaymentGateway
+                    participant PubSub
+                    participant ShootingSchedulerService
+                    participant MailerService
+                    participant NotificationService
+                    participant DB
+                    participant AdminFrontEnd
+                    participant AdminEmail
+                    participant Admin
+                    par
+                        rect rgb(190, 220, 245)
+                        Client ->> ClientFrontEnd: navigate to create <br/>shoot page, fill shoot <br />data (open ended)
+                        end
+                    and
+                        rect rgb(190, 220, 245)
+                        ClientFrontEnd ->> DB: fetch order (order always exists)
+                        DB ->> ClientFrontEnd: send order data
+                        end
+                    end
+                    Client ->> ClientFrontEnd: submit shoot data
+                    ClientFrontEnd ->> ShootingSchedulerManager: send data
+                    par
+                        rect rgb(190, 220, 245)
+                        ShootingSchedulerManager ->> DB: create shooting schedule
+                        end
+                    and
+                        rect rgb(190, 220, 245)
+                        ShootingSchedulerManager ->> PubSub: inform admin
+                        par
+                            rect rgb(190, 210, 245)
+                            PubSub ->> NotificationService: inform admin
+                            NotificationService ->> DB: create notif for admin
+                            end
+                        and
+                            rect rgb(190, 200, 245)
+                            PubSub ->> MailerService: inform admin
+                            MailerService ->> AdminEmail: send email
+                            AdminEmail ->> Admin: admin receive email
+                            end
+                        end
+                        end
+                    end
+                    loop admin and client negotiate and schedule <br />shooting until they agree
+                        Client --> Admin: negotiate and schedule through email
+                    end
+                    alt client agree to shooting schedule and price
+                        rect rgb(190, 220, 255)
+                        Admin ->> AdminFrontEnd: navigate to shooting schedule page
+                        AdminFrontEnd ->> ShootingSchedulerManager: edit shoot, status unpaid
+                        ShootingSchedulerManager ->> DB: edit shoot, status unpaid
+                        ShootingSchedulerManager ->> AdminFrontEnd: 👍
+                        AdminFrontEnd ->> Admin: 👍
+                        Admin ->> Client: send link to payment page
+                        Client ->> ClientFrontEnd: navigate to shoot payment page <br />(assets included if exists), client fill <br />payment info
+                        ClientFrontEnd ->> PaymentGatewayManager: submit payment info
+                        PaymentGatewayManager ->> 3rdPartyPaymentGateway: charge payment
+                        3rdPartyPaymentGateway ->> PaymentGatewayManager: return status (webhook)
+                        alt status 👍
+                            rect rgb(190, 210, 245)
+                            PaymentGatewayManager ->> PubSub: Shooting payment succeed
+                            par
+                                PubSub ->> OrderService: edit order status to paid
+                                OrderService ->> DB: create payment object
+                                DB ->> OrderService: return payment id
+                                OrderService ->> DB: edit order status to paid
+                            and
+                                rect rgb(180, 210, 245)
+                                PubSub ->> ShootingSchedulerService: edit status to paid
+                                ShootingSchedulerService ->> DB: edit shoot status to paid
+                                end
+                            and
+                                rect rgb(170, 210, 245)
+                                par
+                                    PubSub ->> NotificationService: create notif for admin
+                                    NotificationService ->> DB: create notif for admin
+                                and
+                                    PubSub ->> MailerService: email admin for confirmation
+                                    MailerService ->> Admin: send email to admin
+                                end
+                                end
+                            and
+                                rect rgb(160, 210, 245)
+                                par
+                                    PubSub ->> NotificationService: create notif for client
+                                    NotificationService ->> DB: create notif for client
+                                and
+                                    PubSub ->> MailerService: email client for confirmation
+                                    MailerService ->> Client: send email to client
+                                end
+                                end
+                            end
+                            PaymentGatewayManager ->> ClientFrontEnd: 👍
+                            ClientFrontEnd ->> Client: 👍
+                            end
+                        else status 👎
+                            rect rgb(190, 220, 245)
+                            PaymentGatewayManager ->> ClientFrontEnd: 👎
+                            ClientFrontEnd ->> Client: fucked up somewhere,<br /> retry please
+                            end
+                        end
+                        end
+                    else no agreement
+                        rect rgb(190, 220, 245)
+                        Client --> Admin: everyone fucks off
+                        end
+                    end
+            </div>
+        </div>
+    </body>
+</html>

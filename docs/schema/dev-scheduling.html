@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="">
+    <head>
+        <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+        <style>
+            #flow svg{
+                width: 100%
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+            <h1>Development General Scheduling</h1>
+            <h3>Inshallah we'll hit dev targets</h3>
+            <div class="mermaid" id="flow">
+                flowchart LR
+                    subgraph database
+                        direction LR
+                        DB1[setup firestore] --> DB2[user]
+                        DB2 --> DB21[group]
+                        DB2 --> DB22[user_roles]
+
+                        DB1 --> DB3[notifications]
+                        DB3 --> DB31[form_submission]
+                        DB3 --> DB32[shoot]
+                        DB3 --> DB33[order]
+                        DB3 --> DB34[payment]
+
+                        DB1 --> DB4[assets]
+                        DB4 --> DB41[assets_contract]
+
+                        DB1 --> DB8[submission_forms]
+
+                        DB4 <--> DB8
+
+                        DB1 --> DB5[contracts]
+                        DB5 --> DB51[versions]
+
+                        DB1 --> DB9[orders]
+                        DB9 --> DB91[versions]
+
+                        DB1 --> DBA[payments]
+
+                        DB1 --> DB6[shoots]
+                        DB6 --> DB61[shoot_keys]
+
+                        DB1 --> DB7[procedures]
+                        DB7 --> DB6
+
+                        DB1 --> DBB[settings]
+                    end
+
+                    subgraph storage
+                        direction TB
+                        STOR1[setup storage] --> STOR2[create folders]
+                    end
+
+                    subgraph user_frontend
+                        direction TB
+                        UF1[design] --> UF2[Dashboard]
+                        UF1 --> UF3[items lists]
+                        UF3 --> UF31[items search]
+                        UF1 --> UF5[login]
+                        UF1 --> UF6[register]
+                        UF1 --> UF7[item details]
+                        UF3 --> UF8[cart page]
+                        UF8 --> UF9[payment page]
+
+                        UF5 --> UFA[creator user page]
+                        UF6 --> UFA
+                        UFA --> UFA1[asset submission page]
+
+                        UF5 --> UFB[client user page]
+                        UF6 --> UFB
+                        UFB --> UFB1[schedule shooting page]
+
+                        UF5 --> UFC[browser user page]
+                        UF6 --> UFC
+
+                        UF1 --> UFE[notifications page]
+                        UFE --> UFF[contact us page]
+
+                        UF1 --> UFD[everything else<br />about us, T&A, etc]
+                    end
+
+                    %% subgraph user_management
+                    %%     direction TB
+                    %%     UM1[design] --> UM2[asdf]
+                    %% end
+
+                    subgraph admin_frontend
+                        direction LR
+                        AF1[design] --> AF2[user management]
+                        AF1 --> AF3[shoot management]
+                        AF1 --> AF4[transaction management]
+                        AF4 --> AF41[order management]
+                        AF4 --> AF42[payment management]
+                        AF4 --> AF43[contract management]
+                        AF1 --> AF5[assets management]
+                        AF1 --> AF6[admin notifs]
+                        AF1 --> AF7[site settings]
+                    end
+
+                    subgraph auth
+                        direction TB
+                        AUTH1[setup auth] --> AUTH2[do stuff]
+                    end
+
+                    %% subgraph assets
+                    %%     direction TB
+                    %%     A1 --> A2
+                    %%     subgraph assets_management
+                    %%         direction TB
+                    %%         AM1 --> AM2
+                    %%     end
+                        subgraph asset
+                            direction TB
+                            UFA1 --> ASUB1[asset manager]
+                            %% ASUB1 --> ASUB2[asset service]
+                        end
+                    %% end
+
+                    %% subgraph shooting
+                    %%     direction TB
+                    %%     SHO1 --> SHO2
+                    %%     subgraph procedures
+                    %%         direction TB
+                    %%         PM1 --> PM2
+                    %%     end
+                        subgraph shooting_management
+                            direction TB
+                            UFB1 --> SM1[shooting manager]
+                            %% SM1 --> SM2[shooting scheduler service]
+                        end
+                    %% end
+
+                    subgraph cryptographic_service
+                        direction TB
+                        ASUB1 --> CRYPT1
+                        CRYPT1 --> CRYPT2
+                    end
+
+                    subgraph notification_service
+                        direction TB
+                        NS1 --> NS2
+                    end
+
+                    subgraph mailer_service
+                        direction TB
+                        MS1 --> MS2
+                    end
+
+                    subgraph contract_service
+                        direction TB
+                        CS1 --> CS2
+                        CS2 --> CRYPT1
+                    end
+
+                    subgraph order_service
+                        direction TB
+                        OS1 --> OS2
+                    end
+
+                    subgraph shooting_service
+                        direction TB
+                        SS1 --> SS2
+                    end
+
+                    %% subgraph transaction
+                    %%     direction TB
+                    %%     TM1 --> TM2
+                        subgraph payment
+                            direction TB
+                            AF42 --> PS1
+                            UF9 --> PS1[payment manager]
+                            PS1 --> PG2[3rd party payment gateway]
+                            %% PS1 --> PS2[payment service]
+                            %% subgraph payment_gateway_service
+                            %%     direction TB
+                            %%     UF9 --> PG1[payment management]
+                            %% end
+                        end
+                        subgraph order
+                            direction TB
+                            AF41 --> OM1[order manager]
+                            %% OM1 --> OS2[order service]
+                        end
+                        subgraph contract
+                            direction TB
+                            AF43 --> CM1[contract manager]
+                            CM1 --> CRYPT1
+                            %% CM1 --> CM2[contract service]
+                        end
+                    %% end
+
+                    subgraph pub_sub
+                        direction TB
+                        ASUB1 --> PUBSUB1[asset channel] --> OS1
+                        PUBSUB1 --> CS1
+                        SM1 --> PUBSUB2[shooting channel] --> NS1
+                        PUBSUB2 --> MS1
+                        OM1 --> PUBSUB4[order channel]
+                        CM1 --> PUBSUB5[contract channel]
+                        PS1 --> PUBSUB3[payment channel] --> OS1
+                        PUBSUB3 --> SS1
+                        PUBSUB3 --> NS1
+                        PUBSUB3 --> MS1
+                    end
+
+                    %% subgraph terraform
+                    %%     direction TB
+                    %%     TF1 --> TF2
+                    %% end
+                    requirement_analysis -.-> database
+                    requirement_analysis -.-> auth
+                    requirement_analysis -.-> storage
+
+                    database -.-> user_frontend
+                    database -.-> admin_frontend
+
+                    %% requirement_analysis -.-> pub_sub
+                    %% requirement_analysis -.-> terraform
+
+                    %% storage -.-> assets
+                    storage -.-> user_frontend
+                    storage -.-> admin_frontend
+
+                    %% database -.-> user_management
+                    %% database -.-> assets
+                    %% database -.-> shooting
+
+                    %% admin_frontend -.-> user_management
+
+                    %% pub_sub --> mailer_service
+                    %% pub_sub --> notification_service
+                    %% pub_sub --> cryptographic_service
+
+                    auth -.-> user_frontend
+                    auth -.-> admin_frontend
+            </div>
+        </div>
+    </body>
+</html>

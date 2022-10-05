@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="">
+		<head>
+				<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+		</head>
+		<body>
+				<div>
+						<h1>Submitting Submission Form</h1>
+						<div class="mermaid">
+								sequenceDiagram
+                    participant Creator
+                    participant FrontEnd
+                    participant SubmissionManager
+                    %% participant CryptoService
+                    participant DB
+                    participant Storage
+										Creator ->> FrontEnd: fill in submission form application, upload previews, contract type
+                    %% alt if contract type == digital
+                        %% FrontEnd ->> SubmissionManager: ask for key generation?
+                        %% SubmissionManager ->> DB: check if creator already have public key
+                        %% DB ->> SubmissionManager: return check
+                        %% alt if public doesn't exist
+                        %%     SubmissionManager ->> FrontEnd: generate key pair
+                        %%     par
+                        %%         FrontEnd ->> Creator: tell creator to save the private key, if lost everything is forfeit
+                        %%     and
+                        %%         FrontEnd ->> CryptoService: send public key
+                        %%         alt where are we storing the key??? (db)
+                        %%             CryptoService ->> DB: store public key
+                        %%         else storage
+                        %%             CryptoService ->> Storage: store public key
+                        %%         end
+                        %%         CryptoService ->> FrontEnd: 👍
+                        %%     end
+                        %% end
+                    %% end
+										FrontEnd ->> SubmissionManager: send submission form
+                    SubmissionManager ->> DB: store submission form
+                    DB ->> SubmissionManager: retrieve submission form id
+										par
+												rect rgb(190, 220, 255)
+												SubmissionManager ->> DB: create notification for admins, tied to prev submissiom form
+												end
+										and
+												rect rgb(190, 220, 255)
+												SubmissionManager ->> Storage: store uploaded previews
+                        SubmissionManager ->> DB: edit submission form with uploaded previews
+												end
+										end
+										SubmissionManager ->> FrontEnd: Send submission status, good or bad
+										FrontEnd ->> Creator: 👍
+						</div>
+				</div>
+				<div>
+						<h1>Admin Validating Submission Form</h1>
+						<div class="mermaid">
+								sequenceDiagram
+										Admin ->> AdminFrontEnd: check submission notifications
+										AdminFrontEnd ->> SubmissionManager: yo is there submission form to process?
+										SubmissionManager ->> DB: fetch admin notif
+										alt there's notifs
+												rect rgb(190, 220, 255)
+												SubmissionManager ->> AdminFrontEnd: there's notifs
+												AdminFrontEnd ->> Admin: Yo process these submissions
+												Admin -->> Admin: process submissions forms
+												alt submission accepted
+														rect rgb(190, 210, 255)
+														Admin ->> AdminFrontEnd: accept submission, create <br />contract, maybe from template. <br /> also send password for <br />signing
+														AdminFrontEnd ->> SubmissionManager: submission accepted
+                            %% SubmissionManager ->> DB: submission_form status: accepted,
+                            SubmissionManager ->> PubSub: submission accepted
+														par
+																rect rgb(190, 210, 235)
+																PubSub ->> NotificationService: create notification for <br />creator, status accepted.
+                                par
+                                    NotificationService ->> DB: create notification for <br />creator, status accepted.
+                                and
+                                    NotificationService ->> DB: notifs for other admins tied <br />to submission form status changed
+                                end
+																end
+                            and
+                                rect rgb(190, 210, 225)
+                                %% SubmissionManager ->> PubSub: edit submission form
+                                PubSub ->> SubmissionService: edit submission form
+                                SubmissionService ->> DB: submission_form status: accepted
+                                end
+														and
+                                rect rgb(190, 210, 225)
+                                %% SubmissionManager ->> PubSub: create contract, maybe from template
+                                PubSub ->> ContractService: create contract
+                                ContractService ->> CryptographicService: sign admin contract, hash contract
+                                CryptographicService ->> ContractService: return signed and hash
+                                ContractService ->> DB: create asset with contract ref, allows creator <br />to edit said asset (upload etc). edit submission form <br />to include newly created asset.
+                                end
+														end
+														end
+												else submission rejected, needs more work
+														rect rgb(190, 200, 255)
+														Admin ->> AdminFrontEnd: reject submission, needs <br />more work, sends notes
+														AdminFrontEnd ->> SubmissionManager: submission rejected, <br />needs more work, sends notes
+														par
+																rect rgb(190, 200, 245)
+																SubmissionManager ->> DB: submission_form status: rejected, <br />status_history push: {rejected, note}
+                                DB ->> DB: (listener) notifs for other admins tied <br />to submission form status changed
+																end
+														and
+																rect rgb(190, 200, 235)
+																SubmissionManager ->> DB: create notification for creator, status <br />rejected, status_message note
+																end
+														end
+														end
+												else submission closed, total shit
+														rect rgb(190, 190, 255)
+														Admin ->> AdminFrontEnd: close submission
+														AdminFrontEnd ->> SubmissionManager: submission closed
+														par
+																rect rgb(190, 190, 245)
+																SubmissionManager ->> DB: submission_form status: closed, <br />status_history push: {closed, note}
+                                DB ->> DB: (listener) notifs for other admins tied to <br />submission form status changed
+																end
+														and
+																rect rgb(190, 190, 235)
+																SubmissionManager ->> DB: create notification for creator, status <br />closed, status_message note
+																end
+														end
+														end
+												end
+												SubmissionManager ->> AdminFrontEnd: we good
+												AdminFrontEnd ->> Admin: 👍
+												end
+										else there's no notifs
+												rect rgb(190, 200, 255)
+												SubmissionManager ->> AdminFrontEnd: there's not notifs
+												AdminFrontEnd ->> Admin: there's no submission notifcations, so <br />do something else. idk jack off or smth.
+												end
+										end
+						</div>
+				</div>
+				<div>
+						<h1>Creator Editing Submission Form</h1>
+						<h3>When form submission is rejected, but not closed (e.g. there's something wrong but there's still possibility for acceptance)</h3>
+						<div class="mermaid">
+								sequenceDiagram
+										participant Creator
+										participant FrontEnd
+										participant AssetsManager
+										participant DB
+										Creator ->> FrontEnd: navigate to form submission edit page, modify form
+										FrontEnd ->> AssetsManager: submit data to assets managers
+										par
+												AssetsManager ->> DB: modify submission form data on db
+										and
+												AssetsManager ->> DB: create notif for admin
+										end
+										AssetsManager ->> FrontEnd: 👍
+										FrontEnd ->> Creator: Now creator can submit asset
+						</div>
+				</div>
+				<div>
+						<h1>Creator Accepting Submission Term</h1>
+						<h3>After submission form is accepted (if contract is digital)</h3>
+						<div class="mermaid">
+								sequenceDiagram
+										participant Creator
+										participant FrontEnd
+										participant ContractManager
+										participant DB
+                    note over Creator: After creator is notified <br />that their submission is <br />accepted
+										Creator ->> FrontEnd: navigate to sign contract page
+                    FrontEnd ->> Creator: ask for password
+                    FrontEnd ->> FrontEnd: decrypt then load private key
+                    FrontEnd ->> DB: fetch contract
+                    DB ->> FrontEnd: retrieve contract data
+                    FrontEnd ->> FrontEnd: Sign contract with private key
+										FrontEnd ->> ContractManager: submit data to contract manager
+                    ContractManager ->> CryptographicService: calculate current hash (previous hash included)
+                    CryptographicService ->> ContractManager: calculate current hash (previous hash included)
+                    ContractManager ->> DB: create new contract version
+                    ContractManager ->> PubSub: publish event
+										ContractManager ->> FrontEnd: 👍
+										FrontEnd ->> Creator: 👍
+						</div>
+				</div>
+				<div>
+						<h1>Creator Submitting Asset</h1>
+						<h3>After form submission 👍, after submission term is accepted</h3>
+						<div class="mermaid">
+								sequenceDiagram
+										participant Creator
+										participant FrontEnd
+										participant AssetsManager
+										participant DB
+										participant Storage
+										Creator ->> FrontEnd: open upload asset page
+										FrontEnd ->> AssetsManager: check if requested form_submission is valid
+										AssetsManager ->> DB: fetch form submission data, <br />and it's contract latest version
+										DB ->> AssetsManager: return form submission data, or if valid
+										alt form submission is accepted and valid
+												rect rgb(190, 220, 255)
+												AssetsManager ->> FrontEnd: shows current form <br />submission, allows asset edit, asks <br />for private key (if digital)
+												Creator ->> FrontEnd: fill asset info upload <br />asset info page, choose asset upload <br />method, then submit, provide <br />private key (if digital contract)
+                        FrontEnd ->> FrontEnd: sign new contract with assets url
+												par
+														rect rgb(190, 210, 255)
+														FrontEnd ->> AssetsManager: receive asset info, validate asset info
+														AssetsManager ->> DB: edit asset
+                            AssetsManager ->> PubSub: publish asset created
+                            PubSub ->> ContractService: create new contract version with <br />asset url included, hash <br />contract, etc etc
+                            ContractService ->> CryptographicService: create new contract version with <br />asset url included, hash <br />contract, etc etc
+                            CryptographicService ->> ContractService: create new contract version with <br />asset url included, hash <br />contract, etc etc
+                            ContractService ->> DB: store contract version.
+														end
+												and
+														rect rgb(190, 200, 255)
+														alt standard upload
+																rect rgb(190, 200, 245)
+																FrontEnd ->> AssetsManager: upload from frontend <br />to AssetsManager
+																AssetsManager ->> Storage: upload in chunks if too large
+																Storage ->> AssetsManager: return url
+																AssetsManager ->> DB: update assets_url
+																end
+														else some other upload (dropfile, google drive, etc)
+																rect rgb(190, 200, 235)
+																Creator ->> 3rdPartyStorage: upload file
+																3rdPartyStorage ->> Creator: retreive url
+																Creator ->> FrontEnd: fill url
+																FrontEnd ->> AssetsManager: send url
+																AssetsManager ->> DB: update assets_url
+																end
+														end
+														end
+												end
+                        AssetsManager ->> FrontEnd: we good
+                        FrontEnd ->> Creator: 👍
+												end
+										else form submission is rejected, closed or invalid
+												rect rgb(180, 220, 255)
+												AssetsManager ->> FrontEnd: display status, message
+												FrontEnd ->> Creator: 👎
+												end
+										end
+						</div>
+				</div>
+		</body>
+</html>

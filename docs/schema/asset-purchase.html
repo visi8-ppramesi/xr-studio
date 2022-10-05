@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="">
+    <head>
+        <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    </head>
+    <body>
+        <div>
+            <h1>Assets Purchase Client Flow</h1>
+            <h3>Client flow for licensing assets</h3>
+            <div class="mermaid">
+                flowchart TB
+                    A([Start]) --> B[client has empty cart]
+                    B --> C{add asset to cart}
+                    C --> |asset added| DA[cart with items]
+                    DA --> D{continue shopping?}
+                    D --> |yes| C
+                    D --> |finish shopping| E[proceed to checkout]
+                    subgraph checkout
+                        direction TB
+                        CA([checkout start]) --> CB[checkout page]
+                        CB --> CC{choose payment method}
+                        CC --> |manual payment| CDBA[contact us payment info]
+                        CDBA --> CDBB{client fill contact us info}
+                        CDBB --> manual_payment
+                        CC --> |web payment| CDAA[checkout page payment info]
+                        CDAA --> CDAB{client fill payment info}
+                        CDAB --> web_payment
+                        subgraph manual_payment
+                            direction TB
+                            DAA([manual payment start]) --> DAB[contact form filled + data ready]
+                            DAB --> DAC{data submitted, success?}
+                            DAC --> |yes| DAD[tell client to wait for response from admin]
+                            DAD --> DAE[admin reply, negotiate, schedule shoot]
+                            DAE --> DAFA{does client agree price, schedule?}
+                            DAFA --> |agree| DAFB[admin create shoot, status unpaid]
+                            DAFB --> DAFC{admin send payment page to client}
+                            DAFC --> DAFD[client fill payment info,<br /> client charged per agreed price]
+                            DAFD --> DAFE{payment gateway charged, send success<br/> info to admin, edit shoot to paid}
+                            DAFE --> DAFF{admin confirm shoot}
+                            DAFA --> |disagree| DAGB[renegotiate price, schedule]
+                            DAGB --> DAFA
+                            DAC --> |no| DACR[retry]
+                            DACR --> DAB
+                        end
+                        subgraph web_payment
+                            direction TB
+                            EAA([web payment start]) --> EAB[payment info filled + data ready]
+                            EAB --> EAC{payment gateway charged, success?}
+                            EAC --> |yes| EADA[let client know payment succeed, client<br /> can choose to create shoot right now or later]
+                            EADA --> EADAA{create shoot right now?}
+                            EADAA --> |create now| EADB[client fill contact form to schedule shoot]
+                            EADB --> EADC{send contact to admin}
+                            EADC --> EADD[tell client to wait for response from admin]
+
+                            EADD --> EEADD[admin reply, negotiate, schedule shoot]
+                            EEADD --> EEAFA{does client agree price, schedule?}
+                            EEAFA --> |agree| EEAFB[admin create shoot, status unpaid]
+                            EEAFB --> EEAFC{admin send payment page to client}
+                            EEAFC --> EEAFD[client fill payment info,<br /> client charged per agreed price]
+                            EEAFD --> EEAFE{payment gateway charged, send success<br/> info to admin, edit shoot to paid}
+                            EEAFE --> EEAFF{admin confirm shoot}
+                            EEAFA --> |disagree| EEAGB[renegotiate price, schedule]
+                            EEAGB --> EEAFA
+
+                            EAC --> |no| EAEA[retry]
+                            EAEA --> EAC
+                        end
+                    end
+                    E --> CA
+                    EEAFF --> END
+                    EADAA --> |create later| END
+                    DAFF --> END
+            </div>
+        </div>
+        <div>
+            <h1>Assets Purchase Implementation</h1>
+            <h3>After shopping cart is full and ready for checkout</h3>
+            <h6>Still missing contract payment for creator</h6>
+            <div class="mermaid">
+                sequenceDiagram
+                    participant Client
+                    participant FrontEnd
+                    participant PaymentGatewayManager
+                    participant 3rdPartyPaymentGateway
+                    participant AssetsManager
+                    participant MailerManager
+                    participant PubSub
+                    participant OrderService
+                    participant PaymentService
+                    participant DB
+                    participant Storage
+                    participant Admin
+                    Client ->> FrontEnd: navigate to checkout page
+                    FrontEnd ->> Client: shows cart, asks for<br /> payment info, pick payment<br /> method
+                    alt manual purchase (email puchase, shows contact-us like page)
+                        Client ->> FrontEnd: write contact email<br /> to contact admin
+                        par
+                            FrontEnd ->> AssetsManager: send data from cart
+                            AssetsManager ->> PubSub: create order
+                            PubSub ->> OrderService: create order
+                            OrderService ->> DB: create order, payment <br />method empty, status [unpaid, <br />no shoot set, talking to <br />admin]
+                            AssetsManager ->> FrontEnd: 👍
+                        and
+                            FrontEnd ->> MailerManager: send data
+                            MailerManager ->> Admin: send email
+                            MailerManager ->> FrontEnd: 👍
+                        end
+                        FrontEnd ->> Client: 👍
+                        note over Client: client is then asked to wait <br />for response from admin for schooting <br />schedule, assets price negotiation
+                    else web purchase (cc, other stuff)
+                        Client ->> FrontEnd: provides payment info
+                        FrontEnd ->> PaymentGatewayManager: send cart data
+                        PaymentGatewayManager ->> 3rdPartyPaymentGateway: pass payment info
+                        3rdPartyPaymentGateway ->> PaymentGatewayManager: return status
+                        alt success
+                            PaymentGatewayManager ->> PubSub: send data
+                            PubSub ->> OrderService: send data
+                            OrderService ->> DB: create order with data from cart, <br />status [paid, no shoot set]
+                            %% OrderService ->> OrderService: create payment object
+                            PubSub ->> PaymentService: create payment
+                            PaymentService ->> DB: create payment object
+                            FrontEnd ->> Client: 👍
+                            note over Client: client is then asked to <br />schedule shooting now <br />or later
+                        else failed
+                            PaymentGatewayManager ->> FrontEnd: shows fail
+                            FrontEnd ->> Client: 👎
+                        end
+                        PaymentGatewayManager ->> FrontEnd: shows status
+                    end
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="">
+    <head>
+        <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    </head>
+    <body>
+        <div>
+            <h1>Assets validation and key fetching</h1>
+            <h3>For digital assets</h3>
+            <div class="mermaid">
+                sequenceDiagram
+                    note over OnLocationServer: this is being used by the supervisor
+                    OnLocationServer ->> AssetsManager: send supervisor key, shoot id
+                    par
+                        AssetsManager ->> DB: fetch shoot data
+                        DB ->> AssetsManager: shoot data
+                    and
+                        AssetsManager ->> DB: fetch supervisor key
+                        DB ->> AssetsManager: supervisor key
+                    end
+                    AssetsManager -->> AssetsManager: validate supervisor key, shoot data
+                    alt is successful
+                        AssetsManager ->> OnPremiseAssetStorage: request assets
+                        OnPremiseAssetStorage ->> AssetsManager: assets
+                        AssetsManager -->> AssetsManager: generate key, encrypt assets
+                        par
+                            AssetsManager ->> DB: store decryption key
+                        and
+                            AssetsManager ->> OnLocationServer: send encrypted assets and key
+                        end
+                    else is failed
+                        AssetsManager ->> OnLocationServer: validation fail, there's no shoot
+                    end
+            </div>
+        </div>
+        <div>
+            <h1>Unreal decryption</h1>
+            <h3>Supervisor get assets from procedure above, copy file and plugin to client computer</h3>
+            <div class="mermaid">
+                sequenceDiagram
+                    Supervisor ->> ClientUnreal: load plugin, load assets, load key
+                    ClientUnreal ->> AssetsManager: fetch decryption key
+                    AssetsManager -->> AssetsManager: validate key
+                    alt is valid
+                        AssetsManager ->> DB: fetch decryption key
+                        DB ->> AssetsManager: decryption key
+                        AssetsManager ->> ClientUnreal: decryption key
+                        ClientUnreal -->> ClientUnreal: decrypt assets, and load to memory
+                        ClientUnreal ->> Supervisor: ready for shoot
+                    else is not valid
+                        AssetsManager ->> ClientUnreal: failed, throw error
+                        ClientUnreal ->> Supervisor: tell to retry key
+                    end
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="">
+    <head>
+        <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    </head>
+    <body>
+        <div>
+            <h1>Register</h1>
+            <div class="mermaid">
+                sequenceDiagram
+                    User ->> AuthForm: provide auth info, incl password, submit
+                    par
+                        AuthForm ->> FirebaseAuth: register new user
+                        FirebaseAuth ->> AuthForm: return user id
+                    and
+                        AuthForm ->> SubtleCrypto: generate key pair, encrypt private key with password
+                        SubtleCrypto ->> WebSQL: save encrypted private key to websql
+                        SubtleCrypto ->> AuthForm: return encrypted private key
+                    end
+                    AuthForm ->> Firestore: create new user with encrypted private key and public key, other user info
+                    Firestore ->> AuthForm: 👍
+                    AuthForm ->> User: 👍
+            </div>
+        </div>
+        <div>
+            <h1>Login</h1>
+            <div class="mermaid">
+                sequenceDiagram
+                    User ->> LoginForm: provide auth info, incl password, submit
+                    LoginForm ->> FirebaseAuth: login
+                    alt success
+                        LoginForm ->> WebSQL: check if private key exists
+                        alt private key exists
+                            LoginForm ->> User: login succeed
+                        else private key doesn't exist
+                            LoginForm ->> Firestore: fetch private key
+                            Firestore ->> LoginForm: private key
+                            LoginForm ->> WebSQL: store privateKey
+                            LoginForm ->> User: Login succeed
+                        end
+                    else fail
+                        LoginForm ->> User: fuck off
+                    end
+            </div>
+        </div>
+    </body>
+</html>
