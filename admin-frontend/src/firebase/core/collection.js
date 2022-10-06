@@ -1,4 +1,4 @@
-import firebase from './firebase.js'
+import firebase from '../firebase.js'
 import Subcollection from './Subcollection.js';
 import {
     DocumentSnapshot,

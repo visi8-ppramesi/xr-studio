@@ -1,4 +1,5 @@
-import firebase from './firebase.js'
+import firebase from '../firebase.js'
+import Subcollection from './Subcollection.js';
 import {
     DocumentSnapshot,
     doc,
@@ -10,16 +11,14 @@ import {
     getDocs,
     getDoc,
     addDoc,
-    collectionGroup,
     setDoc,
     // orderBy,
     // limit
 } from "firebase/firestore";
 import utils from './utils/index.js'
-// import _ from 'lodash'
 import types, { LongText, ProfilePicture, InstanceProjectionArray, StorageLink, InstanceProjection } from './types/index.js';
 import handleError from '@/utils/handleError.js';
-
+// import _ from 'lodash'
 import isNil from 'lodash/isNil'
 import isEmpty from 'lodash/isEmpty'
 import remove from 'lodash/remove'
@@ -146,7 +145,7 @@ export default class{
                 const eventRef = this.doc.ref
                 await updateDoc(eventRef, data)
                 this.doc = await getDoc(eventRef)
-                this.setData(this.parentId, this.id, data, false, false)
+                this.setData(this.id, data, null, false, false)
                 return this
             }
         }catch(err){
@@ -155,20 +154,20 @@ export default class{
         }
     }
 
-    static async createDocument(parentId, parentPath, data) {
+    static async createDocument(data) {
         try{
             const validation = this.validateData(data)
             if(validation){
-                const newRef = collection(this.db, ...parentPath, this.collection)
+                const newRef = collection(this.db, this.collection)
                 const newDocRef = await addDoc(newRef, data)
                 const newDoc = await getDoc(newDocRef)
                 const instance = new this()
-                await instance.setData(parentId, newDoc.id, data, newDoc, false, false)
+                await instance.setData(newDoc.id, data, newDoc, false, false)
 
                 return instance
             }
         }catch(err){
-            handleError(err, 'createDocumentError')
+            handleError(err, 'updateDocumentError')
             throw err
         }
     }
@@ -194,15 +193,14 @@ export default class{
         }
     }
 
-    async setData(parentId, id, data, doc = null, fetchStorageLink = true, fetchInstanceStorageLink = false){
+    async setData(id, data, doc = null, fetchStorageLink = true, fetchInstanceStorageLink = false){
         this.empty = false
         this.id = id
-        this.parentId = parentId
         const fields = Object.keys(this.constructor.fields)
         for(let p = 0; p < fields.length; p++){
             const field = fields[p]
 
-            const isSubcollection = this.constructor.fields[field] == this
+            const isSubcollection = this.constructor.fields[field] == Subcollection
             const isProfilePicture = this.constructor.fields[field] == ProfilePicture
             const isInstanceProjectionArray = this.constructor.fields[field] instanceof InstanceProjectionArray
             const isInstanceProjection = this.constructor.fields[field] instanceof InstanceProjection
@@ -281,8 +279,8 @@ export default class{
         })
     }
 
-    static async getDocument(path, id, loadStorage = false, loadInstance = false){
-        const eventRef = doc(firebase.db, ...path, id)
+    static async getDocument(id){
+        const eventRef = doc(this.db, this.collection, id)
         try{
             const doc = await getDoc(eventRef)
             if(!doc.exists()){
@@ -292,8 +290,7 @@ export default class{
             }
             const data = doc.data()
             const instance = new this()
-            const parentId = path[path.length - 2]
-            await instance.setData(parentId, doc.id, data, doc, loadStorage, loadInstance)
+            await instance.setData(doc.id, data, doc, false, false)
 
             return instance
         }catch(err){
@@ -302,9 +299,8 @@ export default class{
         }
     }
 
-    static async getDocumentWithStorageResourceUrl(path, id, storageFields = [], loadInstance = false){
-        const eventRef = doc(firebase.db, ...path, id)
-        const parentId = path[path.length - 2]
+    static async getDocumentWithStorageResourceUrl(id, storageFields = [], loadInstance = false){
+        const eventRef = doc(firebase.db, this.collection, id)
         try{
             const doc = await getDoc(eventRef)
             if(!doc.exists()){
@@ -315,7 +311,7 @@ export default class{
             let data = doc.data()
 
             const instance = new this()
-            await instance.setData(parentId, doc.id, data, doc, false, loadInstance)
+            await instance.setData(doc.id, data, doc, false, loadInstance)
 
             try{
                 const resources = []
@@ -340,9 +336,8 @@ export default class{
         }
     }
 
-    static async getDocumentWithStorageResource(path, id, storageFields = [], loadInstance = false){
-        const eventRef = doc(firebase.db, ...path, id)
-        const parentId = path[path.length - 2]
+    static async getDocumentWithStorageResource(id, storageFields = [], loadInstance = false){
+        const eventRef = doc(this.db, this.collection, id)
         try{
             const doc = await getDoc(eventRef)
             if(!doc.exists()){
@@ -353,7 +348,7 @@ export default class{
             let data = doc.data()
 
             const instance = new this()
-            await instance.setData(parentId, doc.id, data, doc, false, loadInstance)
+            await instance.setData(doc.id, data, doc, false, loadInstance)
 
             try{
                 const resources = []
@@ -378,61 +373,8 @@ export default class{
         }
     }
 
-    static async getDocumentsWithStorageResourceUrl(path, queries = [], storageFields = [], loadInstance = false){
-        const eventRef = collection(firebase.db, ...path)
-        const parentId = path[path.length - 2]
-        let q;
-        if(queries.length > 0){
-            q = query(eventRef, ...queries)
-        }else{
-            q = eventRef
-        }
-        let snap
-        try {
-            snap = await getDocs(q)
-        } catch (err) {
-            handleError(err, 'getDocumentsError')
-            throw err
-        }
-        if(snap.empty){
-            return []
-        }
-        const docs = Object.values(snap.docs)
-        const events = []
-        for(let i = 0; i < docs.length; i++){
-            const data = docs[i].data()
-            const resources = []
-
-            data.doc = docs[i]
-            data.id = docs[i].id
-
-            const instance = new this()
-            await instance.setData(parentId, data.id, data, data.doc, false, loadInstance)
-
-            for(let j = 0; j < storageFields.length; j++){
-                resources.push(utils.getResourceUrlFromStorage(instance[storageFields[j]]))
-            }
-
-            try {
-                await Promise.all(resources).then((resource) => {
-                    for(let k = 0; k < resource.length; k++){
-                        instance[storageFields[k]] = resource[k]
-                    }
-                })
-            } catch (err) {
-                handleError(err, 'getDocumentsError')
-                throw err
-            }
-            // data.doc = docs[i]
-            // data.id = docs[i].id
-            events.push(instance)
-        }
-        return events
-    }
-
-    static async getDocuments(path, queries = [], loadStorage = false, loadInstance = false){
-        const eventRef = collection(firebase.db, ...path)
-        const parentId = path[path.length - 2]
+    static async getDocuments(queries = []){
+        const eventRef = collection(this.db, this.collection)
         let q;
         if(queries.length > 0){
             q = query(eventRef, ...queries)
@@ -447,236 +389,20 @@ export default class{
             }else{
                 return await Promise.all(utils.parseDocs(snap.docs).map(async (datum, idx) => {
                     const instance = new this()
-                    await instance.setData(parentId, datum.id, datum, snap.docs[idx], loadStorage, loadInstance)
+                    await instance.setData(datum.id, datum, snap.docs[idx], false, false)
                     return instance
                 }))
             }
         }catch(err){
+            console.error(err)
             handleError(err, 'getDocumentsError')
             throw err
         }
     }
 
-    static async * generateDocumentsWithStorageResourceUrl(path, queries = [], storageFields = [], loadInstance = false){
-        const eventRef = collection(firebase.db, ...path)
-        const parentId = path[path.length - 2]
-        let q;
-        if(queries.length > 0){
-            q = query(eventRef, ...queries)
-        }else{
-            q = eventRef
-        }
 
-        let snap
-        try {
-            snap = await getDocs(q)
-        } catch (err) {
-            handleError(err, 'generateDocumentsError')
-            throw err
-        }
-        if(snap.empty){
-            return []
-        }
-        const docs = Object.values(snap.docs)
-        for(let i = 0; i < docs.length; i++){
-            const data = docs[i].data()
-            const resources = []
-
-            data.doc = docs[i]
-            data.id = docs[i].id
-
-            const instance = new this()
-            await instance.setData(parentId, data.id, data, data.doc, false, loadInstance)
-
-            for(let j = 0; j < storageFields.length; j++){
-                resources.push(utils.getResourceUrlFromStorage(instance[storageFields[j]]))
-            }
-
-            try {
-                await Promise.all(resources).then((res) => {
-                    for(let k = 0; k < res.length; k++){
-                        instance[storageFields[k]] = res[k]
-                    }
-                })
-            } catch (err) {
-                handleError(err, 'generateDocumentsError')
-                throw err
-            }
-
-            yield instance
-        }
-    }
-
-    static async getDocumentsWithStorageResource(path, queries = [], storageFields = [], loadInstance = false){
-        const eventRef = collection(firebase.db, ...path)
-        const parentId = path[path.length - 2]
-        let q;
-        if(queries.length > 0){
-            q = query(eventRef, ...queries)
-        }else{
-            q = eventRef
-        }
-
-        let snap
-        try {
-            snap = await getDocs(q)
-        } catch (err) {
-            handleError(err, 'getDocumentsError')
-            throw err
-        }
-        if(snap.empty){
-            return []
-        }
-        const docs = Object.values(snap.docs)
-        const results = []
-        for(let i = 0; i < docs.length; i++){
-            const data = docs[i].data()
-            const resources = []
-
-            const instance = new this()
-            await instance.setData(parentId, docs[i].id, data, docs[i], false, loadInstance)
-            for(let j = 0; j < storageFields.length; j++){
-                resources.push(utils.getDataUrlFromStorage(instance[storageFields[j]]))
-            }
-
-            try {
-                await Promise.all(resources).then((res) => {
-                    for(let k = 0; k < res.length; k++){
-                        instance[storageFields[k]] = res[k]
-                    }
-                })
-            } catch (err) {
-                handleError(err, 'getDocumentsError')
-                throw err
-            }
-
-            results.push(instance)
-        }
-        return results
-    }
-
-    static async * generateDocumentsWithStorageResource(path, queries = [], storageFields = [], loadInstance = false){
-        const parentId = path[path.length - 2]
-        const eventRef = collection(firebase.db, ...path)
-        let q;
-        if(queries.length > 0){
-            q = query(eventRef, ...queries)
-        }else{
-            q = eventRef
-        }
-
-        let snap
-        try {
-            snap = await getDocs(q)
-        } catch (err) {
-            handleError(err, 'generateDocumentsError')
-            throw err
-        }
-        if(snap.empty){
-            return []
-        }
-
-        const docs = Object.values(snap.docs)
-        for(let i = 0; i < docs.length; i++){
-            const data = docs[i].data()
-            const resources = []
-
-            data.doc = docs[i]
-            data.id = docs[i].id
-
-            const instance = new this()
-            await instance.setData(parentId, docs[i].id, data, docs[i], false, loadInstance)
-            for(let j = 0; j < storageFields.length; j++){
-                resources.push(utils.getDataUrlFromStorage(instance[storageFields[j]]))
-            }
-
-            try {
-                await Promise.all(resources).then((res) => {
-                    for(let k = 0; k < res.length; k++){
-                        instance[storageFields[k]] = res[k]
-                    }
-                })
-            } catch (err) {
-                handleError(err, 'generateDocumentsError')
-                throw err
-            }
-
-            yield instance
-        }
-    }
-
-    static async getDocumentsCollection(queries = []){
-        const eventRef = collectionGroup(firebase.db, this.collection)
-        let q;
-        if(queries.length > 0){
-            q = query(eventRef, ...queries)
-        }else{
-            q = eventRef
-        }
-
-        try{
-            const snap = await getDocs(q)
-            return await Promise.all(utils.parseDocs(snap.docs).map(async (datum, idx) => {
-                const path = datum.doc.ref.path.split('/')
-                const parentId = path[path.length - 3]
-                const instance = new this()
-                await instance.setData(parentId, datum.id, datum, snap.docs[idx], false, false)
-                return instance
-            }))
-        }catch(err){
-            handleError(err, 'getDocumentsError')
-            throw err
-        }
-    }
-
-    static async getDocumentsCollectionWithStorageResource(queries = [], storageFields = [], loadInstance = false){
-        const eventRef = collectionGroup(firebase.db, this.collection)
-        let q;
-        if(queries.length > 0){
-            q = query(eventRef, ...queries)
-        }else{
-            q = eventRef
-        }
-
-        let snap
-        try {
-            snap = await getDocs(q)
-        } catch (err) {
-            handleError(err, 'getDocumentsError')
-            throw err
-        }
-        const docs = Object.values(snap.docs)
-        const results = []
-        for(let i = 0; i < docs.length; i++){
-            const data = docs[i].data()
-            const path = docs[i].ref.path.split('/')
-            const parentId = path[path.length - 3]
-            const resources = []
-
-            const instance = new this()
-            await instance.setData(parentId, docs[i].id, data, docs[i], false, loadInstance)
-            for(let j = 0; j < storageFields.length; j++){
-                resources.push(utils.getDataUrlFromStorage(instance[storageFields[j]]))
-            }
-
-            try {
-                await Promise.all(resources).then((res) => {
-                    for(let k = 0; k < res.length; k++){
-                        instance[storageFields[k]] = res[k]
-                    }
-                })
-            } catch (err) {
-                handleError(err, 'getDocumentsError')
-                throw err
-            }
-
-            results.push(instance)
-        }
-        return results
-    }
-
-    static async getDocumentsCollectionWithStorageResourceUrl(queries = [], storageFields = [], loadInstance = false){
-        const eventRef = collectionGroup(firebase.db, this.collection)
+    static async getDocumentsWithStorageResourceUrl(queries = [], storageFields = [], loadInstance = false){
+        const eventRef = collection(this.db, this.collection)
         let q;
         if(queries.length > 0){
             q = query(eventRef, ...queries)
@@ -689,20 +415,21 @@ export default class{
         } catch (err) {
             handleError(err, 'getDocumentsError')
             throw err
+        }
+        if(snap.empty){
+            return []
         }
         const docs = Object.values(snap.docs)
         const events = []
         for(let i = 0; i < docs.length; i++){
             const data = docs[i].data()
-            const path = docs[i].ref.path.split('/')
-            const parentId = path[path.length - 3]
             const resources = []
 
             data.doc = docs[i]
             data.id = docs[i].id
 
             const instance = new this()
-            await instance.setData(parentId, data.id, data, data.doc, false, loadInstance)
+            await instance.setData(data.id, data, data.doc, false, loadInstance)
 
             for(let j = 0; j < storageFields.length; j++){
                 resources.push(utils.getResourceUrlFromStorage(instance[storageFields[j]]))
@@ -725,6 +452,144 @@ export default class{
         return events
     }
 
+    static async getDocumentsWithStorageResource(queries = [], storageFields = [], loadInstance = false){
+        const eventRef = collection(this.db, this.collection)
+        let q;
+        if(queries.length > 0){
+            q = query(eventRef, ...queries)
+        }else{
+            q = eventRef
+        }
+        let snap
+        try {
+            snap = await getDocs(q)
+        } catch (err) {
+            handleError(err, 'getDocumentsError')
+            throw err
+        }
+        if(snap.empty){
+            return []
+        }
+        const docs = Object.values(snap.docs)
+        const events = []
+        for(let i = 0; i < docs.length; i++){
+            const data = docs[i].data()
+            const resources = []
+
+            data.doc = docs[i]
+            data.id = docs[i].id
+
+            const instance = new this()
+            await instance.setData(data.id, data, data.doc, false, loadInstance)
+
+            for(let j = 0; j < storageFields.length; j++){
+                resources.push(utils.getDataUrlFromStorage(instance[storageFields[j]]))
+            }
+
+            try {
+                await Promise.all(resources).then((resource) => {
+                    for(let k = 0; k < resource.length; k++){
+                        instance[storageFields[k]] = resource[k]
+                    }
+                })
+            } catch (err) {
+                handleError(err, 'getDocumentsError')
+                throw err
+            }
+            // data.doc = docs[i]
+            // data.id = docs[i].id
+            events.push(instance)
+        }
+        return events
+    }
+
+    static async * generateDocumentsWithStorageResourceUrl(queries = [], storageFields = [], loadInstance = false){
+        const eventRef = collection(this.db, this.collection)
+        let q;
+        if(queries.length > 0){
+            q = query(eventRef, ...queries)
+        }else{
+            q = eventRef
+        }
+
+        let snap
+        try {
+            snap = await getDocs(q)
+        } catch (err) {
+            handleError(err, 'generateDocumentsError')
+            throw err
+        }
+        if(snap.empty){
+            return []
+        }
+        const docs = Object.values(snap.docs)
+        for(let i = 0; i < docs.length; i++){
+            const data = docs[i].data()
+            const resources = []
+
+            data.doc = docs[i]
+            data.id = docs[i].id
+
+            const instance = new this()
+            await instance.setData(data.id, data, data.doc, false, loadInstance)
+
+            for(let j = 0; j < storageFields.length; j++){
+                resources.push(utils.getResourceUrlFromStorage(instance[storageFields[j]]))
+            }
+
+            await Promise.all(resources).then((res) => {
+                for(let k = 0; k < res.length; k++){
+                    instance[storageFields[k]] = res[k]
+                }
+            })
+
+            yield instance
+        }
+    }
+
+    static async * generateDocumentsWithStorageResource(queries = [], storageFields = [], loadInstance = false){
+        const eventRef = collection(this.db, this.collection)
+        let q;
+        if(queries.length > 0){
+            q = query(eventRef, ...queries)
+        }else{
+            q = eventRef
+        }
+
+        let snap
+        try {
+            snap = await getDocs(q)
+        } catch (err) {
+            handleError(err, 'generateDocumentsError')
+            throw err
+        }
+        if(snap.empty){
+            return []
+        }
+        const docs = Object.values(snap.docs)
+        for(let i = 0; i < docs.length; i++){
+            const data = docs[i].data()
+            const resources = []
+
+            data.doc = docs[i]
+            data.id = docs[i].id
+
+            const instance = new this()
+            await instance.setData(data.id, data, data.doc, false, loadInstance)
+            for(let j = 0; j < storageFields.length; j++){
+                resources.push(utils.getDataUrlFromStorage(instance[storageFields[j]]))
+            }
+
+            await Promise.all(resources).then((res) => {
+                for(let k = 0; k < res.length; k++){
+                    instance[storageFields[k]] = res[k]
+                }
+            })
+
+            yield instance
+        }
+    }
+
     static resolve(collectionPath){
         const path = collectionPath.split('/')
         const fname = path[path.length - 1].split('.')
@@ -732,12 +597,9 @@ export default class{
         fname.pop()
         Object.defineProperty(fun, "name", { value: fname.join('') });
         return fun
-        // const path = collectionPath.split('/')
-        // const fname = path[path.length - 1].split('.')
-        // fname.pop()
         // return {
         //     name: fname.join(''),
-        //     type: 'subcollection',
+        //     type: 'collection',
         // }
     }
 }

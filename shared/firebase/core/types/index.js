@@ -1,4 +1,4 @@
-import firebase from '../firebase.js'
+import firebase from '../../firebase.js'
 import { ref, uploadBytes } from "firebase/storage";
 import { collection, setDoc, addDoc } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
@@ -110,4 +110,14 @@ export class InstanceProjection{
     }
 }
 
-export default {Subdoc, LongText, ProfilePicture, StorageLink, InstanceProjectionArray, InstanceProjection}
+export class InternalURL{}
+
+export class ExternalURL{}
+
+export class Flex{
+    constructor(possibleTypes){
+        this.possibleTypes = possibleTypes
+    }
+}
+
+export default {Flex, Subdoc, LongText, ProfilePicture, StorageLink, InstanceProjectionArray, InstanceProjection, InternalURL, ExternalURL}

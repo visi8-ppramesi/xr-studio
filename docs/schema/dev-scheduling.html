@@ -55,6 +55,11 @@
                         STOR1[setup storage] --> STOR2[create folders]
                     end
 
+                    subgraph auth
+                        direction TB
+                        AUTH1[setup auth] --> AUTH2[do stuff]
+                    end
+
                     subgraph user_frontend
                         direction TB
                         UF1[design] --> UF2[Dashboard]
@@ -101,11 +106,6 @@
                         AF1 --> AF7[site settings]
                     end
 
-                    subgraph auth
-                        direction TB
-                        AUTH1[setup auth] --> AUTH2[do stuff]
-                    end
-
                     %% subgraph assets
                     %%     direction TB
                     %%     A1 --> A2
@@ -116,6 +116,7 @@
                         subgraph asset
                             direction TB
                             UFA1 --> ASUB1[asset manager]
+                            AF5 --> ASUB1
                             %% ASUB1 --> ASUB2[asset service]
                         end
                     %% end
