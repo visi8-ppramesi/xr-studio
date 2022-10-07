@@ -1,8 +1,8 @@
-import firebase from '../firebase.js'
+import firebase from '../../firebase.js'
 // import { collection, orderBy, startAt, endAt, query, getDocs } from 'firebase/firestore'
 import { getDownloadURL, getBlob as getStorageBlob, ref } from 'firebase/storage'
 // import router from '../../router/index.js'
-import emitter from '@/utils/emitter.js'
+import emitter from '../../../emitter/index'
 // import geofire from 'geofire-common'
 
 let medias = {}

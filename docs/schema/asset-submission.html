@@ -56,11 +56,11 @@
 						<div class="mermaid">
 								sequenceDiagram
 										Admin ->> AdminFrontEnd: check submission notifications
-										AdminFrontEnd ->> SubmissionManager: yo is there submission form to process?
-										SubmissionManager ->> DB: fetch admin notif
+										AdminFrontEnd ->> NotificationService: yo is there submission form to process?
+										NotificationService ->> DB: fetch admin notif
 										alt there's notifs
 												rect rgb(190, 220, 255)
-												SubmissionManager ->> AdminFrontEnd: there's notifs
+												NotificationService ->> AdminFrontEnd: there's notifs
 												AdminFrontEnd ->> Admin: Yo process these submissions
 												Admin -->> Admin: process submissions forms
 												alt submission accepted

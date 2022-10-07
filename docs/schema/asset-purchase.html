@@ -83,7 +83,7 @@
                     participant PaymentGatewayManager
                     participant 3rdPartyPaymentGateway
                     participant AssetsManager
-                    participant MailerManager
+                    participant MailerService
                     participant PubSub
                     participant OrderService
                     participant PaymentService
@@ -94,17 +94,18 @@
                     FrontEnd ->> Client: shows cart, asks for<br /> payment info, pick payment<br /> method
                     alt manual purchase (email puchase, shows contact-us like page)
                         Client ->> FrontEnd: write contact email<br /> to contact admin
+                        FrontEnd ->> AssetsManager: send data
+                        AssetsManager ->> PubSub: trigger manual-purchase-trigger
                         par
-                            FrontEnd ->> AssetsManager: send data from cart
-                            AssetsManager ->> PubSub: create order
+                            %% FrontEnd ->> AssetsManager: send data from cart
+                            %% AssetsManager ->> PubSub: create order
                             PubSub ->> OrderService: create order
                             OrderService ->> DB: create order, payment <br />method empty, status [unpaid, <br />no shoot set, talking to <br />admin]
-                            AssetsManager ->> FrontEnd: 👍
                         and
-                            FrontEnd ->> MailerManager: send data
-                            MailerManager ->> Admin: send email
-                            MailerManager ->> FrontEnd: 👍
+                            PubSub ->> MailerService: send data
+                            MailerService ->> Admin: send email
                         end
+                        AssetsManager ->> FrontEnd: 👍
                         FrontEnd ->> Client: 👍
                         note over Client: client is then asked to wait <br />for response from admin for schooting <br />schedule, assets price negotiation
                     else web purchase (cc, other stuff)
@@ -119,6 +120,7 @@
                             %% OrderService ->> OrderService: create payment object
                             PubSub ->> PaymentService: create payment
                             PaymentService ->> DB: create payment object
+                            PubSub ->> MailerService: send email to client
                             FrontEnd ->> Client: 👍
                             note over Client: client is then asked to <br />schedule shooting now <br />or later
                         else failed

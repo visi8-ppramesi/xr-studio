@@ -1,5 +1,5 @@
 import firebase from '../firebase.js'
-import Subcollection from './Subcollection.js';
+import Subcollection from './subcollection.js';
 import {
     DocumentSnapshot,
     doc,
@@ -17,7 +17,7 @@ import {
 } from "firebase/firestore";
 import utils from './utils/index.js'
 import types, { LongText, ProfilePicture, InstanceProjectionArray, StorageLink, InstanceProjection } from './types/index.js';
-import handleError from '@/utils/handleError.js';
+import handleError from './utils/errorHandler';
 // import _ from 'lodash'
 import isNil from 'lodash/isNil'
 import isEmpty from 'lodash/isEmpty'
