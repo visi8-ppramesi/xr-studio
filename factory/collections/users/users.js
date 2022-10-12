@@ -1,11 +1,14 @@
-const { faker } = require('@faker-js/faker')
+const faker = require('../../utils/faker')
 const Factory = require('../factory.js')
 const { generateKey } = require('../../utils/crypto')
+const _ = require('lodash')
 
 module.exports = class UserFactory extends Factory{
     static collectionName = 'users'
     constructor(){
         super('users')
+        this.publicKey = null
+        this.encryptedPrivateKey = null
     }
 
     static async createData(){
@@ -26,7 +29,9 @@ module.exports = class UserFactory extends Factory{
     }
 
     async createDoc(){
-        const data = await this.createData()
+        const data = await this.constructor.createData()
+        this.publicKey = data.public_key
+        this.encryptedPrivateKey = data.encrypted_private_key
         let userUid = this.constructor.createId()
         const settedDoc = await this.auth.createUser({
             uid: userUid,
@@ -35,15 +40,14 @@ module.exports = class UserFactory extends Factory{
             password: data['password'],
         }).then((newUser) => {
             userUid = newUser.user.uid
-            const newUserDocRef = this.db.collection(this.collectionName).doc(newUser.user.uid)
+            const newUserDocRef = this.db.collection(this.constructor.collectionName).doc(newUser.user.uid)
             let validatedUserData = Object.assign({}, data)
             delete validatedUserData['password']
             this.ref = newUserDocRef
-            return setDoc(newUserDocRef, validatedUserData)
+            return newUserDocRef.set(validatedUserData)
         }).then(() => {
-            console.log(userUid)
-            const userRoleRef = doc('user_roles', userUid)
-            return setDoc(userRoleRef, {roles: [ 'user', Math.random() > 0.5 ? 'creator' : 'client' ]})
+            const userRoleRef = this.db.collection('user_roles').doc(userUid)
+            return userRoleRef.set({ roles: [ 'user', Math.random() > 0.5 ? 'creator' : 'client' ]})
         })
 
         this.data = data
@@ -67,7 +71,7 @@ module.exports = class UserFactory extends Factory{
 
     async getRandomProjection(fields, userType = null){
         if(!_.isNil(userType)){
-            const rdDoc = this.getRandomUtypeDoc(userType)
+            const rdDoc = await this.getRandomUtypeDoc(userType)
             const ref = rdDoc.ref
             return {
                 ..._.pick(rdDoc.data(), fields),

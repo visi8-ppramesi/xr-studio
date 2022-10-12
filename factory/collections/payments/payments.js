@@ -1,4 +1,4 @@
-const { faker } = require('@faker-js/faker')
+const faker = require('../../utils/faker')
 const Factory = require('../factory.js')
 const { signMessage, stabilizeObject } = require('../../utils/crypto')
 
@@ -26,14 +26,14 @@ module.exports = class PaymentFactory extends Factory{
         const signature = await signMessage(toSignObj, privKey, '123qweasd')
         const toReturn = stabilizeObject({
             ...toSignObj,
-            signature: {userId, signature}
+            signature: {userId: sender, signature}
         })
 
         return toReturn
     }
 
-    async createDoc(sender, receiver, forObj, status, contracts, privKey, userId){
-        const data = await this.constructor.createData(sender, receiver, forObj, status, contracts, privKey, userId)
+    async createDoc(sender, receiver, forObj, status, contracts, privKey){
+        const data = await this.constructor.createData(sender, receiver, forObj, status, contracts, privKey)
         const {ref, id: newId} = this.buildNewDocRef()
         this.data = data
         this.ref = ref

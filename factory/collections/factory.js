@@ -8,16 +8,19 @@ const auth = admin.auth()
 
 module.exports = class Factory{
     static collectionName = ''
-    constructor(collectionPath, parent = null){
+    constructor(collectionPath){
         this.db = db
         this.storage = storage
         this.auth = auth
-        this.parent = parent
         this.collectionPath = collectionPath
         this.children = []
         this.data = null
         this.ref = null
         this.id = null
+    }
+
+    setCollectionPath(collectionPath){
+        this.collectionPath = collectionPath
     }
 
     static async createData(){
@@ -68,7 +71,7 @@ module.exports = class Factory{
         const factories = []
         for(let i = 0; i < instanceNum; i++){
             const instance = new this()
-            instance.createDoc()
+            await instance.createDoc()
             factories.push(instance)
         }
         return factories
@@ -76,17 +79,17 @@ module.exports = class Factory{
 
     async createSubDoc(child){
         const childInstance = new child([this.constructor.collectionName, this.id], this)
-        childInstance.createDoc()
+        await childInstance.createDoc()
         this.children.push(childInstance)
         return childInstance
     }
 
     async createSubDocs(children){
-        return children.map(this.createSubDoc)
+        return await children.map(this.createSubDoc)
     }
 
     async getRandomProjection(fields){
-        const rdDoc = this.getRandomDoc()
+        const rdDoc = await this.getRandomDoc()
         const ref = rdDoc.ref
         return {
             ..._.pick(rdDoc.data(), fields),

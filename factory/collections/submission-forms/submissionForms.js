@@ -1,4 +1,4 @@
-const { faker } = require('@faker-js/faker')
+const faker = require('../../utils/faker')
 const Factory = require('../factory.js')
 const UserFactory = require('../users/users')
 
@@ -11,7 +11,7 @@ module.exports = class SubmissionFormFactory extends Factory{
     static async createData(asset){
         const userFactory = new UserFactory()
         return {
-            user: userFactory.getRandomReference(),
+            user: await userFactory.getRandomReference(),
             description: faker.lorem.paragraphs(10),
             preview_urls: 'gs://xr-studio-a9c5e.appspot.com/alan_moore.jpg',
             current_status: ['not-processed', 'not-checked'],
@@ -29,7 +29,7 @@ module.exports = class SubmissionFormFactory extends Factory{
         }
     }
 
-    async createDoc(asset){
+    async createDoc(asset, id = null){
         const data = await this.constructor.createData(asset)
         const {ref, id: newId} = this.buildNewDocRef(id)
         this.data = data

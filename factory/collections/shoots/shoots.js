@@ -1,4 +1,4 @@
-const { faker } = require('@faker-js/faker')
+const faker = require('../../utils/faker')
 const Factory = require('../factory.js')
 const AssetFactory = require('../assets/assets')
 const UserFactory = require('../users/users')
@@ -32,32 +32,32 @@ module.exports = class ShootFactory extends Factory{
                     note: 'started',
                     status: 'unpaid',
                     date: new Date().setDate(new Date().getDate() - 365),
-                    processed_by: userFactory.getRandomReference()
+                    processed_by: await userFactory.getRandomReference()
                 },
                 {
                     note: 'something happened',
                     status: 'unpaid',
                     date: new Date().setDate(new Date().getDate() - 200),
-                    processed_by: userFactory.getRandomReference()
+                    processed_by: await userFactory.getRandomReference()
                 },
                 {
                     note: 'shoot paid',
                     status: 'paid',
                     date: new Date().setDate(new Date().getDate() - 100),
-                    processed_by: userFactory.getRandomReference()
+                    processed_by: await userFactory.getRandomReference()
                 },
                 {
                     note: 'greenlit',
                     status: 'go-ahead',
                     date: new Date().setDate(new Date().getDate() - 50),
-                    processed_by: userFactory.getRandomReference()
+                    processed_by: await userFactory.getRandomReference()
                 },
             ],
-            procedure_type: procedureTypeFactory.getRandomReference()
+            procedure_type: await procedureTypeFactory.getRandomReference()
         }
     }
 
-    async createDoc(order){
+    async createDoc(order, id = null){
         const data = await this.constructor.createData(order)
         const {ref, id: newId} = this.buildNewDocRef(id)
         this.data = data

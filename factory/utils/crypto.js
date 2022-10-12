@@ -3,7 +3,7 @@ const _ = require('lodash')
 const stringify = require('fast-json-stable-stringify');
 
 const stabilizeObject = (obj) => {
-    JSON.parse(stringify(obj))
+    return JSON.parse(stringify(obj))
 }
 
 const enc = new TextEncoder();
@@ -19,9 +19,9 @@ const hash = async (obj) => {
     return Buffer.from(hashBytes).toString("base64")
 }
 
-const buff_to_base64 = (buff) => Buffer.from(buff).toString('base64')
+const buffToBase64 = (buff) => Buffer.from(buff).toString('base64')
 
-const base64_to_buf = (b64) => new Uint8Array(Buffer.from(b64, 'base64'))
+const base64ToBuf = (b64) => new Uint8Array(Buffer.from(b64, 'base64'))
 
 const getPasswordKey = async (password) =>
     crypto.webcrypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, [
@@ -44,7 +44,7 @@ const deriveKey = async (passwordKey, salt, keyUsage) =>
 
 const decrypt = async (encryptedData, password) => {
     try {
-        const encryptedDataBuff = base64_to_buf(encryptedData);
+        const encryptedDataBuff = base64ToBuf(encryptedData);
         const salt = encryptedDataBuff.slice(0, 16);
         const iv = encryptedDataBuff.slice(16, 16 + 12);
         const data = encryptedDataBuff.slice(16 + 12);
@@ -87,7 +87,7 @@ const encrypt = async (secretData, password) => {
         buff.set(salt, 0);
         buff.set(iv, salt.byteLength);
         buff.set(encryptedContentArr, salt.byteLength + iv.byteLength);
-        const base64Buff = buff_to_base64(buff);
+        const base64Buff = buffToBase64(buff);
         return base64Buff;
     } catch (e) {
         console.log(`Error - ${e}`);
@@ -109,12 +109,15 @@ const signMessage = async (message, privKey, pass = null) => {
     const encoded = enc.encode(message)
     const keyObject = await crypto.webcrypto.subtle.importKey('jwk', privKey, { name: "ECDSA", namedCurve: "P-384" }, true, ['sign'])
     const signature = await crypto.webcrypto.subtle.sign({ name: "ECDSA", hash: { name: "SHA-384" }}, keyObject, encoded)
-    return signature
+    return Buffer.from(signature).toString('base64')
 }
 
 const verifySignature = async (message, signature, publicKey) => {
     if(_.isString(publicKey)){
         publicKey = JSON.parse(publicKey)
+    }
+    if(_.isString(signature)){
+        signature = Buffer.from(signature, 'base64')
     }
 
     const encoded = enc.encode(message)

@@ -1,14 +1,14 @@
 const Factory = require('../factory.js')
 
 module.exports = class AssetContractFactory extends Factory{
-    static collectionName = 'assets'
+    static collectionName = 'assets_contracts'
     constructor(){
-        super('assets')
+        super('assets_contracts')
     }
 
     static async createData(contract){
         return {
-            contract: contract
+            contract
         }
     }
 

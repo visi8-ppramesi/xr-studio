@@ -1,6 +1,7 @@
-const { faker } = require('@faker-js/faker')
+const faker = require('../../../utils/faker')
 const Factory = require('../../factory.js')
 const { hash, signMessage, stabilizeObject } = require('../../../utils/crypto')
+const _ = require('lodash')
 
 function randomDate(start, end) {
     return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
@@ -9,8 +10,8 @@ function randomDate(start, end) {
 module.exports = class ContractVersionFactory extends Factory{
     static collectionName = 'contract_versions'
     constructor(parent){
-        parent.push(this.constructor.collectionName)
-        super(parent)
+        super()
+        this.setCollectionPath([...parent, this.constructor.collectionName])
     }
 
     static async createPlainData(){
@@ -46,14 +47,14 @@ module.exports = class ContractVersionFactory extends Factory{
     }
 
     static async createData(version, status, previousVersion, previousHash, previousSignatures, privKey, userId){
-        const plainData = this.createPlainData()
+        const plainData = await this.createPlainData()
         const currentHash = await hash(plainData)
         const toSign = {
             ...plainData, 
             current_hash: currentHash, 
             version, 
             status, 
-            signatures: previousSignatures
+            signatures: [...previousSignatures]
         }
         if(!_.isNil(previousHash)){
             toSign['previous_hash'] = previousHash
@@ -86,6 +87,6 @@ module.exports = class ContractVersionFactory extends Factory{
         this.data = data
         this.ref = ref
         this.id = newId
-        return { refPromise: ref.set(data), data, ref, id: newId }
+        return { refPromise: await ref.set(data), data, ref, id: newId }
     }
 }

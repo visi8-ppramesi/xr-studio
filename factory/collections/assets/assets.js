@@ -1,4 +1,4 @@
-const { faker } = require('@faker-js/faker')
+const faker = require('../../utils/faker')
 const Factory = require('../factory.js')
 const UserFactory = require('../users/users')
 

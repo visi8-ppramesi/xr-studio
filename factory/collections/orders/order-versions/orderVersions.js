@@ -1,16 +1,17 @@
-const { faker } = require('@faker-js/faker')
+const faker = require('../../../utils/faker')
 const Factory = require('../../factory.js')
 const { hash, signMessage, stabilizeObject } = require('../../../utils/crypto')
+const _ = require('lodash')
 
 function randomDate(start, end) {
     return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 }
 
 module.exports = class OrderVersionFactory extends Factory{
-    static collectionName = 'contract_versions'
+    static collectionName = 'order_versions'
     constructor(parent){
-        parent.push(this.constructor.collectionName)
-        super(parent)
+        super()
+        this.setCollectionPath([...parent, this.constructor.collectionName])
     }
 
     static async createPlainData(){
@@ -30,7 +31,7 @@ module.exports = class OrderVersionFactory extends Factory{
         return {
             items: items,
             itemized_price: itemizedPrice,
-            total_price: total,
+            total_price: Math.round(total * 100) / 100,
             tax: 0,
             payment_method: 'credit-card',
             location: 'test'
@@ -38,14 +39,14 @@ module.exports = class OrderVersionFactory extends Factory{
     }
 
     static async createData(version, status, previousVersion, previousHash, previousSignatures, privKey, userId, shoot = null){
-        const plainData = this.createPlainData()
+        const plainData = await this.createPlainData()
         const currentHash = await hash(plainData)
         const toSign = {
             ...plainData, 
             current_hash: currentHash, 
             version, 
             status, 
-            signatures: previousSignatures
+            signatures: [...previousSignatures]
         }
         if(!_.isNil(previousHash)){
             toSign['previous_hash'] = previousHash
@@ -84,6 +85,6 @@ module.exports = class OrderVersionFactory extends Factory{
         this.data = data
         this.ref = ref
         this.id = newId
-        return { refPromise: ref.set(data), data, ref, id: newId }
+        return { refPromise: await ref.set(data), data, ref, id: newId }
     }
 }
