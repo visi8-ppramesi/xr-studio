@@ -5,6 +5,7 @@ const ContractVersionFactory = require('./contract-versions/contractVersions')
 
 module.exports = class ContractFactory extends Factory{
     static collectionName = 'contracts'
+    static subcollections = [ContractVersionFactory]
     constructor(){
         super('contracts')
         this.subjects = []

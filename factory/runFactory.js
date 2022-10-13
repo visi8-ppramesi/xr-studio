@@ -26,7 +26,17 @@ dep.set(SubmissionFormFactory, [UserFactory, AssetFactory])
 dep.set(PaymentFactory, [UserFactory, OrderFactory, ShootFactory, ContractFactory])
 dep.set(ShootFactory, [AssetFactory, UserFactory, ProcedureTypeFactory])
 
-module.exports = async () => {
+const resetCollections = async () => {
+    const factories = [UserFactory, ContractTemplateFactory, ProcedureTypeFactory, AssetFactory, AssetContractFactory,
+    ContractFactory, OrderFactory, SubmissionFormFactory, PaymentFactory, ShootFactory]
+    const clearPromises = factories.map(factory => {
+        const fact = new factory()
+        return fact.clearCollections()
+    })
+    return Promise.all(clearPromises)
+}
+
+const buildCollections = async () => {
     const users = await UserFactory.createDocs(50)
     const contract_templates = await ContractTemplateFactory.createDocs(10)
     const procedure_types = await ProcedureTypeFactory.createDocs(10)
@@ -70,8 +80,8 @@ module.exports = async () => {
     const payments = []
     for (let j = 0; j < 10; j++) {
         const payment = new PaymentFactory()
-        const randomUser1 = users[Math.round(Math.random() * users.length)]
-        const randomUser2 = users[Math.round(Math.random() * users.length)]
+        const randomUser1 = users[Math.floor(Math.random() * users.length)]
+        const randomUser2 = users[Math.floor(Math.random() * users.length)]
         const randomContract = contracts[Math.floor(Math.random() * contracts.length)]
         payment.createDoc(randomUser1.ref, randomUser2.ref, null, 'paid', randomContract.ref, randomUser1.encryptedPrivateKey)
         payments.push(payment)
@@ -84,3 +94,10 @@ module.exports = async () => {
         assets_contracts, payments
     }
 }
+
+exports.runFactory = async () => {
+    await resetCollections().then(buildCollections)
+}
+
+exports.resetCollections = resetCollections
+exports.buildCollections = buildCollections

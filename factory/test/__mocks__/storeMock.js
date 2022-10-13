@@ -1,5 +1,15 @@
 const cloneDeep = require('lodash/cloneDeep')
-const initData = {}
+const _ = require('lodash')
+const fs = require('fs')
+const path = require('path')
+const dataPath = path.resolve('test', 'result', 'generatedData.json')
+let initData = {}
+if(fs.existsSync(dataPath)){
+    const genData = fs.readFileSync(dataPath, {encoding: 'utf-8'})
+    if(genData.length > 0){
+        initData = JSON.parse(genData)
+    }
+}
 
 class Store{
     constructor(initState = null, indices = null){
@@ -24,6 +34,9 @@ class Store{
 
     getState(paths){
         let data = this.state[paths[0]]
+        if(_.isNil(data)){
+            return null
+        }
         for(let i = 1; i < paths.length; i++){
             if(paths[i] === '*'){
                 if(i === paths.length - 1){

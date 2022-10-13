@@ -5,6 +5,7 @@ const OrderVersionFactory = require('./order-versions/orderVersions')
 
 module.exports = class OrderFactory extends Factory{
     static collectionName = 'orders'
+    static subcollections = [OrderVersionFactory]
     constructor(){
         super('orders')
         this.subjects = []

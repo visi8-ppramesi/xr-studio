@@ -67,6 +67,33 @@ module.exports = class Factory{
         return ref.set(data)
     }
 
+    async clearCollections(){
+        const snap = await this.buildCollectionRef().get()
+        if(snap.empty){
+            return
+        }
+        const delPromises = Object.values(snap.docs).reduce((acc, doc) => {
+            const ref = doc.ref
+            if(ref.id.startsWith('ft-')){
+                if(!_.isNil(this.constructor.subcollections) && _.isArray(this.constructor.subcollections)){
+                    const innerPromises = this.constructor.subcollections.reduce((innerAcc, subcollectionFactory) => {
+                        const factory = new subcollectionFactory([this.constructor.collectionName, ref.id])
+                        innerAcc.push(factory.clearCollections())
+                        return innerAcc
+                    }, [])
+                    acc.push(Promise.all(innerPromises).then(() => {
+                        return ref.delete()
+                    }))
+                }else{
+                    acc.push(ref.delete())
+                }
+            }
+            return acc
+        }, [])
+        const results = await Promise.all(delPromises)
+        return results
+    }
+
     static async createDocs(instanceNum){
         const factories = []
         for(let i = 0; i < instanceNum; i++){

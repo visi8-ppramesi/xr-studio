@@ -6,20 +6,35 @@ class Collection{
         this.path = path
     }
 
-    async get(){
-        const self = this
-        const data = store.getState(this.path)
+    get ref(){
+        return this
+    }
 
-        return Object.keys(data).map((key) => {
+    async get(){
+        const data = store.getState(this.path)
+        if(_.isNil(data)){
+            return {
+                empty: true
+            }
+        }
+
+        const docs = Object.keys(data).map((key) => {
             const myDoc = new Doc([...this.path, key])
             return {
                 data(){
                     return data[key]
                 },
                 id: key,
-                ref: myDoc.ref()
+                ref: myDoc.ref
             }
         })
+        return {
+            docs,
+            forEach(fun){return docs.forEach(fun)},
+            map(fun){return docs.map(fun)},
+            reduce(fun){return docs.reduce(fun)},
+            empty: false
+        }
     }
 
     async set(data){
@@ -38,10 +53,6 @@ class Collection{
         return this
     }
 
-    ref(){
-        return this
-    }
-
     delete(){
         store.deleteState(this.path)
     }
@@ -56,6 +67,10 @@ class Doc{
         return this.path[this.path.length - 1]
     }
 
+    get ref(){
+        return this
+    }
+
     async get(){
         const self = this
         return {
@@ -63,7 +78,7 @@ class Doc{
                 return store.getState(self.path)
             },
             id: this.path[this.path.length - 1],
-            ref: self.ref()
+            ref: self.ref
         }
     }
 
@@ -75,12 +90,12 @@ class Doc{
         store.setState(this.path, data, true)
     }
 
-    static buildNew(path){
-        return new this(path)
+    async delete(){
+        store.deleteState(this.paths)
     }
 
-    ref(){
-        return this
+    static buildNew(path){
+        return new this(path)
     }
 
     delete(){

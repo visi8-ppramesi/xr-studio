@@ -1,11 +1,26 @@
+const script = `
+//nodejs
 const crypto = require('crypto')
-const _ = require('lodash')
+const isObject = require('lodash/isObject')
+const isArray = require('lodash/isArray')
+const isNil = require('lodash/isNil')
+const isString = require('lodash/isString')
 const stringify = require('fast-json-stable-stringify');
 const webcrypto = crypto.webcrypto
+//nodejs end
+
+//browser
+import _ from 'lodash'
+import stringify from 'fast-json-stable-stringify';
+import isObject from 'lodash/isObject'
+import isArray from 'lodash/isArray'
+import isNil from 'lodash/isNil'
+import isString from 'lodash/isString'
+const webcrypto = window.crypto
+//browser end
 
 const SALT_LENGTH = 16
 const IV_LENGTH = 12
-
 const stabilizeObject = (obj) => {
     return JSON.parse(stringify(obj))
 }
@@ -14,7 +29,7 @@ const enc = new TextEncoder();
 const dec = new TextDecoder();
 
 const hash = async (obj) => {
-    if(_.isObject(obj) || _.isArray(obj)) {
+    if (isObject(obj) || isArray(obj)) {
         obj = stringify(obj)
     }
 
@@ -64,7 +79,7 @@ const decrypt = async (encryptedData, password) => {
         );
         return dec.decode(decryptedContent);
     } catch (e) {
-        console.log(`Error - ${e}`);
+        console.log(\`Error - \${e}\`);
         return "";
     }
 }
@@ -94,19 +109,19 @@ const encrypt = async (secretData, password) => {
         const base64Buff = buffToBase64(buff);
         return base64Buff;
     } catch (e) {
-        console.log(`Error - ${e}`);
+        console.log(\`Error - \${e}\`);
         return "";
     }
 }
 
 const signMessage = async (message, privKey, pass = null) => {
-    if (!_.isNil(pass) && _.isString(privKey)) {
+    if (!isNil(pass) && isString(privKey)) {
         privKey = await decrypt(privKey, pass)
     }
-    if (_.isString(privKey)) {
+    if (isString(privKey)) {
         privKey = JSON.parse(privKey)
     }
-    if (_.isObject(message) || _.isArray(message)) {
+    if (isObject(message) || isArray(message)) {
         message = stringify(message)
     }
 
@@ -117,13 +132,13 @@ const signMessage = async (message, privKey, pass = null) => {
 }
 
 const verifySignature = async (message, signature, publicKey) => {
-    if (_.isString(publicKey)) {
+    if (isString(publicKey)) {
         publicKey = JSON.parse(publicKey)
     }
-    if (_.isString(signature)) {
+    if (isString(signature)) {
         signature = Buffer.from(signature, 'base64')
     }
-    if (_.isObject(message) || _.isArray(message)) {
+    if (isObject(message) || isArray(message)) {
         message = stringify(message)
     }
 
@@ -133,7 +148,7 @@ const verifySignature = async (message, signature, publicKey) => {
     return verified
 }
 
-exports.generateKey = (pass) => new Promise((resolve, reject) => {
+const generateKey = (pass) => new Promise((resolve, reject) => {
     webcrypto.subtle.generateKey(
         {
             name: "ECDSA",
@@ -155,9 +170,32 @@ exports.generateKey = (pass) => new Promise((resolve, reject) => {
     }).catch(reject)
 })
 
+//nodejs
+exports.generateKey = generateKey
 exports.encrypt = encrypt
 exports.decrypt = decrypt
 exports.hash = hash
 exports.verifySignature = verifySignature
 exports.signMessage = signMessage
 exports.stabilizeObject = stabilizeObject
+//nodejs end
+
+//browser
+export { generateKey, encrypt, decrypt, hash, verifySignature, signMessage, stabilizeObject }
+//browser end
+`
+
+const types = ['nodejs', 'browser']
+const path = require('path'), fs = require('fs')
+types.forEach((type) => {
+    if(type === 'nodejs'){
+        const formattedScript = script.replace(/^\/\/browser\s(.+\s)+\/\/browser end$/gm, '')
+        const filePath = path.resolve('shared', 'cryptography', 'nodejs', 'crypto.js')
+        fs.writeFileSync(filePath, formattedScript)
+    }else if(type === 'browser'){
+        const formattedScript = script.replace(/^\/\/nodejs\s(.+\s)+\/\/nodejs end$/gm, '')
+        const filePath = path.resolve('shared', 'cryptography', 'browser', 'crypto.js')
+        fs.writeFileSync(filePath, formattedScript)
+    }
+})
+process.exit(0)
