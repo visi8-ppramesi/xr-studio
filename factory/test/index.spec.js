@@ -1,7 +1,11 @@
-const { runFactory } = require('../runFactory')
+const { buildCollections, resetCollections } = require('../runFactory')
 const storeMock = require("./__mocks__/storeMock");
 const fs = require('fs')
 const path = require('path')
+
+const runFactory = async () => {
+    await resetCollections().then(buildCollections)
+}
 
 test('User Factory', async () => {
     await runFactory().then((fact) => {

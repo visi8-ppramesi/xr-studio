@@ -68,6 +68,12 @@ module.exports = class Factory{
     }
 
     async clearCollections(){
+        // try{
+        //     await db.recursiveDelete(this.buildCollectionRef())
+        //     return true
+        // }catch(error){
+        //     throw error
+        // }
         const snap = await this.buildCollectionRef().get()
         if(snap.empty){
             return
@@ -95,12 +101,14 @@ module.exports = class Factory{
     }
 
     static async createDocs(instanceNum){
+        console.log('creating ' + this.collectionName)
         const factories = []
         for(let i = 0; i < instanceNum; i++){
             const instance = new this()
             await instance.createDoc()
             factories.push(instance)
         }
+        console.log(this.collectionName + ' created')
         return factories
     }
 

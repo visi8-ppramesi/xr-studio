@@ -11,7 +11,8 @@ const webcrypto = crypto.webcrypto
 
 
 
-
+const SALT_LENGTH = 16
+const IV_LENGTH = 12
 const stabilizeObject = (obj) => {
     return JSON.parse(stringify(obj))
 }
@@ -55,9 +56,9 @@ const deriveKey = async (passwordKey, salt, keyUsage) =>
 const decrypt = async (encryptedData, password) => {
     try {
         const encryptedDataBuff = base64ToBuf(encryptedData);
-        const salt = encryptedDataBuff.slice(0, 16);
-        const iv = encryptedDataBuff.slice(16, 16 + 12);
-        const data = encryptedDataBuff.slice(16 + 12);
+        const salt = encryptedDataBuff.slice(0, SALT_LENGTH);
+        const iv = encryptedDataBuff.slice(SALT_LENGTH, SALT_LENGTH + IV_LENGTH);
+        const data = encryptedDataBuff.slice(SALT_LENGTH + IV_LENGTH);
         const passwordKey = await getPasswordKey(password);
         const aesKey = await deriveKey(passwordKey, salt, ["decrypt"]);
         const decryptedContent = await webcrypto.subtle.decrypt(
@@ -77,8 +78,8 @@ const decrypt = async (encryptedData, password) => {
 
 const encrypt = async (secretData, password) => {
     try {
-        const salt = webcrypto.getRandomValues(new Uint8Array(16));
-        const iv = webcrypto.getRandomValues(new Uint8Array(12));
+        const salt = webcrypto.getRandomValues(new Uint8Array(SALT_LENGTH));
+        const iv = webcrypto.getRandomValues(new Uint8Array(IV_LENGTH));
         const passwordKey = await getPasswordKey(password);
         const aesKey = await deriveKey(passwordKey, salt, ["encrypt"]);
         const encryptedContent = await webcrypto.subtle.encrypt(
@@ -128,6 +129,9 @@ const verifySignature = async (message, signature, publicKey) => {
     }
     if (isString(signature)) {
         signature = Buffer.from(signature, 'base64')
+    }
+    if (isObject(message) || isArray(message)) {
+        message = stringify(message)
     }
 
     const encoded = enc.encode(message)

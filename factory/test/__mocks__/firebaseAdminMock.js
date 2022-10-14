@@ -1,5 +1,6 @@
 const store = require('./storeMock')
 const _ = require('lodash')
+const { state } = require('./storeMock')
 
 class Collection{
     constructor(path){
@@ -128,6 +129,9 @@ module.exports = {
                     return Collection.buildNew([collName])
                 }
             },
+            recursiveDelete(ref){
+                store.deleteState(ref.path)
+            },
             store
         }
     },
@@ -140,9 +144,7 @@ module.exports = {
         return {
             async createUser({uid}){
                 return {
-                    user: {
-                        uid
-                    }
+                    uid
                 }
             }
         }

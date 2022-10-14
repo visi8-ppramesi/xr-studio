@@ -28,6 +28,37 @@ module.exports = class UserFactory extends Factory{
         }
     }
 
+    async clearCollections(){
+        const snap = await this.buildCollectionRef().get()
+        if(snap.empty){
+            return
+        }
+        const delPromises = Object.values(snap.docs).reduce((acc, doc) => {
+            const ref = doc.ref
+            if(ref.id.startsWith('ft-')){
+                const locPromises = []
+                locPromises.push(this.auth.deleteUser(ref.id))
+                locPromises.push(this.db.collection('user_roles').doc(ref.id))
+                if(!_.isNil(this.constructor.subcollections) && _.isArray(this.constructor.subcollections)){
+                    const innerPromises = this.constructor.subcollections.reduce((innerAcc, subcollectionFactory) => {
+                        const factory = new subcollectionFactory([this.constructor.collectionName, ref.id])
+                        innerAcc.push(factory.clearCollections())
+                        return innerAcc
+                    }, [])
+                    locPromises.push(Promise.all(innerPromises).then(() => {
+                        return ref.delete()
+                    }))
+                }else{
+                    locPromises.push(ref.delete())
+                }
+                acc.push(Promise.all(locPromises))
+            }
+            return acc
+        }, [])
+        const results = await Promise.all(delPromises)
+        return results
+    }
+
     async createDoc(){
         const data = await this.constructor.createData()
         this.publicKey = data.public_key
@@ -39,8 +70,8 @@ module.exports = class UserFactory extends Factory{
             emailVerified: false,
             password: data['password'],
         }).then((newUser) => {
-            userUid = newUser.user.uid
-            const newUserDocRef = this.db.collection(this.constructor.collectionName).doc(newUser.user.uid)
+            userUid = newUser.uid
+            const newUserDocRef = this.db.collection(this.constructor.collectionName).doc(newUser.uid)
             let validatedUserData = Object.assign({}, data)
             delete validatedUserData['password']
             this.ref = newUserDocRef
@@ -57,7 +88,7 @@ module.exports = class UserFactory extends Factory{
     }
 
     async getRandomUtypeDoc(userType){
-        const coll = this.db.collection('user_roles').where('types', 'array-contains', userType)
+        const coll = this.db.collection('user_roles').where('roles', 'array-contains', userType)
         const docs = await coll.get()
         const arr = []
         docs.forEach((doc) => {

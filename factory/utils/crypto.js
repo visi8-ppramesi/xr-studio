@@ -1,11 +1,18 @@
+
+//nodejs
 const crypto = require('crypto')
-const _ = require('lodash')
+const isObject = require('lodash/isObject')
+const isArray = require('lodash/isArray')
+const isNil = require('lodash/isNil')
+const isString = require('lodash/isString')
 const stringify = require('fast-json-stable-stringify');
 const webcrypto = crypto.webcrypto
+//nodejs end
+
+
 
 const SALT_LENGTH = 16
 const IV_LENGTH = 12
-
 const stabilizeObject = (obj) => {
     return JSON.parse(stringify(obj))
 }
@@ -14,7 +21,7 @@ const enc = new TextEncoder();
 const dec = new TextDecoder();
 
 const hash = async (obj) => {
-    if(_.isObject(obj) || _.isArray(obj)) {
+    if (isObject(obj) || isArray(obj)) {
         obj = stringify(obj)
     }
 
@@ -100,13 +107,13 @@ const encrypt = async (secretData, password) => {
 }
 
 const signMessage = async (message, privKey, pass = null) => {
-    if (!_.isNil(pass) && _.isString(privKey)) {
+    if (!isNil(pass) && isString(privKey)) {
         privKey = await decrypt(privKey, pass)
     }
-    if (_.isString(privKey)) {
+    if (isString(privKey)) {
         privKey = JSON.parse(privKey)
     }
-    if (_.isObject(message) || _.isArray(message)) {
+    if (isObject(message) || isArray(message)) {
         message = stringify(message)
     }
 
@@ -117,13 +124,13 @@ const signMessage = async (message, privKey, pass = null) => {
 }
 
 const verifySignature = async (message, signature, publicKey) => {
-    if (_.isString(publicKey)) {
+    if (isString(publicKey)) {
         publicKey = JSON.parse(publicKey)
     }
-    if (_.isString(signature)) {
+    if (isString(signature)) {
         signature = Buffer.from(signature, 'base64')
     }
-    if (_.isObject(message) || _.isArray(message)) {
+    if (isObject(message) || isArray(message)) {
         message = stringify(message)
     }
 
@@ -133,7 +140,7 @@ const verifySignature = async (message, signature, publicKey) => {
     return verified
 }
 
-exports.generateKey = (pass) => new Promise((resolve, reject) => {
+const generateKey = (pass) => new Promise((resolve, reject) => {
     webcrypto.subtle.generateKey(
         {
             name: "ECDSA",
@@ -155,9 +162,14 @@ exports.generateKey = (pass) => new Promise((resolve, reject) => {
     }).catch(reject)
 })
 
+//nodejs
+exports.generateKey = generateKey
 exports.encrypt = encrypt
 exports.decrypt = decrypt
 exports.hash = hash
 exports.verifySignature = verifySignature
 exports.signMessage = signMessage
 exports.stabilizeObject = stabilizeObject
+//nodejs end
+
+

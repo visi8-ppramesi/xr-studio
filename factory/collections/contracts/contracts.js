@@ -46,6 +46,7 @@ module.exports = class ContractFactory extends Factory{
     }
 
     async createSubDocs(revNum, userId, privateKey){
+        console.log('creating ' + this.constructor.collectionName + ' versions')
         let previousHash = null
         let previousVersion = null
         let previousSignatures = []
@@ -74,6 +75,7 @@ module.exports = class ContractFactory extends Factory{
             .doc(this.id)
             .update({ current_contract: ref, contract_fields: contractFields })
         
+        console.log(this.constructor.collectionName + ' versions created')
         return childInstances
     }
 }

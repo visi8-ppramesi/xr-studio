@@ -32,7 +32,8 @@ module.exports = class OrderFactory extends Factory{
         return ref.set(data)
     }
 
-    async createSubDocs(revNum, userId, privateKey, shoot){
+    async createSubDocs(revNum, userId, privateKey){
+        console.log('creating ' + this.constructor.collectionName + ' versions')
         let previousHash = null
         let previousVersion = null
         let previousSignatures = []
@@ -40,7 +41,7 @@ module.exports = class OrderFactory extends Factory{
         const childInstances = []
         for(let i = 1; i < revNum; i++){
             const newChildInstance = new OrderVersionFactory([this.constructor.collectionName, this.id])
-            const { refPromise, data, ref } = await newChildInstance.createDoc(i, 'unpaid', previousVersion, previousHash, previousSignatures, privateKey, userId, shoot)
+            const { refPromise, data, ref } = await newChildInstance.createDoc(i, 'unpaid', previousVersion, previousHash, previousSignatures, privateKey, userId)
             previousHash = data['previous_hash']
             previousSignatures = data['signatures']
             previousVersion = ref
@@ -48,7 +49,7 @@ module.exports = class OrderFactory extends Factory{
             childInstances.push(newChildInstance)
         }
         const lastChildInstance = new OrderVersionFactory([this.constructor.collectionName, this.id])
-        const { refPromise, data, ref } = await lastChildInstance.createDoc(revNum, 'unpaid', previousVersion, previousHash, previousSignatures, privateKey, userId, shoot)
+        const { refPromise, data, ref } = await lastChildInstance.createDoc(revNum, 'unpaid', previousVersion, previousHash, previousSignatures, privateKey, userId)
 
         childInstances.push(lastChildInstance)
 
@@ -56,7 +57,8 @@ module.exports = class OrderFactory extends Factory{
             .collection(this.constructor.collectionName)
             .doc(this.id)
             .update({ current_order: ref, order_fields: orderFields })
-
+        
+        console.log(this.constructor.collectionName + ' versions created')
         return childInstances
     }
 

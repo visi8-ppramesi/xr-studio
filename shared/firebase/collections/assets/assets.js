@@ -6,6 +6,7 @@ export default class extends Collection{
     static orderByParam = 'name'
     static fields = {
         name: String,
+        description: String,
         categories: Array,
         group: String,
         preview_url: StorageLink,

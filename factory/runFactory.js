@@ -12,19 +12,153 @@ const SubmissionFormFactory = require("./collections/submission-forms/submission
 const UserFactory = require("./collections/users/users")
 const _ = require('lodash')
 
-const dep = new Map()
-dep.set(UserFactory, [])
-dep.set(ContractTemplateFactory, [])
-dep.set(ProcedureTypeFactory, [])
-dep.set(AssetFactory, [UserFactory])
-dep.set(ContractFactory, [UserFactory])
-dep.set(OrderFactory, [UserFactory, ShootFactory])
-dep.set(AssetContractFactory, [AssetFactory, ContractFactory])
-dep.set(ContractVersionFactory, [UserFactory, ContractFactory])
-dep.set(OrderVersionFactory, [UserFactory, OrderFactory])
-dep.set(SubmissionFormFactory, [UserFactory, AssetFactory])
-dep.set(PaymentFactory, [UserFactory, OrderFactory, ShootFactory, ContractFactory])
-dep.set(ShootFactory, [AssetFactory, UserFactory, ProcedureTypeFactory])
+const factoryMap = new Map()
+factoryMap.set(UserFactory, {
+    dep: [],
+    buildFunc: ['createDocs', 10],
+})
+factoryMap.set(ContractTemplateFactory, {
+    dep: [],
+    buildFunc: ['createDocs', 5],
+})
+factoryMap.set(ProcedureTypeFactory, {
+    dep: [],
+    buildFunc: ['createDocs', 5],
+})
+factoryMap.set(AssetFactory, {
+    dep: [UserFactory],
+    buildFunc: ['createDocs', 5],
+})
+factoryMap.set(SubmissionFormFactory, {
+    dep: [UserFactory, AssetFactory],
+    buildFunc: async (context) => {
+        const submissionForms = []
+        const assets = context.get(AssetFactory).passValue
+        for(let i = 0; i < 5; i++){
+            const submissionForm = new SubmissionFormFactory()
+            await submissionForm.createDoc(assets[l].ref)
+            submissionForms.push(submissionForm)
+        }
+        return submissionForms
+    },
+})
+factoryMap.set(ContractFactory, {
+    dep: [UserFactory],
+    buildFunc: ['createDocs', 5]
+})
+factoryMap.set(ContractVersionFactory, {
+    dep: [UserFactory, ContractFactory],
+    buildFunc: async (context) => {
+        const contracts = context.get(ContractFactory).passValue
+        const contractVersions = {}
+        for(let k = 0; k < contracts.length; k++){
+            const person = contracts[k].subjects[Math.round(Math.random())]
+            const pkey = users.find(v => v.id == person.id).encryptedPrivateKey
+            contractVersions[contracts[k].id] = await contracts[k].createSubDocs(5, person.id, pkey)
+        }
+        return contractVersions
+    }
+})
+factoryMap.set(AssetContractFactory, {
+    dep: [AssetFactory, ContractFactory],
+    buildFunc: async (context) => {
+        const assets = context.get(AssetFactory).passValue
+        const contracts = context.get(ContractFactory).passValue
+        const shuffledAssets = _.shuffle(assets)
+        const shuffledContracts = _.shuffle(contracts)
+
+        const retVal = await Promise.all(shuffledAssets.map((ass, idx) => {
+            const acFactory = new AssetContractFactory()
+            return acFactory.createDoc(ass.id, shuffledContracts[idx].ref).then(v => {
+                return acFactory
+            })
+        }))
+        return retVal
+    }
+})
+factoryMap.set(OrderFactory, {
+    dep: [UserFactory, ShootFactory],
+    buildFunc: ['createDocs', 5]
+})
+factoryMap.set(OrderVersionFactory, {
+    dep: [UserFactory, OrderFactory],
+    buildFunc: async (context) => {
+        const orders = context.get(OrderFactory).passValue
+        const orderVersions = {}
+        for (let i = 0; i < orders.length; i++) {
+            const person = orders[i].subjects[Math.round(Math.random())]
+            const pkey = users.find(v => v.id == person.id).encryptedPrivateKey
+            orderVersions[orders[i].id] = await orders[i].createSubDocs(5, person.id, pkey)
+        }
+        return orderVersions
+    }
+})
+factoryMap.set(ShootFactory, {
+    dep: [AssetFactory, UserFactory, ProcedureTypeFactory],
+    buildFunc: async (context) => {
+        const orders = context.get(OrderFactory).passValue
+        const shoots = []
+        for (let i = 0; i < orders.length; i++) {
+            const shoot = new ShootFactory()
+            shoot.createDoc(orders[i].ref)
+            shoots.push(shoot)
+        }
+        return shoots
+    }
+})
+factoryMap.set(PaymentFactory, {
+    dep: [UserFactory, OrderFactory, ShootFactory, ContractFactory],
+    buildFunc: async (context) => {
+        const users = context.get(UserFactory).passValue
+        const payments = []
+        for (let j = 0; j < 5; j++) {
+            const payment = new PaymentFactory()
+            const randomUser1 = users[Math.floor(Math.random() * users.length)]
+            const randomUser2 = users[Math.floor(Math.random() * users.length)]
+            const randomContract = contracts[Math.floor(Math.random() * contracts.length)]
+            payment.createDoc(randomUser1.ref, randomUser2.ref, null, 'paid', randomContract.ref, randomUser1.encryptedPrivateKey)
+            payments.push(payment)
+        }
+        return payments
+    }
+})
+
+const runFactoryFromMap = async (factMap, context = null) => {
+    if(_.isNil(context)){
+        context = new Map()
+    }
+    for(const fact of factMap.keys()){
+        let result
+        const { dep, buildFunc } = factMap.get(fact)
+        const depCheck = dep.reduce((acc, v) => {
+            return acc && context.has(v)
+        }, true)
+        if(_.isNil(dep) || dep.length == 0 || depCheck){
+            if(_.isArray(buildFunc)){
+                const func = buildFunc.shift()
+                if(fact[func][Symbol.toStringTag] === 'AsyncFunction'){
+                    result = await fact[func](...buildFunc)
+                }else{
+                    result = fact[func](...buildFunc)
+                }
+            }else if(_.isFunction(buildFunc)){
+                if(buildFunc[Symbol.toStringTag] === 'AsyncFunction'){
+                    result = await buildFunc(context)
+                }else{
+                    result = buildFunc(context)
+                }
+            }
+            context.set(fact, {
+                passValue: result
+            })
+            factMap.delete(fact)
+        }
+    }
+    if(factMap.size > 0){
+        await runFactoryFromMap(factMap, context)
+    }
+    return context
+}
 
 const resetCollections = async () => {
     const factories = [UserFactory, ContractTemplateFactory, ProcedureTypeFactory, AssetFactory, AssetContractFactory,
@@ -37,19 +171,21 @@ const resetCollections = async () => {
 }
 
 const buildCollections = async () => {
-    const users = await UserFactory.createDocs(50)
-    const contract_templates = await ContractTemplateFactory.createDocs(10)
-    const procedure_types = await ProcedureTypeFactory.createDocs(10)
-    const assets = await AssetFactory.createDocs(10)
+    const users = await UserFactory.createDocs(10)
+    const contract_templates = await ContractTemplateFactory.createDocs(5)
+    const procedure_types = await ProcedureTypeFactory.createDocs(5)
+    const assets = await AssetFactory.createDocs(5)
 
     const submission_forms = []
     for (let l = 0; l < assets.length; l++) {
+        console.log('creating submission_form')
         const submissionForm = new SubmissionFormFactory()
         await submissionForm.createDoc(assets[l].ref)
         submission_forms.push(submissionForm)
+        console.log('submission_form created')
     }
 
-    const contracts = await ContractFactory.createDocs(10)
+    const contracts = await ContractFactory.createDocs(5)
     const contract_versions = {}
     for(let k = 0; k < contracts.length; k++){
         const person = contracts[k].subjects[Math.round(Math.random())]
@@ -57,14 +193,16 @@ const buildCollections = async () => {
         contract_versions[contracts[k].id] = await contracts[k].createSubDocs(5, person.id, pkey)
     }
 
-    const shoots = await ShootFactory.createDocs(10)
-
-    const orders = await OrderFactory.createDocs(10)
+    const orders = await OrderFactory.createDocs(5)
     const order_versions = {}
+    const shoots = []
     for (let i = 0; i < orders.length; i++) {
         const person = orders[i].subjects[Math.round(Math.random())]
         const pkey = users.find(v => v.id == person.id).encryptedPrivateKey
-        order_versions[orders[i].id] = await orders[i].createSubDocs(5, person.id, pkey, shoots[Math.floor(Math.random() * shoots.length)].ref)
+        order_versions[orders[i].id] = await orders[i].createSubDocs(5, person.id, pkey)
+        const shoot = new ShootFactory()
+        shoot.createDoc(orders[i].ref)
+        shoots.push(shoot)
     }
 
     const shuffledAssets = _.shuffle(assets)
@@ -78,7 +216,7 @@ const buildCollections = async () => {
     })
 
     const payments = []
-    for (let j = 0; j < 10; j++) {
+    for (let j = 0; j < 5; j++) {
         const payment = new PaymentFactory()
         const randomUser1 = users[Math.floor(Math.random() * users.length)]
         const randomUser2 = users[Math.floor(Math.random() * users.length)]
@@ -95,9 +233,9 @@ const buildCollections = async () => {
     }
 }
 
-exports.runFactory = async () => {
-    await resetCollections().then(buildCollections)
-}
+// exports.runFactory = async () => {
+//     await resetCollections().then(buildCollections)
+// }
 
 exports.resetCollections = resetCollections
 exports.buildCollections = buildCollections

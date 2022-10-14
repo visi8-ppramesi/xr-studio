@@ -12,6 +12,7 @@ module.exports = class AssetFactory extends Factory{
         const userFactory = new UserFactory()
         return {
             name: faker.hacker.noun(),
+            description: Array(10).fill().map(v => faker.hacker.phrase()).join(' '),
             categories: [faker.hacker.noun(), faker.hacker.noun(), faker.hacker.noun()],
             group: [],
             preview_url: 'gs://xr-studio-a9c5e.appspot.com/alan_moore.jpg',

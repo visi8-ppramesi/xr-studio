@@ -85,12 +85,18 @@ class Store{
     deleteState(paths){
         if(this.locked) return
         let data = this.state[paths[0]]
+        if(_.isNil(data)){
+            return
+        }
         for(let i = 1; i < paths.length - 1; i++){
             if(data[paths[i]]){
                 data = data[paths[i]]
             }else{
                 return
             }
+        }
+        if(_.isNil(data[paths[paths.length - 1]])){
+            return
         }
         delete data[paths[paths.length - 1]]
     }

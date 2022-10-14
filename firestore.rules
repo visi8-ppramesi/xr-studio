@@ -1,8 +1,162 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    match /assets/{asset} {
+      allow read: if true;//!isDraft() || isAdmin() || assetOwnedByUser();
+      allow write: if assetOwnedByUser() || isAdmin();
+
+      function assetOwnedByUser(){
+        let assetUserId = get(/databases/$(database)/documents/assets/$(asset)).data.user.id;
+        return request.auth.uid == assetUserId;
+      }
+
+      function isDraft(){
+        let isDraft = get(/databases/$(database)/documents/shoots/$(shoot)).data.is_draft;
+        return isDraft != null && isDraft ;
+      }
+    }
+
+    match /contract_templates/{contract_template} {
+      allow read, create: if isAdmin();
+    }
+
+    match /contracts/{contract} {
+      allow read: if true;
+      allow create: if isLoggedIn() && isCreator();
+      allow update: if isAdmin();
+      allow delete: if false;
+
+      match /contract_versions/{contract_version} {
+        allow read: if true;
+        allow write: if false;//only admin sdk can touch this
+      }
+    }
+
+    match /orders/{order} {
+      allow read: if true;
+      allow create: if isLoggedIn() && isClient();
+      allow update: if isAdmin();
+      allow delete: if false;
+
+      match /order_versions/{order_version} {
+        allow read: if true;
+        allow write: if false;//only admin sdk can touch this
+      }
+    }
+
+    match /procedure_types/{procedure_type} {
+      allow read, create: if isAdmin();
+    }
+
+    match /payments/{payment} {
+      allow read: if refersToBelong() || isAdmin();
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+
+      function refersToBelong(){
+        let senderUserId = get(/databases/$(database)/documents/payments/$(payment)).data.sender.id;
+        let receiverUserId = get(/databases/$(database)/documents/payments/$(payment)).data.receiver.id;
+        return request.auth.uid == senderUserId || request.auth.uid == receiverUserId;
+      }
+    }
+
+    match /shoots/{shoot} {
+      allow read: if true;
+      allow create: if (isLoggedIn() && isClient()) || isAdmin();
+      allow update: if shootOwnedByUser() || isAdmin();
+      allow delete: if isAdmin();
+
+      function shootOwnedByUser(){
+        let shootUserId = get(/databases/$(database)/documents/shoots/$(shoot)).data.creator.id;
+        return request.auth.uid == shootUserId;
+      }
+    }
+
+    match /submission_forms/{submission_form} {
+      allow read: if submissionFormOwnedByUser() || isAdmin();
+      allow write: if submissionFormOwnedByUser() || isAdmin();
+
+      function submissionFormOwnedByUser(){
+        let formUserId = get(/databases/$(database)/documents/submission_forms/$(submission_form)).data.user.id;
+        return request.auth.uid == formUserId;
+      }
+    }
+
+    match /notifications/{user} {
+      allow read: if belongsTo(user) || isAdmin();
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+      
+      match /submission_form_notifications/{notification}{
+        allow read: if belongsTo(user) || isAdmin();
+        allow create: if isAdmin();
+        allow update: if isAdmin();
+        allow delete: if isAdmin();
+      }
+      
+      match /shoot_notifications/{notification}{
+        allow read: if belongsTo(user) || isAdmin();
+        allow create: if isAdmin();
+        allow update: if isAdmin();
+        allow delete: if isAdmin();
+      }
+      
+      match /order_notifications/{notification}{
+        allow read: if belongsTo(user) || isAdmin();
+        allow create: if isAdmin();
+        allow update: if isAdmin();
+        allow delete: if isAdmin();
+      }
+      
+      match /payment_notifications/{notification}{
+        allow read: if belongsTo(user) || isAdmin();
+        allow create: if isAdmin();
+        allow update: if isAdmin();
+        allow delete: if isAdmin();
+      }
+    }
+
+    match /user_roles/{user} {
+      allow read: if belongsTo(user) || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /users/{user} {
+      allow list: if isAdmin();
+      allow get: if belongsTo(user) || isAdmin();
+      allow update: if belongsTo(user) || isAdmin();
+      allow delete: if belongsTo(user) || isAdmin();
+      allow create: if canCreateUser() || isAdmin();
+
+      function canCreateUser(){
+        return request.resource.data.keys().hasOnly(['username', 'email', 'full_name', 'profile_image_url', 'groups', 'public_key', 'encrypted_private_key']);
+      }
+    }
+
     match /{document=**} {
-      allow read, write: if false;
+      allow read, write: if isAdmin();
+    }
+
+    function isLoggedIn(){
+      return request.auth.uid != null;
+    }
+
+    function belongsTo(userId) {
+      return request.auth.uid == userId;
+    }
+
+    function isAdmin(){
+      return 'admin' in get(/databases/$(database)/documents/user_roles/$(request.auth.uid)).data.roles;
+    }
+
+    function isClient(){
+      return 'client' in get(/databases/$(database)/documents/user_roles/$(request.auth.uid)).data.roles;
+    }
+
+    function isCreator(){
+      return 'creator' in get(/databases/$(database)/documents/user_roles/$(request.auth.uid)).data.roles;
     }
   }
 }

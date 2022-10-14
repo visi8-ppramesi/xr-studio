@@ -74,11 +74,14 @@ module.exports = class ContractVersionFactory extends Factory{
         if(!_.isNil(previousHash)){
             toReturn['previous_hash'] = previousHash
         }
+
+        const stabilizedObject = stabilizeObject(toReturn)
+
         if(!_.isNil(previousVersion)){
-            toReturn['previous_version'] = previousVersion
+            stabilizedObject['previous_version'] = previousVersion
         }
 
-        return stabilizeObject(toReturn)
+        return stabilizedObject
     }
 
     async createDoc(version, status, previousVersion, previousHash, previousSignatures, privKey, userId){
