@@ -4,7 +4,7 @@ const {admin} = require("../utils/initializeFirebase");
 const db = admin.firestore();
 
 exports.onCreateUser = functions
-    .region("asia-east2")
+    .region("asia-southeast2")
     .auth
     .user()
     .onCreate((user) => {

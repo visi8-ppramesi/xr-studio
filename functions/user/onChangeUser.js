@@ -4,7 +4,7 @@ const {admin} = require("../utils/initializeFirebase");
 const db = admin.firestore();
 
 exports.onUpdateUser = functions
-    .region("asia-east2")
+    .region("asia-southeast2")
     .firestore
     .document("/users/{userId}")
     // eslint-disable-next-line no-unused-vars
