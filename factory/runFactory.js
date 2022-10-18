@@ -170,6 +170,11 @@ const resetCollections = async () => {
     return Promise.all(clearPromises)
 }
 
+const buildMappedCollections = async () => {
+    const resultingContext = runFactoryFromMap(factoryMap)
+    return resultingContext
+}
+
 const buildCollections = async () => {
     const users = await UserFactory.createDocs(10)
     const contract_templates = await ContractTemplateFactory.createDocs(5)
@@ -239,3 +244,4 @@ const buildCollections = async () => {
 
 exports.resetCollections = resetCollections
 exports.buildCollections = buildCollections
+exports.buildMappedCollections = buildMappedCollections
