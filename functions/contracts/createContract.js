@@ -15,7 +15,7 @@ app.post('/', async (req, res) => {
     const newContractId = req.body['contract_id']
     const { parsedBody } = req
     const setAssetPromise = db.collection('assets').doc(newAssetId).set({
-        ...parsedBody.data
+        ...parsedBody.data //placeholder
     })
     const setAssetContractPromise = db.collection('assets_contracts').doc(newAssetId).set({
         contract: db.collection('contracts').doc(newContractId)
