@@ -15,12 +15,16 @@
   "dependencies": {
     "core-js": "^3.8.3",
     "fast-json-stable-stringify": "^2.1.0",
+    "file-loader": "^6.2.0",
     "firebase": "^9.10.0",
     "lodash": "^4.17.21",
     "mitt": "^3.0.0",
     "pinia": "^2.0.22",
+    "postprocessing": "^6.26.3",
+    "tw-elements": "^1.0.0-alpha12",
     "vue": "^3.2.13",
-    "vue-router": "^4.0.3"
+    "vue-router": "^4.0.3",
+    "vue-loading-overlay": "^5.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
@@ -39,7 +43,8 @@
     "eslint-plugin-vue": "^8.0.3",
     "jest": "^27.0.5",
     "lint-staged": "^11.1.2",
-    "prettier": "^2.4.1"
+    "prettier": "^2.4.1",
+    "tailwindcss": "^3.2.0"
   },
   "eslintConfig": {
     "root": true,
@@ -56,6 +61,14 @@
     },
     "rules": {},
     "overrides": [
+      {
+        "files": [
+          "*"
+        ],
+        "rules": {
+          "vue/multi-word-component-names": "off"
+        }
+      },
       {
         "files": [
           "**/__tests__/*.{j,t}s?(x)",
