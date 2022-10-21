@@ -2,8 +2,9 @@ import firebase from '../../firebase.js'
 // import { collection, orderBy, startAt, endAt, query, getDocs } from 'firebase/firestore'
 import { getDownloadURL, getBlob as getStorageBlob, ref } from 'firebase/storage'
 // import router from '../../router/index.js'
-import emitter from '../../../emitter/index'
+// import emitter from '../../../emitter/index'
 // import geofire from 'geofire-common'
+import errorHandlerTop from './errorHandler'
 
 let medias = {}
 let cache = {}
@@ -116,26 +117,28 @@ const parseDocs = (docs, extraFields = []) => {
 //     router.push({name: 'Login'})
 // }
 
-const handleError = function(err, type){
-    switch(type){
-        case 'loginError':
-            emitter.emit('loginError')
-            break;
-        case 'registerError':
-            emitter.emit('registerError')
-            break;
-        case 'getDocumentError':
-            break;
-        case 'getDocumentsError':
-            break;
-        case 'generateDocumentsError':
-            break;
-        case 'favoriteError':
-            break;
-        default:
-            break;
-    }
-    return err
+
+const handleError = function(type, err){
+    errorHandlerTop(type, err)
+    // switch(type){
+    //     case 'loginError':
+    //         emitter.emit('loginError')
+    //         break;
+    //     case 'registerError':
+    //         emitter.emit('registerError')
+    //         break;
+    //     case 'getDocumentError':
+    //         break;
+    //     case 'getDocumentsError':
+    //         break;
+    //     case 'generateDocumentsError':
+    //         break;
+    //     case 'favoriteError':
+    //         break;
+    //     default:
+    //         break;
+    // }
+    // return err
 }
 
 export default { getResourceUrlFromStorage, handleError, getBlob, getDataUrlFromStorage, constructArtistUrl, constructEventUrl, parseDocs, getProtectedDataUrlFromStorage, revokeDataUrl }

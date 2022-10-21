@@ -18,7 +18,7 @@ import {
 import utils from './utils/index.js'
 // import _ from 'lodash'
 import types, { LongText, ProfilePicture, InstanceProjectionArray, StorageLink, InstanceProjection } from './types/index.js';
-import handleError from '@/utils/handleError.js';
+import handleError from './utils/errorHandler';
 
 import isNil from 'lodash/isNil'
 import isEmpty from 'lodash/isEmpty'

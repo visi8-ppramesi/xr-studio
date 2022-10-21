@@ -5,4 +5,8 @@ export default class extends Collection{
     static fields = {
         unread_count: Number
     }
+
+    static async getDocuments(){
+        
+    }
 }

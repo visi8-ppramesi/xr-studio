@@ -10,7 +10,6 @@ const webcrypto = crypto.webcrypto
 //nodejs end
 
 //browser
-import _ from 'lodash'
 import stringify from 'fast-json-stable-stringify';
 import isObject from 'lodash/isObject'
 import isArray from 'lodash/isArray'
