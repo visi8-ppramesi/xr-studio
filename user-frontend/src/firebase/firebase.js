@@ -9,7 +9,7 @@ import {
 } from "firebase/auth";
 import { getStorage } from "firebase/storage";
 import { getPerformance } from "firebase/performance";
-import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
+// import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
 // import _ from 'lodash'
 // import dotenv from 'dotenv'
 
@@ -36,20 +36,19 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 const analytics = getAnalytics(app);
 const storage = getStorage(app);
-const functions = getFunctions(app, "asia-east2");
+const functions = getFunctions(app, "asia-southeast2");
 const performance = getPerformance(app);
 
-if (process.env.NODE_ENV == "development") {
-  self.FIREBASE_APPCHECK_DEBUG_TOKEN =
-    process.env.VUE_APP_FIREBASE_APPCHECK_DEBUG_TOKEN;
-}
-const appCheck = initializeAppCheck(app, {
-  provider: new ReCaptchaV3Provider("6LcdV4ghAAAAAGT8x3ghDtIliODpgtyejRy87RR2"),
+// if(process.env.NODE_ENV == "development"){
+//     self.FIREBASE_APPCHECK_DEBUG_TOKEN = process.env.VUE_APP_FIREBASE_APPCHECK_DEBUG_TOKEN;
+// }
+// const appCheck = initializeAppCheck(app, {
+//     provider: new ReCaptchaV3Provider('6LcdV4ghAAAAAGT8x3ghDtIliODpgtyejRy87RR2'),
 
-  // Optional argument. If true, the SDK automatically refreshes App Check
-  // tokens as needed.
-  isTokenAutoRefreshEnabled: true,
-});
+//     // Optional argument. If true, the SDK automatically refreshes App Check
+//     // tokens as needed.
+//     isTokenAutoRefreshEnabled: true
+// });
 
 setPersistence(auth, browserLocalPersistence);
 
@@ -63,5 +62,4 @@ export default {
   firebaseConfig,
   functions,
   buildGsPath,
-  appCheck,
 };

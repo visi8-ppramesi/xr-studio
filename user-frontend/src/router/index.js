@@ -32,7 +32,7 @@ const routes = [
     component: () => import("@/views/assets/Asset.vue"),
   },
   {
-    path: "*",
+    path: "/:catchAll(.*)",
     name: "NotFound",
     component: () => import("../views/NotFound.vue"),
   },
