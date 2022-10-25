@@ -1,9 +1,9 @@
 <template>
-  <div id="logout-loading">{{ $t("logOut") }}</div>
+  <div id="logout-loading">Logout</div>
 </template>
 
 <script>
-import { useAuthStore } from "../store/auth.js";
+import { useAuthStore } from "../../store/auth.js";
 
 const i18Texts = {
   messages: {

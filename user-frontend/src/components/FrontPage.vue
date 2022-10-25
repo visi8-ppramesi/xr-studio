@@ -28,26 +28,42 @@
                 <div class="grid md:grid-cols-2 md:gap-6">
                   <div class="mb-6">
                     <input
-                      type="text"
+                      name="username"
+                      for="username"
+                      v-model="username"
+                      type="username"
+                      id="username"
                       class="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
                       placeholder="First name"
                     />
                   </div>
                   <div class="mb-6">
                     <input
-                      type="text"
+                      name="full_name"
+                      for="full_name"
+                      v-model="full_name"
+                      type="full_name"
+                      id="full_name"
                       class="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                      placeholder="Last name"
+                      placeholder="Full name"
                     />
                   </div>
                 </div>
                 <input
+                  name="email"
+                  for="email"
+                  v-model="email"
                   type="email"
+                  id="email"
                   class="form-control block w-full px-3 py-1.5 mb-6 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
                   placeholder="Email address"
                 />
                 <input
+                  name="password"
+                  for="password"
+                  v-model="password"
                   type="password"
+                  id="password"
                   class="form-control block w-full px-3 py-1.5 mb-6 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
                   placeholder="Password"
                 />
@@ -67,6 +83,7 @@
                   </label>
                 </div>
                 <button
+                  @click="register"
                   type="button"
                   data-mdb-ripple="true"
                   data-mdb-ripple-color="light"
@@ -161,8 +178,42 @@
 </template>
 
 <script>
+import { useAuthStore } from "@/store/auth";
 export default {
   name: "front-page",
+  data() {
+    return {
+      email: "",
+      password: "",
+      username: "",
+      full_name: "",
+    };
+  },
+  setup() {
+    const authStore = useAuthStore();
+    return {
+      authStore,
+    };
+  },
+  methods: {
+    register() {
+      this.authStore.register(
+        this.email,
+        this.password,
+        { name: this.username, full_name: this.full_name },
+        () => {
+          this.$router.push({ name: "Home", query: { registered: 1 } });
+        },
+        () => {
+          this.loginFailed = true;
+          this.email = "";
+          this.password = "";
+          this.name = "";
+          this.full_name = "";
+        }
+      );
+    },
+  },
 };
 </script>
 
