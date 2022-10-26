@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-
+console.log("asdfasdfasdfasdf");
 module.exports = {
   content: [
     "./src/**/*.{html,js,vue}",

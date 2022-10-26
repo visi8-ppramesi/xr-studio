@@ -1,12 +1,11 @@
-import TrackedCollection from "../../core/trackedCollection";
+import Collection from "../../core/collection";
 import {
   InstanceProjectionArray,
-  InstanceProjection,
   StorageLink,
   ExternalURL,
 } from "../../core/types";
 
-export default class extends TrackedCollection {
+export default class extends Collection {
   static collection = "shoots";
   static fields = {
     creation_date: Date,
@@ -14,18 +13,13 @@ export default class extends TrackedCollection {
     locked_in_end_date: Date,
     location: String,
     assets: new InstanceProjectionArray({
-      id: String,
       name: String,
       preview_url: StorageLink,
       assets_url: ExternalURL,
     }),
-    creator: new InstanceProjection({
-      username: String,
-      id: String,
-    }),
-    order: TrackedCollection.resolve("../../orders/orders"),
+    order: Collection.resolve("../../orders/orders"),
     current_statuses: Array,
     status_history: Array,
-    // procedure_type: TrackedCollection.resolve("../../procedure-types/procedureTypes"),
+    procedure_type: Collection.resolve("../../procedure-types/procedureTypes"),
   };
 }

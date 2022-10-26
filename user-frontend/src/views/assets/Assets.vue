@@ -8,7 +8,6 @@
 <script>
 import AssetsSidenav from "@/components/assets/AssetsSidenav.vue";
 import AssetsContent from "@/components/assets/AssetsContent.vue";
-import { Assets } from "@/firebase/collections/assets/"
 export default {
   name: "assets",
   components: {

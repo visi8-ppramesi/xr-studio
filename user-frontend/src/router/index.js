@@ -55,16 +55,6 @@ const routes = [
     component: () => import("@/views/assets/Asset.vue"),
   },
   {
-    path: "/equipments/:type?/:query?",
-    name: "Equipments",
-    component: () => import("@/views/equipments/Equipments.vue"),
-  },
-  {
-    path: "/equipment/:id",
-    name: "Equipment",
-    component: () => import("@/views/equipments/Equipment.vue"),
-  },
-  {
     path: "/:catchAll(.*)",
     name: "NotFound",
     component: () => import("../views/NotFound.vue"),
