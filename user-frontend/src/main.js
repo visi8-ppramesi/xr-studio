@@ -8,7 +8,9 @@ import "tw-elements";
 import { createPinia } from "pinia";
 import { useAuthStore } from "./store/auth";
 import VueLoading from "vue-loading-overlay";
+import VueI18n from "./utils/i18n";
 import "vue-loading-overlay/dist/vue-loading.css";
+import i18n from "./i18n";
 
 const vuePropertySetter = (app, name, instance) => {
   app.provide(name, instance);
@@ -22,10 +24,11 @@ const injector = {
   },
 };
 
-const app = createApp(App);
+const app = createApp(App).use(i18n);
 app.use(router);
 app.use(injector);
 app.use(VueLoading);
+app.use(VueI18n);
 app.use(createPinia());
 const authStore = useAuthStore();
 authStore.authAction();

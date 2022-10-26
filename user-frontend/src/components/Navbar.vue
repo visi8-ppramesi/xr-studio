@@ -118,28 +118,39 @@
                         >Something else here</a
                       >
                     </li>
+                    <li>
+                      <router-link
+                        class="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-gray-700 hover:bg-gray-100"
+                        to="/logout"
+                        >Logout</router-link
+                      >
+                    </li>
                   </ul>
                 </div>
               </div>
             </div>
           </div>
           <div v-else class="flex items-center items-center lg:ml-auto">
-            <button
-              type="button"
-              class="inline-block px-6 py-2.5 mr-2 bg-transparent text-blue-600 font-medium text-xs leading-tight uppercase rounded hover:text-blue-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none focus:ring-0 active:bg-gray-200 transition duration-150 ease-in-out"
-              data-mdb-ripple="true"
-              data-mdb-ripple-color="light"
-            >
-              Login
-            </button>
-            <button
-              type="button"
-              class="inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
-              data-mdb-ripple="true"
-              data-mdb-ripple-color="light"
-            >
-              Sign up
-            </button>
+            <router-link to="/login">
+              <button
+                type="button"
+                class="inline-block px-6 py-2.5 mr-2 bg-transparent text-blue-600 font-medium text-xs leading-tight uppercase rounded hover:text-blue-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none focus:ring-0 active:bg-gray-200 transition duration-150 ease-in-out"
+                data-mdb-ripple="true"
+                data-mdb-ripple-color="light"
+              >
+                Login
+              </button>
+            </router-link>
+            <router-link to="/">
+              <button
+                type="button"
+                class="inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
+                data-mdb-ripple="true"
+                data-mdb-ripple-color="light"
+              >
+                Sign up
+              </button>
+            </router-link>
           </div>
         </div>
       </nav>

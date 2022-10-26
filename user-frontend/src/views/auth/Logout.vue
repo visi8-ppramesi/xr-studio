@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import { useAuthStore } from "../store/auth.js";
+import { useAuthStore } from "../../store/auth.js";
 
 const i18Texts = {
   messages: {
