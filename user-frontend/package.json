@@ -9,6 +9,7 @@
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
+    "i18n:report": "vue-cli-service i18n:report --src \"./src/**/*.?(js|vue)\" --locales \"./src/locales/**/*.json\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "main": "index.js",
@@ -25,12 +26,14 @@
     "postprocessing": "^6.26.3",
     "tw-elements": "^1.0.0-alpha12",
     "vue": "^3.2.13",
+    "vue-i18n": "^9.1.0",
     "vue-loading-overlay": "^5.0.3",
     "vue-router": "^4.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
     "@babel/eslint-parser": "^7.12.16",
+    "@intlify/vue-i18n-loader": "^3.0.0",
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-plugin-router": "~5.0.0",
@@ -51,7 +54,8 @@
     "prettier": "^2.4.1",
     "prettier-eslint": "^15.0.1",
     "sass-loader": "^13.1.0",
-    "tailwindcss": "^3.0.7"
+    "tailwindcss": "^3.0.7",
+    "vue-cli-plugin-i18n": "~2.3.1"
   },
   "eslintConfig": {
     "root": true,

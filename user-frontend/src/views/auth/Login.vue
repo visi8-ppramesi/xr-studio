@@ -1,5 +1,5 @@
 <template>
-  <div class="mb-12 lg:mb-0">
+  <div class="flex justify-center items-center m-10">
     <div class="block rounded-lg shadow-lg bg-white px-6 py-12 md:px-12">
       <form>
         <input
