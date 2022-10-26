@@ -1,5 +1,28 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Home from "../views/Home.vue";
+import mitt from "mitt";
+
+const emitter = mitt();
+const authRoutes = [
+  {
+    path: "/login",
+    name: "Login",
+    component: () => import("../views/auth/Login.vue"),
+    meta: {
+      requiresLoggedOut: true,
+      class: "Auth",
+    },
+  },
+  {
+    path: "/logout",
+    name: "Logout",
+    component: () => import("@/views/auth/Logout.vue"),
+    meta: {
+      requiresAuth: true,
+      class: "Auth",
+    },
+  },
+];
 
 const routes = [
   {
@@ -46,6 +69,7 @@ const routes = [
     name: "NotFound",
     component: () => import("../views/NotFound.vue"),
   },
+  ...authRoutes,
 ];
 
 const router = createRouter({
@@ -53,4 +77,23 @@ const router = createRouter({
   routes,
 });
 
+router.beforeEach((to, from, next) => {
+  if (from.name && from.name !== "Login") {
+    const fromRoute = {
+      name: from.name,
+      params: from.params,
+      query: from.query,
+    };
+    localStorage.setItem("fromRoute", JSON.stringify(fromRoute));
+  }
+
+  emitter.emit("navigate");
+  const loggedIn = localStorage.getItem("uid");
+
+  if (to.meta.requiresAuth && !loggedIn) {
+    return next("/");
+  }
+
+  next();
+});
 export default router;
