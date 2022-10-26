@@ -3,9 +3,13 @@ const Factory = require('../factory.js')
 const AssetFactory = require('../assets/assets')
 const UserFactory = require('../users/users')
 const ProcedureTypeFactory = require('../procedure-types/procedureTypes')
+const ShootProcedureFactory = require('./procedures/procedures')
+const ShootAssetFactory = require('./assets/assets')
+const ShootEquipmentFactory = require('./equipments/equipments')
 
 module.exports = class ShootFactory extends Factory{
     static collectionName = 'shoots'
+    static subcollections = [ShootProcedureFactory, ShootAssetFactory, ShootEquipmentFactory]
     constructor(){
         super('shoots')
     }
@@ -19,12 +23,12 @@ module.exports = class ShootFactory extends Factory{
             locked_in_start_date: new Date().setDate(new Date().getDate() + 7),
             locaked_in_end_date: new Date().setDate(new Date().getDate() + 365),
             location: 'main-location',
-            assets: [ 
-                await assetFactory.getRandomProjection(['name', 'preview_url']),
-                await assetFactory.getRandomProjection(['name', 'preview_url']),
-                await assetFactory.getRandomProjection(['name', 'preview_url']),
-                await assetFactory.getRandomProjection(['name', 'preview_url']),
-            ],
+            // assets: [ 
+            //     await assetFactory.getRandomProjection(['name', 'preview_url']),
+            //     await assetFactory.getRandomProjection(['name', 'preview_url']),
+            //     await assetFactory.getRandomProjection(['name', 'preview_url']),
+            //     await assetFactory.getRandomProjection(['name', 'preview_url']),
+            // ],
             order: order,
             current_statuses: ['go-ahead', 'paid'],
             status_history: [
@@ -60,9 +64,17 @@ module.exports = class ShootFactory extends Factory{
     async createDoc(order, id = null){
         const data = await this.constructor.createData(order)
         const {ref, id: newId} = this.buildNewDocRef(id)
+        const parent = [this.constructor.collectionName, newId]
         this.data = data
         this.ref = ref
         this.id = newId
-        return ref.set(data)
+        const retVal = await ref.set(data)
+        const spf = new ShootProcedureFactory(parent)
+        const sef = new ShootEquipmentFactory(parent)
+        const saf = new ShootAssetFactory(parent)
+        await spf.createDoc()
+        await sef.createDoc()
+        await saf.createDoc()
+        return retVal
     }
 }

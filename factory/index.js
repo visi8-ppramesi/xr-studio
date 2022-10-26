@@ -1,4 +1,4 @@
-const { buildCollections, resetCollections } = require('./runFactory')
+const { buildMappedCollections, resetCollections } = require('./runFactory')
 const argv = require('minimist')(process.argv.slice(2));
 
 const main = async () => {
@@ -12,7 +12,7 @@ const main = async () => {
     }
     if(argv.build){
         try{
-            await buildCollections()
+            await buildMappedCollections()
             console.log('collections build')
         }catch(err){
             console.error(err)

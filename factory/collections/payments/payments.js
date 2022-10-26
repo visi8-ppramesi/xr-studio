@@ -3,9 +3,9 @@ const Factory = require('../factory.js')
 const { signMessage, stabilizeObject } = require('../../utils/crypto')
 
 module.exports = class PaymentFactory extends Factory{
-    static collectionName = 'assets'
+    static collectionName = 'payments'
     constructor(){
-        super('assets')
+        super('payments')
     }
 
     static async createData(sender, receiver, forObj, status, contracts, privKey, userId){

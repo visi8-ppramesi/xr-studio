@@ -10,6 +10,7 @@ const ProcedureTypeFactory = require("./collections/procedure-types/procedureTyp
 const ShootFactory = require("./collections/shoots/shoots")
 const SubmissionFormFactory = require("./collections/submission-forms/submissionForms")
 const UserFactory = require("./collections/users/users")
+const EquipmentFactory = require("./collections/equipments/equipments")
 const _ = require('lodash')
 
 const factoryMap = new Map()
@@ -29,6 +30,10 @@ factoryMap.set(AssetFactory, {
     dep: [UserFactory],
     buildFunc: ['createDocs', 5],
 })
+factoryMap.set(EquipmentFactory, {
+    dep: [],
+    buildFunc: ['createDocs', 10]
+})
 factoryMap.set(SubmissionFormFactory, {
     dep: [UserFactory, AssetFactory],
     buildFunc: async (context) => {
@@ -36,7 +41,7 @@ factoryMap.set(SubmissionFormFactory, {
         const assets = context.get(AssetFactory).passValue
         for(let i = 0; i < 5; i++){
             const submissionForm = new SubmissionFormFactory()
-            await submissionForm.createDoc(assets[l].ref)
+            await submissionForm.createDoc(assets[i].ref)
             submissionForms.push(submissionForm)
         }
         return submissionForms
@@ -50,6 +55,7 @@ factoryMap.set(ContractVersionFactory, {
     dep: [UserFactory, ContractFactory],
     buildFunc: async (context) => {
         const contracts = context.get(ContractFactory).passValue
+        const users = context.get(UserFactory).passValue
         const contractVersions = {}
         for(let k = 0; k < contracts.length; k++){
             const person = contracts[k].subjects[Math.round(Math.random())]
@@ -77,13 +83,14 @@ factoryMap.set(AssetContractFactory, {
     }
 })
 factoryMap.set(OrderFactory, {
-    dep: [UserFactory, ShootFactory],
+    dep: [UserFactory],
     buildFunc: ['createDocs', 5]
 })
 factoryMap.set(OrderVersionFactory, {
     dep: [UserFactory, OrderFactory],
-    buildFunc: async (context) => {
+    async buildFunc(context){
         const orders = context.get(OrderFactory).passValue
+        const users = context.get(UserFactory).passValue
         const orderVersions = {}
         for (let i = 0; i < orders.length; i++) {
             const person = orders[i].subjects[Math.round(Math.random())]
@@ -94,31 +101,38 @@ factoryMap.set(OrderVersionFactory, {
     }
 })
 factoryMap.set(ShootFactory, {
-    dep: [AssetFactory, UserFactory, ProcedureTypeFactory],
-    buildFunc: async (context) => {
+    dep: [AssetFactory, OrderFactory, UserFactory, ProcedureTypeFactory, EquipmentFactory],
+    async buildFunc(context){
         const orders = context.get(OrderFactory).passValue
         const shoots = []
+        const promises = []
         for (let i = 0; i < orders.length; i++) {
             const shoot = new ShootFactory()
-            shoot.createDoc(orders[i].ref)
+            const promise = shoot.createDoc(orders[i].ref)
             shoots.push(shoot)
+            promises.push(promise)
         }
+        await Promise.all(promises)
         return shoots
     }
 })
 factoryMap.set(PaymentFactory, {
     dep: [UserFactory, OrderFactory, ShootFactory, ContractFactory],
-    buildFunc: async (context) => {
+    async buildFunc(context){
         const users = context.get(UserFactory).passValue
+        const contracts = context.get(ContractFactory).passValue
         const payments = []
+        const promises = []
         for (let j = 0; j < 5; j++) {
             const payment = new PaymentFactory()
             const randomUser1 = users[Math.floor(Math.random() * users.length)]
             const randomUser2 = users[Math.floor(Math.random() * users.length)]
             const randomContract = contracts[Math.floor(Math.random() * contracts.length)]
-            payment.createDoc(randomUser1.ref, randomUser2.ref, null, 'paid', randomContract.ref, randomUser1.encryptedPrivateKey)
+            const promise = payment.createDoc(randomUser1.ref, randomUser2.ref, null, 'paid', randomContract.ref, randomUser1.encryptedPrivateKey)
             payments.push(payment)
+            promises.push(promise)
         }
+        await Promise.all(promises)
         return payments
     }
 })
@@ -161,7 +175,7 @@ const runFactoryFromMap = async (factMap, context = null) => {
 }
 
 const resetCollections = async () => {
-    const factories = [UserFactory, ContractTemplateFactory, ProcedureTypeFactory, AssetFactory, AssetContractFactory,
+    const factories = [EquipmentFactory, UserFactory, ContractTemplateFactory, ProcedureTypeFactory, AssetFactory, AssetContractFactory,
     ContractFactory, OrderFactory, SubmissionFormFactory, PaymentFactory, ShootFactory]
     const clearPromises = factories.map(factory => {
         const fact = new factory()
@@ -180,6 +194,7 @@ const buildCollections = async () => {
     const contract_templates = await ContractTemplateFactory.createDocs(5)
     const procedure_types = await ProcedureTypeFactory.createDocs(5)
     const assets = await AssetFactory.createDocs(5)
+    const equipments = await EquipmentFactory.createDocs(5)
 
     const submission_forms = []
     for (let l = 0; l < assets.length; l++) {
