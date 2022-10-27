@@ -1,8 +1,8 @@
 <template>
   <div class="relative block bg-white rounded-lg shadow-lg">
-    <div v-if="imagesource" class="flex">
+    <div v-if="imageSource" class="flex">
       <div
-        class="relative overflow-hidden bg-no-repeat bg-cover relative overflow-hidden bg-no-repeat bg-cover shadow-lg rounded-lg mx-4 -mt-4"
+        class="w-full relative overflow-hidden bg-no-repeat bg-cover relative overflow-hidden bg-no-repeat bg-cover shadow-lg rounded-lg mx-4 -mt-4"
         data-mdb-ripple="true"
         data-mdb-ripple-color="light"
       >
@@ -17,13 +17,13 @@
     </div>
     <div class="p-6">
       <h5 class="font-bold text-lg mb-3">{{ title }}</h5>
-      <p class="text-gray-500 mb-4">
+      <p v-if="createdDate" class="text-gray-500 mb-4">
         <small
           >Published <u>{{ createdDate }}</u></small
         >
       </p>
       <p class="mb-4 pb-2">
-        {{ description }}
+        <slot></slot>
       </p>
       <router-link
         :to="linkToUrl"
@@ -38,13 +38,6 @@
 
 <script>
 export default {
-  props: [
-    "title",
-    "imageUrl",
-    "imageSource",
-    "description",
-    "createdDate",
-    "linkToUrl",
-  ],
+  props: ["title", "imageUrl", "imageSource", "createdDate", "linkToUrl"],
 };
 </script>

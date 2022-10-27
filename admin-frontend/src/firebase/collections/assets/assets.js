@@ -1,5 +1,5 @@
 import Collection from "../../core/collection";
-import { StorageLink, InstanceProjection, ProfilePicture, ExternalURL } from "../../core/types";
+import { InstanceProjection, ProfilePicture, ExternalURL } from "../../core/types";
 
 export default class extends Collection{
     static collection = 'assets'
@@ -9,7 +9,7 @@ export default class extends Collection{
         description: String,
         categories: Array,
         group: String,
-        preview_url: StorageLink,
+        preview_url: Array,
         user_data: new InstanceProjection({
             id: String,
             name: String,

@@ -146,6 +146,9 @@ module.exports = {
                 return {
                     uid
                 }
+            },
+            async deleteUser(uid){
+                return true
             }
         }
     }

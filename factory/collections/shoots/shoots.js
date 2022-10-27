@@ -1,6 +1,6 @@
 const faker = require('../../utils/faker')
 const Factory = require('../factory.js')
-const AssetFactory = require('../assets/assets')
+// const AssetFactory = require('../assets/assets')
 const UserFactory = require('../users/users')
 const ProcedureTypeFactory = require('../procedure-types/procedureTypes')
 const ShootProcedureFactory = require('./procedures/procedures')
@@ -15,13 +15,13 @@ module.exports = class ShootFactory extends Factory{
     }
 
     static async createData(order){
-        const assetFactory = new AssetFactory()
+        // const assetFactory = new AssetFactory()
         const userFactory = new UserFactory()
         const procedureTypeFactory = new ProcedureTypeFactory()
         return {
             creation_date: new Date(),
-            locked_in_start_date: new Date().setDate(new Date().getDate() + 7),
-            locaked_in_end_date: new Date().setDate(new Date().getDate() + 365),
+            locked_in_start_date: new Date(new Date().setDate(new Date().getDate() + 7)),
+            locaked_in_end_date: new Date(new Date().setDate(new Date().getDate() + 365)),
             location: 'main-location',
             // assets: [ 
             //     await assetFactory.getRandomProjection(['name', 'preview_url']),
@@ -35,25 +35,25 @@ module.exports = class ShootFactory extends Factory{
                 {
                     note: 'started',
                     status: 'unpaid',
-                    date: new Date().setDate(new Date().getDate() - 365),
+                    date: new Date(new Date().setDate(new Date().getDate() - 365)),
                     processed_by: await userFactory.getRandomReference()
                 },
                 {
                     note: 'something happened',
                     status: 'unpaid',
-                    date: new Date().setDate(new Date().getDate() - 200),
+                    date: new Date(new Date().setDate(new Date().getDate() - 200)),
                     processed_by: await userFactory.getRandomReference()
                 },
                 {
                     note: 'shoot paid',
                     status: 'paid',
-                    date: new Date().setDate(new Date().getDate() - 100),
+                    date: new Date(new Date().setDate(new Date().getDate() - 100)),
                     processed_by: await userFactory.getRandomReference()
                 },
                 {
                     note: 'greenlit',
                     status: 'go-ahead',
-                    date: new Date().setDate(new Date().getDate() - 50),
+                    date: new Date(new Date().setDate(new Date().getDate() - 50)),
                     processed_by: await userFactory.getRandomReference()
                 },
             ],

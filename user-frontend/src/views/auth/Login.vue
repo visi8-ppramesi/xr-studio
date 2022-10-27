@@ -76,7 +76,6 @@ export default {
       loginFailed: false,
     };
   },
-  inject: ["routeResolver"],
   mounted() {
     this.emitter.on("loginError", () => {
       this.loginFailed = true;

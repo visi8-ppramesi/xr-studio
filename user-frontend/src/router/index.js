@@ -14,6 +14,15 @@ const authRoutes = [
     },
   },
   {
+    path: "/register",
+    name: "Register",
+    component: () => import("../views/auth/Register.vue"),
+    meta: {
+      requiresLoggedOut: true,
+      class: "Auth",
+    },
+  },
+  {
     path: "/logout",
     name: "Logout",
     component: () => import("@/views/auth/Logout.vue"),
@@ -24,26 +33,7 @@ const authRoutes = [
   },
 ];
 
-const routes = [
-  {
-    path: "/",
-    name: "Home",
-    component: Home,
-  },
-  // {
-  //   path: "/about",
-  //   name: "About",
-  //   // route level code-splitting
-  //   // this generates a separate chunk (about.[hash].js) for this route
-  //   // which is lazy-loaded when the route is visited.
-  //   component: () =>
-  //     import(/* webpackChunkName: "about" */ "../views/About.vue"),
-  // },
-  // {
-  //   path: "/blog",
-  //   name: "Blog",
-  //   component: () => import(/* webpackChunkName: "blog" */ "../views/Blog.vue"),
-  // },
+const assetRoutes = [
   {
     path: "/assets/:type?/:query?",
     name: "Assets",
@@ -54,6 +44,9 @@ const routes = [
     name: "Asset",
     component: () => import("@/views/assets/Asset.vue"),
   },
+];
+
+const equipmentRoutes = [
   {
     path: "/equipments/:type?/:query?",
     name: "Equipments",
@@ -64,15 +57,78 @@ const routes = [
     name: "Equipment",
     component: () => import("@/views/equipments/Equipment.vue"),
   },
+];
+
+const creatorRoutes = [
+  {
+    path: "/creators/:type?/:query?",
+    name: "Creators",
+    component: () => import("@/views/creators/Creators.vue"),
+  },
+  {
+    path: "/creator/:id",
+    name: "Creator",
+    component: () => import("@/views/creators/Creator.vue"),
+  },
+];
+
+const preproRoutes = [
+  {
+    path: "/production/service-request",
+    name: "PreproductionServiceRequest",
+    component: () =>
+      import("@/views/production/PreproductionServiceRequest.vue"),
+  },
+  {
+    path: "/production/service-about",
+    name: "PreproductionServiceAbout",
+    component: () => import("@/views/production/PreproductionServiceAbout.vue"),
+  },
+  {
+    path: "/production/custom-asset-request",
+    name: "CustomAssetRequest",
+    component: () => import("@/views/production/CustomAssetRequest.vue"),
+  },
+];
+
+const studioRoutes = [
+  {
+    path: "/studio/calendar",
+    name: "Calendar",
+    component: () => import("@/views/studio/Calendar.vue"),
+  },
+  {
+    path: "/studio/register-shoot",
+    name: "RegisterShoot",
+    component: () => import("@/views/studio/RegisterShoot.vue"),
+  },
+];
+
+const routes = [
+  {
+    path: "/",
+    name: "Home",
+    component: Home,
+  },
+  ...authRoutes,
+  ...assetRoutes,
+  ...equipmentRoutes,
+  ...creatorRoutes,
+  ...preproRoutes,
+  ...studioRoutes,
   {
     path: "/:catchAll(.*)",
     name: "NotFound",
     component: () => import("../views/NotFound.vue"),
   },
-  ...authRoutes,
 ];
 
 const router = createRouter({
+  //eslint-disable-next-line no-unused-vars
+  scrollBehavior(to, from, savedPosition) {
+    // always scroll to top
+    return { top: 0 };
+  },
   history: createWebHistory(process.env.BASE_URL),
   routes,
 });
@@ -90,8 +146,12 @@ router.beforeEach((to, from, next) => {
   emitter.emit("navigate");
   const loggedIn = localStorage.getItem("uid");
 
-  if (to.meta.requiresAuth && !loggedIn) {
+  if (to.meta.requiresLoggedOut && !!loggedIn) {
     return next("/");
+  }
+
+  if (to.meta.requiresAuth && !loggedIn) {
+    return next("/login");
   }
 
   next();

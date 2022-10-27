@@ -12,6 +12,7 @@ import {
     getDoc,
     addDoc,
     setDoc,
+    getCountFromServer
     // orderBy,
     // limit
 } from "firebase/firestore";
@@ -588,6 +589,12 @@ export default class{
 
             yield instance
         }
+    }
+
+    static async getCount(){
+        const eventRef = collection(this.db, this.collection);
+        const snapshot = await getCountFromServer(eventRef);
+        return snapshot.data().count;
     }
 
     static resolve(collectionPath){

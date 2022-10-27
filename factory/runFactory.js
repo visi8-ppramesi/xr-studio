@@ -28,11 +28,11 @@ factoryMap.set(ProcedureTypeFactory, {
 })
 factoryMap.set(AssetFactory, {
     dep: [UserFactory],
-    buildFunc: ['createDocs', 5],
+    buildFunc: ['createDocs', 12],
 })
 factoryMap.set(EquipmentFactory, {
     dep: [],
-    buildFunc: ['createDocs', 10]
+    buildFunc: ['createDocs', 12]
 })
 factoryMap.set(SubmissionFormFactory, {
     dep: [UserFactory, AssetFactory],
@@ -260,3 +260,4 @@ const buildCollections = async () => {
 exports.resetCollections = resetCollections
 exports.buildCollections = buildCollections
 exports.buildMappedCollections = buildMappedCollections
+exports.runFactoryFromMap = runFactoryFromMap

@@ -8,7 +8,7 @@
 <script>
 import AssetsSidenav from "@/components/assets/AssetsSidenav.vue";
 import AssetsContent from "@/components/assets/AssetsContent.vue";
-import { Assets } from "@/firebase/collections/assets/"
+import { Assets } from "@/firebase/collections/assets/";
 export default {
   name: "assets",
   components: {
@@ -16,7 +16,12 @@ export default {
     AssetsContent,
   },
   created() {
-    console.log(this.$route.params);
+    this.getAssets();
+  },
+  methods: {
+    async getAssets() {
+      this.assets = await Assets.getDocuments();
+    },
   },
   data() {
     return {

@@ -1,166 +1,53 @@
 <template>
   <div class="equipments">
-    <EquipmentsSidenav />
-    <EquipmentsContent :equipments="equipments" />
+    <EquipmentsSidenav @search="search" />
+    <EquipmentsContent
+      ref="equipmentsContent"
+      :equipments="equipments"
+      @loadMore="loadMore"
+    />
   </div>
 </template>
 
 <script>
 import EquipmentsSidenav from "@/components/equipments/EquipmentsSidenav.vue";
 import EquipmentsContent from "@/components/equipments/EquipmentsContent.vue";
-import { Equipments } from "@/firebase/collections/equipments"
+import { Equipments } from "@/firebase/collections/equipments";
+import { paginationQuery } from "@/utils/queries";
+// import isNil from "lodash/isNil";
 export default {
   name: "equipments",
   components: {
     EquipmentsSidenav,
     EquipmentsContent,
   },
-  created() {
-    console.log(this.$route.params);
-    this.getEquipments()
+  mounted() {
+    this.getEquipments();
   },
   methods: {
-    async getEquipments(){
-      this.equipments = await Equipments.getDocuments()
-    }
+    search() {},
+    loadMore() {
+      this.getEquipments(true);
+    },
+    async getEquipments(loadMore = false) {
+      let pQuery;
+      if (!loadMore) {
+        pQuery = paginationQuery(12, "name");
+      } else {
+        const lastDoc = this.equipments[this.equipments.length - 1].doc;
+        pQuery = paginationQuery(12, "name", lastDoc);
+      }
+      const currentCount = await Equipments.getCount(pQuery);
+      if (currentCount < 12) {
+        this.$refs.equipmentsContent.disableLoadMore();
+      }
+      const equipments = await Equipments.getDocuments(pQuery);
+      this.equipments.push(...equipments);
+    },
   },
   data() {
     return {
-      equipments: [
-        {
-          title: "Test test test",
-          image_url: "https://picsum.photos/200",
-          likes: 100,
-          comments: 100,
-          views: 100,
-        },
-        {
-          title: "Test test test",
-          image_url: "https://picsum.photos/200",
-          likes: 100,
-          comments: 100,
-          views: 100,
-        },
-        {
-          title: "Test test test",
-          image_url: "https://picsum.photos/200",
-          likes: 100,
-          comments: 100,
-          views: 100,
-        },
-        {
-          title: "Test test test",
-          image_url: "https://picsum.photos/200",
-          likes: 100,
-          comments: 100,
-          views: 100,
-        },
-        {
-          title: "Test test test",
-          image_url: "https://picsum.photos/200",
-          likes: 100,
-          comments: 100,
-          views: 100,
-        },
-        {
-          title: "Test test test",
-          image_url: "https://picsum.photos/200",
-          likes: 100,
-          comments: 100,
-          views: 100,
-        },
-        {
-          title: "Test test test",
-          image_url: "https://picsum.photos/200",
-          likes: 100,
-          comments: 100,
-          views: 100,
-        },
-        {
-          title: "Test test test",
-          image_url: "https://picsum.photos/200",
-          likes: 100,
-          comments: 100,
-          views: 100,
-        },
-        {
-          title: "Test test test",
-          image_url: "https://picsum.photos/200",
-          likes: 100,
-          comments: 100,
-          views: 100,
-        },
-        {
-          title: "Test test test",
-          image_url: "https://picsum.photos/200",
-          likes: 100,
-          comments: 100,
-          views: 100,
-        },
-        {
-          title: "Test test test",
-          image_url: "https://picsum.photos/200",
-          likes: 100,
-          comments: 100,
-          views: 100,
-        },
-        {
-          title: "Test test test",
-          image_url: "https://picsum.photos/200",
-          likes: 100,
-          comments: 100,
-          views: 100,
-        },
-        {
-          title: "Test test test",
-          image_url: "https://picsum.photos/200",
-          likes: 100,
-          comments: 100,
-          views: 100,
-        },
-        {
-          title: "Test test test",
-          image_url: "https://picsum.photos/200",
-          likes: 100,
-          comments: 100,
-          views: 100,
-        },
-        {
-          title: "Test test test",
-          image_url: "https://picsum.photos/200",
-          likes: 100,
-          comments: 100,
-          views: 100,
-        },
-        {
-          title: "Test test test",
-          image_url: "https://picsum.photos/200",
-          likes: 100,
-          comments: 100,
-          views: 100,
-        },
-        {
-          title: "Test test test",
-          image_url: "https://picsum.photos/200",
-          likes: 100,
-          comments: 100,
-          views: 100,
-        },
-        {
-          title: "Test test test",
-          image_url: "https://picsum.photos/200",
-          likes: 100,
-          comments: 100,
-          views: 100,
-        },
-        {
-          title: "Test test test",
-          image_url: "https://picsum.photos/200",
-          likes: 100,
-          comments: 100,
-          views: 100,
-        },
-      ],
+      equipments: [],
     };
   },
 };

@@ -1,6 +1,5 @@
 import Collection from "../../core/collection";
 import {
-  StorageLink,
   InstanceProjection,
   ProfilePicture,
   ExternalURL,
@@ -14,7 +13,7 @@ export default class extends Collection {
     description: String,
     categories: Array,
     group: String,
-    preview_url: StorageLink,
+    preview_url: Array,
     user_data: new InstanceProjection({
       id: String,
       name: String,

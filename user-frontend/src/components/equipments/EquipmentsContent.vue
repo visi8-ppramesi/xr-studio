@@ -1,6 +1,6 @@
 <template>
   <section
-    class="px-6 py-12 md:px-12 bg-gray-100 text-gray-800 text-center lg:text-left md:ml-60"
+    class="px-6 py-12 md:px-12 bg-gray-100 text-gray-800 text-center lg:text-left md:ml-60 min-h-screen"
   >
     <h2 class="text-3xl font-bold mb-12 text-center">Equipment Rental</h2>
 
@@ -13,13 +13,30 @@
         :key="'equipment-' + idx"
       >
         <BoxContent
-          title="My paradise"
-          imageUrl="/equipment/test"
-          imageSource="https://mdbcdn.b-cdn.net/img/new/standard/city/024.webp"
-          description="Ut pretium ultricies dignissim. Sed sit amet mi eget urna placerat vulputate. Ut vulputate est non quam dignissim elementum. Donec a ullamcorper diam."
-          createdDate="13.01.2022"
-          linkToUrl="/equipment/test"
-        />
+          :title="equipment.name"
+          :image-url="'/equipment/' + equipment.id"
+          :image-source="equipment.preview_url"
+          :created-date="null"
+          :link-to-url="'/equipment/' + equipment.id"
+        >
+          <div>
+            {{ filters.truncate(equipment.description, 100) }}
+          </div>
+          <div>Price: {{ formatters.currency(equipment.price) }}</div>
+        </BoxContent>
+      </div>
+    </div>
+    <div
+      v-if="loadMoreEnabled"
+      class="w-full flex content-center justify-center"
+    >
+      <div
+        data-mdb-ripple="true"
+        data-mdb-ripple-color="light"
+        class="inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded-full shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
+        @click="loadMore"
+      >
+        Load more
       </div>
     </div>
   </section>
@@ -33,6 +50,19 @@ export default {
   },
   name: "equipments-content",
   props: ["equipments"],
+  data() {
+    return {
+      loadMoreEnabled: true,
+    };
+  },
+  methods: {
+    disableLoadMore() {
+      this.loadMoreEnabled = false;
+    },
+    loadMore() {
+      this.$emit("loadMore");
+    },
+  },
 };
 </script>
 

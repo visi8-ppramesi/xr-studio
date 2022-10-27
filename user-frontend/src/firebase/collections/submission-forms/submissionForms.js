@@ -1,5 +1,5 @@
 import Collection from "../../core/collection";
-import { StorageLink } from "../../core/types";
+// import { StorageLink } from "../../core/types";
 
 export default class extends Collection {
   static collection = "submission_forms";
@@ -7,7 +7,7 @@ export default class extends Collection {
     name: String,
     user: Collection.resolve("../../users/users"),
     description: String,
-    preview_urls: StorageLink,
+    preview_urls: Array,
     current_status: Array,
     status_history: Array,
     submission_date: Date,

@@ -12,6 +12,7 @@ import {
   getDoc,
   addDoc,
   setDoc,
+  getCountFromServer,
   // orderBy,
   // limit
 } from "firebase/firestore";
@@ -678,6 +679,18 @@ export default class {
 
       yield instance;
     }
+  }
+
+  static async getCount(queries = null) {
+    const eventRef = collection(this.db, this.collection);
+    let q;
+    if (!isNil(queries)) {
+      q = query(eventRef, ...queries);
+    } else {
+      q = eventRef;
+    }
+    const snapshot = await getCountFromServer(q);
+    return snapshot.data().count;
   }
 
   static resolve(collectionPath) {

@@ -1,7 +1,7 @@
 <template>
   <div class="right hidden md:block md:w-1/3 ml-8">
     <div class="mb-3">
-      <span class="text-gray-400 text-md mb-3">RELATED SCENES</span>
+      <span class="text-gray-400 text-md mb-3">RELATED EQUIPMENTS</span>
     </div>
 
     <div

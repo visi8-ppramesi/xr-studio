@@ -1,22 +1,48 @@
-import { query, where, limit, orderBy, startAfter, startAt, doc, FieldPath, endBefore, getDoc } from 'firebase/firestore'
-import isNil from 'lodash/isNil'
+import {
+  where,
+  limit,
+  orderBy,
+  startAfter,
+  // startAt,
+  // doc,
+  // FieldPath,
+  // endBefore,
+  // getDoc,
+} from "firebase/firestore";
+import isNil from "lodash/isNil";
 
-export const shootCalendarBetweenQuery = (ref, startAtParam, endAtParam) => {
-    return query(ref, where('locked_in_start_date', '>=', startAtParam), where('locked_in_start_date', '<=', endAtParam))
-}
+export const shootCalendarBetweenQuery = (startAtParam, endAtParam) => {
+  return [
+    where("locked_in_start_date", ">=", startAtParam),
+    where("locked_in_start_date", "<=", endAtParam),
+  ];
+};
 
-export const shootCalendarCreatedByQuery = (ref, startAtParam, endAtParam) => {
-    return query(ref, where('creation_date', '>=', startAtParam), where('creation_date', '<=', endAtParam))
-}
+export const shootCalendarCreatedByQuery = (startAtParam, endAtParam) => {
+  return [
+    where("creation_date", ">=", startAtParam),
+    where("creation_date", "<=", endAtParam),
+  ];
+};
 
-export const paginationQuery = (ref, limitParam, startAtParam = null) => {
-    if(isNil(startAtParam)){
-        return query(ref, orderBy('name'), limit(limitParam))
-    }else{
-        return query(ref, orderBy('name'), startAt(startAtParam), limit(limitParam))
-    }
-}
+export const paginationQuery = (
+  limitParam,
+  orderByParam = "name",
+  startAtParam = null
+) => {
+  if (isNil(startAtParam)) {
+    return [orderBy(orderByParam), limit(limitParam)];
+  } else {
+    return [orderBy(orderByParam), startAfter(startAtParam), limit(limitParam)];
+  }
+};
 
-export const searchByName = () => {
-    
-}
+export const searchByName = () => {};
+
+export const relatedByCategories = (categories) => {
+  return [where("categories", "array-contains-any", categories)];
+};
+
+export const relatedByTags = (tags) => {
+  return [where("tags", "array-contains-any", tags)];
+};

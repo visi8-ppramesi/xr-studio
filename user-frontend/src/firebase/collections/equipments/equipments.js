@@ -11,5 +11,6 @@ export default class extends TrackedCollection {
     manufacturer: String,
     description: String,
     on_inventory: Number,
+    preview_url: String,
   };
 }

@@ -1,10 +1,10 @@
 <template>
-  <div></div>
+  <Calendar></Calendar>
 </template>
 
 <script>
 import Calendar from "@/components/graphs/Calendar.vue";
-import Shoots from "@/firebase/collections/shoots/shoots"
+import Shoots from "@/firebase/collections/shoots/shoots";
 
 export default {
   components: {
@@ -15,18 +15,18 @@ export default {
       calendarData: [],
     };
   },
-  created(){
+  created() {
     this.getCalendarData().then((calendarData) => {
-      this.calendarData = calendarData
-    })
+      this.calendarData = calendarData;
+    });
   },
   methods: {
-    async getCalendarData(){
-      const shoots = await Shoots.getDocuments()
+    async getCalendarData() {
+      const shoots = await Shoots.getDocuments();
       //process shoots
 
-      return shoots
-    }
-  }
+      return shoots;
+    },
+  },
 };
 </script>

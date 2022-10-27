@@ -1,6 +1,18 @@
-import settings from "@/settings";
+export const toAbsoluteTime = function (time, locale = "id-ID") {
+  if (typeof time === "number") {
+    time = new Date(time);
+  }
+  if (typeof time.toDate === "function") {
+    time = time.toDate();
+  }
+  const intlFormatter = new Intl.DateTimeFormat(locale);
+  return intlFormatter.format(time);
+};
 
-export const toRelativeTime = function (time) {
+export const toRelativeTime = function (time, locale = "id-ID") {
+  if (typeof time.toDate === "function") {
+    time = time.toDate();
+  }
   let timestamp = time;
   if (typeof time == "object") {
     timestamp = time.getTime();
@@ -39,6 +51,6 @@ export const toRelativeTime = function (time) {
     unit = "year";
   }
 
-  const formatter = new Intl.RelativeTimeFormat(settings.locale);
+  const formatter = new Intl.RelativeTimeFormat(locale);
   return formatter.format(output, unit);
 };

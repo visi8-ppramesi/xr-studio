@@ -2,7 +2,7 @@ import TrackedCollection from "../../core/trackedCollection";
 import {
   InstanceProjectionArray,
   InstanceProjection,
-  StorageLink,
+  // StorageLink,
   ExternalURL,
 } from "../../core/types";
 
@@ -16,7 +16,7 @@ export default class extends TrackedCollection {
     assets: new InstanceProjectionArray({
       id: String,
       name: String,
-      preview_url: StorageLink,
+      preview_url: Array,
       assets_url: ExternalURL,
     }),
     creator: new InstanceProjection({
