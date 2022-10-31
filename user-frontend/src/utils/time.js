@@ -1,4 +1,7 @@
+import isNil from "lodash/isNil";
+
 export const toAbsoluteTime = function (time, locale = "id-ID") {
+  if (isNil(time)) return null;
   if (typeof time === "number") {
     time = new Date(time);
   }
