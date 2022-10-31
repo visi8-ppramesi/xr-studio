@@ -13,6 +13,7 @@ import { SubmissionForms } from './submission-forms';
 import { UserRoles } from './user-roles';
 import { Users } from './users';
 import { Equipments } from "./equipments";
+import { Calendar } from "./calendar";
 
 export default {
     AssetsContracts, Assets,
@@ -28,5 +29,6 @@ export default {
     SubmissionForms,
     UserRoles, 
     Users,
-    Equipments
+    Equipments,
+    Calendar
 }

@@ -12,7 +12,7 @@ import VueI18n from "./utils/i18n";
 import "vue-loading-overlay/dist/vue-loading.css";
 import i18n from "./i18n";
 import startCase from "lodash/startCase";
-import { toRelativeTime, toAbsoluteTime } from "./utils/time";
+import { toRelativeTime, toAbsoluteTime, toLongMonth } from "./utils/time";
 
 const vuePropertySetter = (app, name, instance) => {
   app.provide(name, instance);
@@ -54,6 +54,7 @@ const formatters = {
   relativeDate: function (dateObj, locale = "id-ID") {
     return toRelativeTime(dateObj, locale);
   },
+  longMonth: toLongMonth,
 };
 const injector = {
   install(app) {

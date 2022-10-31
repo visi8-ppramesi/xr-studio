@@ -24,6 +24,7 @@ import { SubmissionForms } from "./submission-forms";
 import { UserRoles } from "./user-roles";
 import { Users } from "./users";
 import { Equipments } from "./equipments";
+import { Calendar } from "./calendar";
 
 export default {
   AssetsContracts,
@@ -50,4 +51,5 @@ export default {
   UserRoles,
   Users,
   Equipments,
+  Calendar,
 };

@@ -11,6 +11,7 @@ export default class extends Collection {
   static fields = {
     name: String,
     description: String,
+    created_date: Date,
     categories: Array,
     group: String,
     preview_url: Array,

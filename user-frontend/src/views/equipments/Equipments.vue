@@ -1,5 +1,5 @@
 <template>
-  <div class="equipments">
+  <div class="equipments min-h-screen">
     <EquipmentsSidenav @search="search" />
     <EquipmentsContent
       ref="equipmentsContent"

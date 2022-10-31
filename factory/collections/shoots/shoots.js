@@ -6,6 +6,7 @@ const ProcedureTypeFactory = require('../procedure-types/procedureTypes')
 const ShootProcedureFactory = require('./procedures/procedures')
 const ShootAssetFactory = require('./assets/assets')
 const ShootEquipmentFactory = require('./equipments/equipments')
+const CalendarFactory = require('../calendar/calendar')
 
 module.exports = class ShootFactory extends Factory{
     static collectionName = 'shoots'
@@ -18,10 +19,11 @@ module.exports = class ShootFactory extends Factory{
         // const assetFactory = new AssetFactory()
         const userFactory = new UserFactory()
         const procedureTypeFactory = new ProcedureTypeFactory()
+        const randomDays = Math.floor(Math.random() * 120)
         return {
             creation_date: new Date(),
-            locked_in_start_date: new Date(new Date().setDate(new Date().getDate() + 7)),
-            locaked_in_end_date: new Date(new Date().setDate(new Date().getDate() + 365)),
+            locked_in_start_date: new Date(new Date().setDate(new Date().getDate() + randomDays + 7)),
+            locked_in_end_date: new Date(new Date().setDate(new Date().getDate() + randomDays + 14)),
             location: 'main-location',
             // assets: [ 
             //     await assetFactory.getRandomProjection(['name', 'preview_url']),
@@ -69,12 +71,25 @@ module.exports = class ShootFactory extends Factory{
         this.ref = ref
         this.id = newId
         const retVal = await ref.set(data)
+        const cal = new CalendarFactory()
+        const calPromise = cal.createDoc(
+            data.locked_in_start_date,
+            data.locked_in_end_date,
+            ref
+        )
+
         const spf = new ShootProcedureFactory(parent)
         const sef = new ShootEquipmentFactory(parent)
         const saf = new ShootAssetFactory(parent)
-        await spf.createDoc()
-        await sef.createDoc()
-        await saf.createDoc()
+        const spfPromise = spf.createDoc()
+        const sefPromise = sef.createDoc()
+        const safPromise = saf.createDoc()
+        await Promise.all([
+            calPromise,
+            spfPromise,
+            sefPromise,
+            safPromise
+        ])
         return retVal
     }
 }

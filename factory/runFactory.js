@@ -12,6 +12,7 @@ const SubmissionFormFactory = require("./collections/submission-forms/submission
 const UserFactory = require("./collections/users/users")
 const EquipmentFactory = require("./collections/equipments/equipments")
 const _ = require('lodash')
+const isNil = require("lodash/isNil")
 
 const factoryMap = new Map()
 factoryMap.set(UserFactory, {
@@ -49,7 +50,7 @@ factoryMap.set(SubmissionFormFactory, {
 })
 factoryMap.set(ContractFactory, {
     dep: [UserFactory],
-    buildFunc: ['createDocs', 5]
+    buildFunc: ['createDocs', 12]
 })
 factoryMap.set(ContractVersionFactory, {
     dep: [UserFactory, ContractFactory],
@@ -59,8 +60,11 @@ factoryMap.set(ContractVersionFactory, {
         const contractVersions = {}
         for(let k = 0; k < contracts.length; k++){
             const person = contracts[k].subjects[Math.round(Math.random())]
-            const pkey = users.find(v => v.id == person.id).encryptedPrivateKey
-            contractVersions[contracts[k].id] = await contracts[k].createSubDocs(5, person.id, pkey)
+            const foundUser = users.find(v => v.id == person.id)
+            if(!isNil(foundUser)){
+                const pkey = foundUser.encryptedPrivateKey
+                contractVersions[contracts[k].id] = await contracts[k].createSubDocs(5, person.id, pkey)
+            }
         }
         return contractVersions
     }
@@ -75,6 +79,7 @@ factoryMap.set(AssetContractFactory, {
 
         const retVal = await Promise.all(shuffledAssets.map((ass, idx) => {
             const acFactory = new AssetContractFactory()
+            shuffledContracts[idx]
             return acFactory.createDoc(ass.id, shuffledContracts[idx].ref).then(v => {
                 return acFactory
             })
@@ -94,8 +99,11 @@ factoryMap.set(OrderVersionFactory, {
         const orderVersions = {}
         for (let i = 0; i < orders.length; i++) {
             const person = orders[i].subjects[Math.round(Math.random())]
-            const pkey = users.find(v => v.id == person.id).encryptedPrivateKey
-            orderVersions[orders[i].id] = await orders[i].createSubDocs(5, person.id, pkey)
+            const foundUser = users.find(v => v.id == person.id)
+            if(!isNil(foundUser)){
+                const pkey = foundUser.encryptedPrivateKey
+                orderVersions[orders[i].id] = await orders[i].createSubDocs(5, person.id, pkey)
+            }
         }
         return orderVersions
     }

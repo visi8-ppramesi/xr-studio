@@ -1,5 +1,14 @@
 import isNil from "lodash/isNil";
 
+export const toLongMonth = function (time, locale = "id-ID") {
+  if (typeof time.toDate === "function") {
+    time = time.toDate();
+  }
+
+  const date = new Date(time);
+  return date.toLocaleString(locale, { month: "long", year: "numeric" });
+};
+
 export const toAbsoluteTime = function (time, locale = "id-ID") {
   if (isNil(time)) return null;
   if (typeof time === "number") {

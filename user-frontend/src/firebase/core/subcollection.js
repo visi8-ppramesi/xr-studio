@@ -44,6 +44,7 @@ const setDataHelper = async (
   const isLongText = fields[key] == LongText;
   const isProfilePicture = fields[key] == ProfilePicture;
   const isStorageLink = fields[key] == StorageLink;
+  const isDate = fields[key] == Date;
 
   if (!isNil(data[key]) && extraConditional) {
     if (isLongText) {
@@ -58,6 +59,8 @@ const setDataHelper = async (
       }
     } else if (isStorageLink && fetchStorageLink) {
       instance[key] = await utils.getDataUrlFromStorage(data[key]);
+    } else if (isDate && typeof data[key].toDate === "function") {
+      instance[key] = data[key].toDate();
     } else {
       instance[key] = data[key];
     }
@@ -909,16 +912,9 @@ export default class {
     return events;
   }
 
-  static async getCount(path, queries = null) {
+  static async getCount(path) {
     const eventRef = collection(this.db, ...path);
-    let q;
-    if (!isNil(queries)) {
-      q = query(eventRef, ...queries);
-    } else {
-      q = eventRef;
-    }
-
-    const snapshot = await getCountFromServer(q);
+    const snapshot = await getCountFromServer(eventRef);
     return snapshot.data().count;
   }
 

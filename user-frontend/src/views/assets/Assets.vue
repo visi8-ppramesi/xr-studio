@@ -1,5 +1,5 @@
 <template>
-  <div class="assets">
+  <div class="assets min-h-screen">
     <AssetsSidenav />
     <AssetsContent
       ref="equipmentsContent"
