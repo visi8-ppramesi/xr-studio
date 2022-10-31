@@ -12,27 +12,43 @@
         v-for="(asset, idx) in assets"
         :key="'asset-' + idx"
       >
-        <BoxContent
-          title="My paradise"
-          imageUrl="/asset/test"
-          imageSource="https://mdbcdn.b-cdn.net/img/new/standard/city/024.webp"
-          description="Ut pretium ultricies dignissim. Sed sit amet mi eget urna placerat vulputate. Ut vulputate est non quam dignissim elementum. Donec a ullamcorper diam."
-          createdDate="13.01.2022"
-          linkToUrl="/asset/test"
-        />
+        <BoxComponentMultipleImages
+          :title="asset.name"
+          :image-url="'/asset/' + asset.id"
+          :image-source="asset.preview_url[0]"
+          :created-date="formatters.absoluteDate(asset.created_date)"
+          :link-to-url="'/asset/' + asset.id"
+        >
+          <div>
+            {{ filters.truncate(asset.description, 25) }}
+          </div>
+        </BoxComponentMultipleImages>
       </div>
     </div>
   </section>
 </template>
 
 <script>
-import BoxContent from "../BoxContent.vue";
+import BoxComponentMultipleImages from "../BoxComponentMultipleImages.vue";
 export default {
   components: {
-    BoxContent,
+    BoxComponentMultipleImages,
   },
   name: "assets-content",
   props: ["assets"],
+  data() {
+    return {
+      loadMoreEnabled: true,
+    };
+  },
+  methods: {
+    disableLoadMore() {
+      this.loadMoreEnabled = false;
+    },
+    loadMore() {
+      this.$emit("loadMore");
+    },
+  },
 };
 </script>
 
