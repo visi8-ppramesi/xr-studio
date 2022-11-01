@@ -3,6 +3,7 @@
     class="hidden md:block w-60 h-full bg-white absolute pt-8"
     id="sidenavSecExample"
   >
+    <span class="text-lg">Browse By Month</span>
     <ul class="relative px-1">
       <li
         v-for="(year, idx) in years"

@@ -1,16 +1,54 @@
 import { defineStore } from "pinia";
+import emitter from "@/utils/emitter";
+import Processor from "./utils/processCart";
+import { ref } from "vue";
+import isNil from "lodash/isNil";
+import {
+  DEFAULT_STATUS,
+  ITEM_IN_CART,
+  ITEM_NEW,
+  ITEM_INVALID,
+} from "./utils/cartStatus";
 
-export const useCartStore = defineStore("cart", {
-  state: () => ({
-    cart: JSON.parse(localStorage.getItem("cart") || "[]"),
-  }),
-  getters: {},
-  actions: {
-    clearCart() {
-      this.cart = [];
-      localStorage.removeItem("cart");
-    },
-    addItemToCart({ image_url, type, name, description, id, price }) {
+const items = JSON.parse(localStorage.getItem("cart") || "[]");
+
+export const useCartStore = defineStore("cart", () => {
+  const cart = ref(items);
+  const itemCount = ref(items.length);
+
+  let processor;
+
+  function clearCart() {
+    this.cart = [];
+    localStorage.removeItem("cart");
+    this.itemCount = 0;
+    emitter.emit("cartUpdated", { cart: this.cart, count: this.itemCount });
+  }
+
+  function removeItem(id) {
+    this.cart = this.cart.filter(function (obj) {
+      return obj.id !== id;
+    });
+    localStorage.setItem("cart", JSON.stringify(this.cart));
+    this.itemCount = this.cart.reduce((acc, v) => {
+      acc += v.count;
+      return acc;
+    }, 0);
+    emitter.emit("cartUpdated", { cart: this.cart, count: this.itemCount });
+  }
+
+  function addItem(item) {
+    //{ image_url, type, name, description, id, price }) {
+    let itemStatus = DEFAULT_STATUS;
+    if (!isNil(processor)) {
+      const pipeline = processor.getProcessorPipeline();
+      item = pipeline(item);
+      const filter = processor.getProcessorFilter();
+      itemStatus = filter(item);
+    }
+
+    const { image_url, type, name, description, id, price } = item;
+    if (itemStatus === ITEM_NEW || itemStatus === DEFAULT_STATUS) {
       this.cart.push({
         name,
         description,
@@ -18,9 +56,38 @@ export const useCartStore = defineStore("cart", {
         price,
         type,
         image_url,
+        count: 1,
         created_date: new Date().getTime(),
       });
       localStorage.setItem("cart", JSON.stringify(this.cart));
-    },
-  },
+      this.itemCount = this.cart.reduce((acc, v) => {
+        acc += v.count;
+        return acc;
+      }, 0);
+      emitter.emit("cartUpdated", { cart: this.cart, count: this.itemCount });
+    } else if (itemStatus === ITEM_IN_CART) {
+      const tempItem = this.cart.find((v) => v.id === id);
+      tempItem.count = tempItem.count + 1;
+      localStorage.setItem("cart", JSON.stringify(this.cart));
+      this.itemCount = this.cart.reduce((acc, v) => {
+        acc += v.count;
+        return acc;
+      }, 0);
+      emitter.emit("cartUpdated", { cart: this.cart, count: this.itemCount });
+    } else if (itemStatus === ITEM_INVALID) {
+      console.error("invalid item");
+    }
+  }
+
+  const cartObj = {
+    cart,
+    itemCount,
+    clearCart,
+    removeItem,
+    addItem,
+  };
+
+  processor = new Processor(cartObj);
+
+  return cartObj;
 });

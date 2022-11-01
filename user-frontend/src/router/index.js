@@ -109,6 +109,14 @@ const studioRoutes = [
   },
 ];
 
+const shopRoutes = [
+  {
+    path: "/shopping/cart",
+    name: "Cart",
+    component: () => import("@/views/shopping/Cart.vue"),
+  },
+];
+
 const routes = [
   {
     path: "/",
@@ -121,6 +129,7 @@ const routes = [
   ...creatorRoutes,
   ...preproRoutes,
   ...studioRoutes,
+  ...shopRoutes,
   {
     path: "/:catchAll(.*)",
     name: "NotFound",

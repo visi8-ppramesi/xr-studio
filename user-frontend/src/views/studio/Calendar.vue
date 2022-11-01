@@ -4,7 +4,7 @@
     class="px-6 py-12 md:px-12 bg-gray-100 text-gray-800 text-center lg:text-left md:ml-60"
   >
     <h2 class="text-3xl font-bold mb-12 text-center">
-      Shootings Schedule Calendar
+      Shooting Schedule Calendar
     </h2>
     <Calendar
       ref="calendar"

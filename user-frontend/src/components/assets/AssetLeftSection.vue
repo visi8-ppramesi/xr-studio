@@ -12,27 +12,25 @@
           class="carousel-indicators absolute right-0 bottom-0 left-0 flex justify-center p-0 mb-4"
         >
           <button
+            v-for="(url, idx) in asset.preview_url"
+            :key="'preview-switcher-' + idx + '-' + id"
             type="button"
             :data-bs-target="'#carouselExampleCaptions' + id"
-            data-bs-slide-to="0"
-            class="active"
+            :data-bs-slide-to="idx"
+            :class="idx === 0 ? 'active' : ''"
             aria-current="true"
-            aria-label="Slide 1"
-          ></button>
-          <button
-            type="button"
-            :data-bs-target="'#carouselExampleCaptions' + id"
-            data-bs-slide-to="1"
-            aria-label="Slide 2"
+            :aria-label="'Slide ' + idx"
           ></button>
         </div>
 
         <div class="carousel-inner relative w-full overflow-hidden">
-          <div class="carousel-item active relative float-left w-full">
-            <img :src="asset.preview_url[0]" class="w-full rounded-sm" />
-          </div>
-          <div class="carousel-item relative float-left w-full">
-            <img :src="asset.preview_url[1]" class="w-full rounded-sm" />
+          <div
+            v-for="(url, idx) in asset.preview_url"
+            :class="idx === 0 ? 'active' : ''"
+            class="carousel-item relative float-left w-full"
+            :key="'asset-preview-' + idx + '-' + id"
+          >
+            <img :src="url" class="w-full rounded-sm" />
           </div>
         </div>
 
@@ -61,49 +59,23 @@
           <span class="visually-hidden">Next</span>
         </button>
       </div>
-      <!-- <CanvasComponent /> -->
-      <!-- <img
-          src="https://mdbcdn.b-cdn.net/img/new/standard/city/024.webp"
-          class="w-full rounded-sm"
-        /> -->
     </div>
     <div v-if="asset" class="content-wrapper">
       <div class="pt-5 mb-4">
         <h1 class="font-medium leading-none text-5xl mt-0">{{ asset.name }}</h1>
-        <!-- <h6 class="font-medium leading-none text-base mt-0 mb-2 text-gray-400">
-          {{ asset.description }}
-        </h6> -->
       </div>
       <div class="flex">
-        <button
-          class="flex items-center text-sm h-8 mr-2 md:mr-8 text-gray-400"
-        >
-          <svg
-            class="w-4 h-4 mr-1 text-gray-400"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 576 512"
-          >
-            <!--! Font Awesome Pro 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
-            <path
-              fill="#9CA3AF"
-              d="M24 0C10.7 0 0 10.7 0 24S10.7 48 24 48H76.1l60.3 316.5c2.2 11.3 12.1 19.5 23.6 19.5H488c13.3 0 24-10.7 24-24s-10.7-24-24-24H179.9l-9.1-48h317c14.3 0 26.9-9.5 30.8-23.3l54-192C578.3 52.3 563 32 541.8 32H122l-2.4-12.5C117.4 8.2 107.5 0 96 0H24zM176 512c26.5 0 48-21.5 48-48s-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48zm336-48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48z"
-            />
-          </svg>
-          Add To Cart
-        </button>
-        <!-- <button
-          class="flex items-center text-sm h-8 mr-2 md:mr-8 text-gray-400"
-        >
-          button 2
-        </button>
-        <button
-          class="flex items-center text-sm h-8 mr-2 md:mr-8 text-gray-400"
-        >
-          button 3
-        </button>
-        <button class="flex items-center text-sm h-8 ml-auto text-gray-400">
-          button 4
-        </button> -->
+        <CartButton
+          :item-data="{
+            image_url: asset.preview_url,
+            type: 'asset',
+            name: asset.name,
+            description: asset.description,
+            id: asset.id,
+            price: asset.price,
+          }"
+          item-type="asset"
+        />
       </div>
       <div class="pt-3 border-t border-gray-300 mb-2">
         <div class="my-4 max-w-xl text-gray-600">
@@ -146,11 +118,13 @@
 // import NewComment from "../comment/NewComment.vue";
 // import CommentComponent from "../comment/CommentComponent.vue";
 // import CanvasComponent from "./threejs/CanvasComponent.vue";
+import CartButton from "../CartButton.vue";
 export default {
   components: {
     // NewComment,
     // CommentComponent,
     // CanvasComponent,
+    CartButton,
   },
   props: ["asset"],
   data() {
