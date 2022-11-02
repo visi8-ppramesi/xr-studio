@@ -18,7 +18,6 @@
       </div>
       <div class="flex">
         <CartButton
-          type="cart"
           :item-data="{
             image_url: equipment.preview_url,
             type: 'equipment',
@@ -52,7 +51,7 @@
 </template>
 
 <script>
-import CartButton from "../CartButton.vue";
+import CartButton from "../shopping/CartButton.vue";
 export default {
   components: {
     CartButton,

@@ -58,7 +58,7 @@
             </div>
           </div>
           <div class="flex justify-center w-1/5">
-            <CartButton
+            <SummaryButton
               type="summaryRemove"
               :item-data="{
                 image_url:
@@ -73,7 +73,7 @@
               }"
               item-type="equipment"
             >
-            </CartButton>
+            </SummaryButton>
 
             <input
               class="mx-2 border text-center w-8"
@@ -81,7 +81,7 @@
               :value="item.count"
             />
 
-            <CartButton
+            <SummaryButton
               type="summaryAdd"
               :item-data="{
                 image_url: item.image_url,
@@ -93,7 +93,7 @@
               }"
               item-type="equipment"
             >
-            </CartButton>
+            </SummaryButton>
           </div>
           <span class="text-center w-1/5 font-semibold text-sm"
             >${{ item.price }}</span
@@ -174,7 +174,7 @@
 import isArray from "lodash/isArray";
 import { useCartStore } from "@/store/cart";
 import { mapState } from "pinia";
-import CartButton from "../CartButton.vue";
+import SummaryButton from "./SummaryButton.vue";
 export default {
   setup() {
     const cartStore = useCartStore();
@@ -183,7 +183,7 @@ export default {
     };
   },
   components: {
-    CartButton,
+    SummaryButton,
   },
   data() {
     return {
