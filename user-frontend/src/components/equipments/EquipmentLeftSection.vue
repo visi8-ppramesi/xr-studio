@@ -51,7 +51,7 @@
 </template>
 
 <script>
-import CartButton from "../CartButton.vue";
+import CartButton from "../shopping/CartButton.vue";
 export default {
   components: {
     CartButton,

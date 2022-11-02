@@ -20,6 +20,7 @@
 
 <script>
 import { useCartStore } from "@/store/cart";
+import { mapState } from "pinia";
 export default {
   setup() {
     const cartStore = useCartStore();
@@ -35,11 +36,29 @@ export default {
       type: String,
       default: "item",
     },
+    type: {
+      type: String,
+    },
+    id: {
+      type: String,
+    },
+    name: {
+      type: String,
+    },
   },
   methods: {
     addToCart() {
       this.cartStore.addItem({ ...this.itemData, type: this.itemType });
     },
+    removeItem() {
+      // const cartId = this.cart.reduce((item) => {
+      //   return item.id;
+      // });
+      this.cartStore.decreaseItemQty(this.itemData.id);
+    },
+  },
+  computed: {
+    ...mapState(useCartStore, ["cart"]),
   },
 };
 </script>

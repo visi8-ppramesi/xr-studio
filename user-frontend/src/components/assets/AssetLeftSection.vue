@@ -118,7 +118,7 @@
 // import NewComment from "../comment/NewComment.vue";
 // import CommentComponent from "../comment/CommentComponent.vue";
 // import CanvasComponent from "./threejs/CanvasComponent.vue";
-import CartButton from "../CartButton.vue";
+import CartButton from "../shopping/CartButton.vue";
 export default {
   components: {
     // NewComment,
