@@ -18,6 +18,7 @@
       </div>
       <div class="flex">
         <CartButton
+          type="cart"
           :item-data="{
             image_url: equipment.preview_url,
             type: 'equipment',

@@ -14,7 +14,11 @@ const items = JSON.parse(localStorage.getItem("cart") || "[]");
 
 export const useCartStore = defineStore("cart", () => {
   const cart = ref(items);
-  const itemCount = ref(items.length);
+  const count = items.reduce((acc, v) => {
+    acc += v?.count ?? 0;
+    return acc;
+  }, 0);
+  const itemCount = ref(count);
 
   let processor;
 
@@ -26,7 +30,7 @@ export const useCartStore = defineStore("cart", () => {
   }
 
   function removeItem(id) {
-    this.cart = this.cart.filter(function (obj) {
+    this.cart = this.cart.filter((obj) => {
       return obj.id !== id;
     });
     localStorage.setItem("cart", JSON.stringify(this.cart));
@@ -35,6 +39,17 @@ export const useCartStore = defineStore("cart", () => {
       return acc;
     }, 0);
     emitter.emit("cartUpdated", { cart: this.cart, count: this.itemCount });
+  }
+
+  function decreaseItemQty(id) {
+    const item = this.cart.find((v) => v.id === id);
+    if (item.count === 1) {
+      this.removeItem(id);
+    } else {
+      item.count -= 1;
+      this.itemCount -= 1;
+      emitter.emit("cartUpdated", { cart: this.cart, count: this.itemCount });
+    }
   }
 
   function addItem(item) {
@@ -85,6 +100,7 @@ export const useCartStore = defineStore("cart", () => {
     clearCart,
     removeItem,
     addItem,
+    decreaseItemQty,
   };
 
   processor = new Processor(cartObj);

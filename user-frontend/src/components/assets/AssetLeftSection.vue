@@ -66,6 +66,7 @@
       </div>
       <div class="flex">
         <CartButton
+          type="cart"
           :item-data="{
             image_url: asset.preview_url,
             type: 'asset',
