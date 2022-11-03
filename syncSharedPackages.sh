@@ -7,3 +7,6 @@ cp ./shared/cryptography/browser/crypto.js ./user-frontend/src/utils/crypto.js
 cp ./shared/cryptography/browser/crypto.js ./admin-frontend/src/utils/crypto.js
 cp ./shared/cryptography/nodejs/crypto.js ./factory/utils/crypto.js
 cp ./shared/cryptography/nodejs/crypto.js ./functions/utils/crypto.js
+node ./shared/dateRangeHash/buildDateRangeHash.js
+cp ./shared/dateRangeHash/browser/dateRangeHash.js ./user-frontend/src/utils/dateRangeHash.js
+cp ./shared/dateRangeHash/nodejs/dateRangeHash.js ./factory/utils/dateRangeHash.js

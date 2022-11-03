@@ -35,6 +35,15 @@ function createFilters(context) {
       }
       return ITEM_NEW;
     },
+    studio: function () {
+      const localCart = !isNil(context.cart?.value)
+        ? context.cart.value
+        : context.cart;
+      if (localCart.exists((v) => v.type === "studio")) {
+        return ITEM_INVALID;
+      }
+      return ITEM_NEW;
+    },
   };
 }
 
