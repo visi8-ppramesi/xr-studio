@@ -70,6 +70,11 @@ const creatorRoutes = [
     name: "Creator",
     component: () => import("@/views/creators/Creator.vue"),
   },
+  {
+    path: "/creator/notification",
+    name: "Creator",
+    component: () => import("@/views/creators/Notification.vue"),
+  },
 ];
 
 const preproRoutes = [
