@@ -1,48 +1,59 @@
 const script = `
 //nodejs
 const isNil = require('lodash/isNil')
+const every = require('lodash/every')
+const sortBy = require('lodash/sortBy')
 //nodejs end
 
 //browser
 import isNil from 'lodash/isNil'
+import every from "lodash/every";
+import sortBy from "lodash/sortBy";
 //browser end
 
 const strDate = new Date("2000-01-01").getTime();
 const endDate = new Date("2100-01-01").getTime();
 const maxLen = endDate - strDate;
-const base64Code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-'
 
-class DateRangeHashGenerator {
-    constructor(type = 'normal', base = 36, depth = 14) {
-        this.type = type
-        this.depth = depth
-        if (type === 'normal') {
-            this.base = base
-            this.divisor = Math.sqrt(this.base)
-            this.encoder = this.xyEncoder
-            this.decoder = this.xyDecoder
-        } else if (type === 'morton') {
-            this.base = 64
-            this.divisor = 8
-            this.encoder = this.zOrderInterleave
-            this.decoder = this.zOrderDeinterleave
-        }
-    }
-
-    xyEncoder(x, y) {
-        return (x + y * this.divisor).toString(this.base)
-    }
-
-    xyDecoder(code) {
-        const num = parseInt(code, this.base);
-
+const xyEncBuilder = function(self){
+    const base64Code =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-";
+    const encoder = function(x, y){
+        const index = x + y * this.divisor
+        return this.base <= 36 ? index.toString(this.base) : base64Code[index];
+    }.bind(self)
+    const decoder = function(code){
+        const num = this.base <= 36 ? parseInt(code, this.base) : base64Code.indexOf(code);
+    
         const x = num % this.divisor;
         const y = Math.floor(num / this.divisor);
         return [x, y];
-    }
+    }.bind(self)
+    return {encoder, decoder}
+}
 
-    zOrderInterleave(x, y) {
-        const B = [0x55555555, 0x33333333, 0x0F0F0F0F, 0x00FF00FF];
+const verticalEncBuilder = function(self){
+    const base64Code =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-";
+    const encoder = function(x, y){
+        const index = y + x * this.divisor
+        return this.base <= 36 ? index.toString(this.base) : base64Code[index];
+    }.bind(self)
+    const decoder = function(code){
+        const num = this.base <= 36 ? parseInt(code, this.base) : base64Code.indexOf(code);
+    
+        const y = num % this.divisor;
+        const x = Math.floor(num / this.divisor);
+        return [x, y];
+    }.bind(self)
+    return {encoder, decoder}
+}
+
+const mortonEncBuilder = function (self) {
+    const base64Code =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-";
+    const encoder = function (x, y) {
+        const B = [0x55555555, 0x33333333, 0x0f0f0f0f, 0x00ff00ff];
         const S = [1, 2, 4, 8];
 
         x = (x | (x << S[3])) & B[3];
@@ -57,23 +68,73 @@ class DateRangeHashGenerator {
 
         let z = x | (y << 1);
         return base64Code[z];
-    }
-
-    zOrderDeinterleave(code) {
-        let v = base64Code.indexOf(code)
+    }.bind(self)
+    const decoder = function (code) {
+        let v = base64Code.indexOf(code);
         function deinterleave(x) {
             x = x & 0x55555555;
             x = (x | (x >> 1)) & 0x33333333;
-            x = (x | (x >> 2)) & 0x0F0F0F0F;
-            x = (x | (x >> 4)) & 0x00FF00FF;
-            x = (x | (x >> 8)) & 0x0000FFFF;
+            x = (x | (x >> 2)) & 0x0f0f0f0f;
+            x = (x | (x >> 4)) & 0x00ff00ff;
+            x = (x | (x >> 8)) & 0x0000ffff;
             return x;
         }
 
-        return [
-            deinterleave(v),
-            deinterleave(v >> 1)
-        ]
+        return [deinterleave(v), deinterleave(v >> 1)];
+    }.bind(self)
+    return { encoder, decoder }
+}
+
+class DateRangeHashGenerator {
+    constructor(type = 'normal', base = 36, depth = 14) {
+        this.type = type
+        this.depth = depth
+        let encoding;
+        if (type === "normal") {
+            this.base = base;
+            this.divisor = Math.sqrt(this.base);
+            encoding = xyEncBuilder(this)
+        } else if (type === "morton") {
+            this.base = 64;
+            this.divisor = 8;
+            encoding = mortonEncBuilder(this)
+        } else if (type === 'vertical') {
+            this.base = base;
+            this.divisor = Math.sqrt(this.base);
+            encoding = verticalEncBuilder(this);
+        }
+        this.encoder = encoding.encoder
+        this.decoder = encoding.decoder
+    }
+
+    getFreeSpots(datesArray, minLength){
+        const isSorted = every(datesArray, (v, idx, arr) => {
+            return idx === 0 || String(arr[idx - 1]) <= String(v);
+        })
+        if(!isSorted){
+            datesArray = sortBy(datesArray);
+        }
+        const availableDates = []
+    
+        for(let i = 1; i < datesArray.length; i++){
+            let { ya, xb } = this.calculateHashesValues(datesArray[i - 1], datesArray[i]);
+            const evDiff = xb - ya
+            if(evDiff > minLength){
+                availableDates.push(this.encodeDates(ya, xb))
+            }
+        }
+    
+        return availableDates;
+    }
+
+    getIntervalLength(hash) {
+        const letters = hash.split("");
+        return letters.reduce(
+            (acc, v, idx) =>
+                (acc +=
+                this.decoder(v)[1] * Math.floor(maxLen / this.divisor ** (idx + 1))),
+            0
+        );
     }
 
     getHashLetter(x, y, myMaxLen) {
@@ -87,54 +148,55 @@ class DateRangeHashGenerator {
         return [map, blockSize, [xRemainder, yRemainder]];
     }
 
-    hashesOverlap(hashA, hashB) {
+    calculateHashesValues(hashA, hashB){
         const lettersA = hashA.split("");
         const lettersB = hashB.split("");
         const lenA = lettersA.length;
         const lenB = lettersB.length;
-        let plusOneDeep = false;
         let xa = 0,
             ya = 0,
             xb = 0,
             yb = 0;
-        let innerCount = 0;
-
+    
         for (let i = 0; i < Math.max(lenA, lenB); i++) {
             if (isNil(lettersA[i])) {
-                if (this.type === 'normal') {
+                if (this.type === "normal" || this.type === "vertical") {
                     lettersA[i] = "0";
-                } else if (this.type === 'morton') {
+                } else if (this.type === "morton") {
                     lettersA[i] = "A";
                 }
             }
             if (isNil(lettersB[i])) {
-                if (this.type === 'normal') {
+                if (this.type === "normal" || this.type === "vertical") {
                     lettersB[i] = "0";
-                } else if (this.type === 'morton') {
+                } else if (this.type === "morton") {
                     lettersB[i] = "A";
                 }
             }
-
-            if (lettersA[i] !== lettersB[i] || plusOneDeep) {
-                const [mxa, tmya] = this.decoder(lettersA[i]);
-                const [mxb, tmyb] = this.decoder(lettersB[i]);
-                const mya = tmya + mxa
-                const myb = tmyb + mxb
-                const multiplier = 1 / (this.divisor ** innerCount);
-                xa += mxa * multiplier;
-                ya += mya * multiplier;
-                xb += mxb * multiplier;
-                yb += myb * multiplier;
-                plusOneDeep = true;
-                innerCount++;
-            }
+    
+            const [mxa, tmya] = this.decoder(lettersA[i]);
+            const [mxb, tmyb] = this.decoder(lettersB[i]);
+            const mya = tmya + mxa;
+            const myb = tmyb + mxb;
+            const multiplier = maxLen / (this.divisor ** (i + 1));
+            xa += mxa * multiplier;
+            ya += mya * multiplier;
+            xb += mxb * multiplier;
+            yb += myb * multiplier;
         }
+    
         [xa, ya, xb, yb] = [
-            parseFloat(xa.toFixed(6)),
-            parseFloat(ya.toFixed(6)),
-            parseFloat(xb.toFixed(6)),
-            parseFloat(yb.toFixed(6)),
-        ]
+            parseInt(xa) + strDate,
+            parseInt(ya) + strDate,
+            parseInt(xb) + strDate,
+            parseInt(yb) + strDate,
+        ];
+    
+        return { xa, ya, xb, yb }
+    }
+  
+    hashesOverlap(hashA, hashB) {
+        const { xa, ya, xb, yb } = this.calculateHashesValues(hashA, hashB)
         return !((xa > yb && ya > xb) || (xa < yb && ya < xb));
     }
 
@@ -154,7 +216,7 @@ class DateRangeHashGenerator {
         }, []);
         return [
             new Date((strStamp + strDate)),
-            new Date((endStamp + strDate)),
+            new Date((endStamp + strStamp + strDate + 1)),
         ];
     }
 
@@ -166,7 +228,7 @@ class DateRangeHashGenerator {
             end = new Date(end);
         }
 
-        if (str > end){
+        if (str > end) {
             throw new Error('temporal paradox error: cannot end before it starts');
         }
 
@@ -178,7 +240,7 @@ class DateRangeHashGenerator {
         const endStamp = end.getTime();
 
         let x = strStamp - strDate;
-        let y = endStamp - strDate;
+        let y = endStamp - strStamp - 1;
         let letters = "";
         let localMaxLen = maxLen;
 
@@ -197,13 +259,20 @@ class DateRangeHashGenerator {
         return letters;
     }
 }
+const hedhg = new DateRangeHashGenerator("normal", 64);
+const vedhg = new DateRangeHashGenerator("vertical", 64);
+const medhg = new DateRangeHashGenerator("morton", 64);
 
 //nodejs
 module.exports = DateRangeHashGenerator
+exports.hedhg = hedhg
+exports.vedhg = vedhg
+exports.medhg = medhg
 //nodejs end
 
 //browser
-export default DateRangeHashGenerator
+export default DateRangeHashGenerator;
+export { hedhg, vedhg, medhg };
 //browser end
 `
 

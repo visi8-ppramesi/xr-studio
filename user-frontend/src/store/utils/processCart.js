@@ -1,6 +1,7 @@
-const isNil = require("lodash/isNil");
-const isFunction = require("lodash/isFunction");
+import isNil from "lodash/isNil";
+import isFunction from "lodash/isFunction";
 import { ITEM_IN_CART, ITEM_NEW, ITEM_INVALID } from "./cartStatus";
+import { vedhg } from "@/utils/dateRangeHash";
 
 Array.prototype.exists = function (testFunc) {
   return !isNil(this.find(testFunc));
@@ -35,11 +36,15 @@ function createFilters(context) {
       }
       return ITEM_NEW;
     },
-    studio: function () {
+    studio: function (item) {
       const localCart = !isNil(context.cart?.value)
         ? context.cart.value
         : context.cart;
-      if (localCart.exists((v) => v.type === "studio")) {
+      if (
+        localCart.exists(
+          (v) => v.type === "studio" && vedhg.hashesOverlap(v.id, item.id)
+        )
+      ) {
         return ITEM_INVALID;
       }
       return ITEM_NEW;
