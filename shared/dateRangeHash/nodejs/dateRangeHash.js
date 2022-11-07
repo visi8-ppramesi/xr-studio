@@ -260,10 +260,10 @@ const vedhg = new DateRangeHashGenerator("vertical", 64);
 const medhg = new DateRangeHashGenerator("morton", 64);
 
 //nodejs
-module.exports = DateRangeHashGenerator
-exports.hedhg = hedhg
-exports.vedhg = vedhg
-exports.medhg = medhg
+const myModule = module.exports = DateRangeHashGenerator
+myModule.hedhg = hedhg
+myModule.vedhg = vedhg
+myModule.medhg = medhg
 //nodejs end
 
 

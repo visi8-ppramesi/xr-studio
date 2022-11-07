@@ -5,6 +5,7 @@ export default class extends Collection {
   static fields = {
     name: String,
     description: String,
+    procedure_code: String,
     procedures: Array,
   };
 }

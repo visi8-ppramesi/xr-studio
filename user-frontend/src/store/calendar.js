@@ -25,7 +25,7 @@ export const useCalendarStore = defineStore("calendar", () => {
       });
     });
     return this.calendar;
-  };
+  }
 
   return { calendar, getCalendar, freeSpots };
 });

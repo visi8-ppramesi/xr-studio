@@ -1,4 +1,5 @@
 const Factory = require('../factory.js')
+const { vedhg } = require('../../utils/dateRangeHash.js')
 
 module.exports = class CalendarFactory extends Factory{
     static collectionName = 'calendar'
@@ -16,7 +17,8 @@ module.exports = class CalendarFactory extends Factory{
 
     async createDoc(startDate, endDate, ev, id = null){
         const data = await this.constructor.createData(startDate, endDate, ev)
-        const {ref, id: newId} = this.buildNewDocRef(id)
+        const hashId = 'ft-' + vedhg.encodeDates(startDate, endDate)
+        const {ref, id: newId} = this.buildNewDocRef(hashId)
         this.data = data
         this.ref = ref
         this.id = newId

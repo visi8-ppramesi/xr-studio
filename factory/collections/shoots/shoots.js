@@ -7,6 +7,7 @@ const ShootProcedureFactory = require('./procedures/procedures')
 const ShootAssetFactory = require('./assets/assets')
 const ShootEquipmentFactory = require('./equipments/equipments')
 const CalendarFactory = require('../calendar/calendar')
+const { vedhg } = require('../../utils/dateRangeHash.js')
 
 module.exports = class ShootFactory extends Factory{
     static collectionName = 'shoots'
@@ -20,10 +21,13 @@ module.exports = class ShootFactory extends Factory{
         const userFactory = new UserFactory()
         const procedureTypeFactory = new ProcedureTypeFactory()
         const randomDays = Math.floor(Math.random() * 120)
+        const lockedStart = new Date(new Date().setDate(new Date().getDate() + randomDays + 7))
+        const lockedEnd = new Date(new Date().setDate(new Date().getDate() + randomDays + 14))
         return {
             creation_date: new Date(),
-            locked_in_start_date: new Date(new Date().setDate(new Date().getDate() + randomDays + 7)),
-            locked_in_end_date: new Date(new Date().setDate(new Date().getDate() + randomDays + 14)),
+            locked_in_start_date: lockedStart,
+            locked_in_end_date: lockedEnd,
+            locked_in_hash: vedhg.encodeDates(lockedStart, lockedEnd),
             location: 'main-location',
             // assets: [ 
             //     await assetFactory.getRandomProjection(['name', 'preview_url']),

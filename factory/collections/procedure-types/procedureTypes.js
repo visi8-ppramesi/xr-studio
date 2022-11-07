@@ -11,6 +11,7 @@ module.exports = class ProcedureTypeFactory extends Factory{
         return {
             name: faker.hacker.verb() + ' ' + faker.hacker.verb(),
             description: Array(10).fill().map(v => faker.hacker.phrase()).join(' '),
+            procedure_code: Math.random().toString(36).substring(2, 5),
             procedures: [
                 {
                     name: 'step 1',
