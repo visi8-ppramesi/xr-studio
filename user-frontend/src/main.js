@@ -9,6 +9,7 @@ import { createPinia } from "pinia";
 import { useAuthStore } from "./store/auth";
 import VueLoading from "vue-loading-overlay";
 import VueI18n from "./utils/i18n";
+import { logger } from "./utils/logger.js";
 import "vue-loading-overlay/dist/vue-loading.css";
 import i18n from "./i18n";
 import startCase from "lodash/startCase";
@@ -65,6 +66,7 @@ const injector = {
     vuePropertySetter(app, "emitter", emitter);
     vuePropertySetter(app, "filters", filters);
     vuePropertySetter(app, "formatters", formatters);
+    vuePropertySetter(app, "logger", logger);
   },
 };
 
