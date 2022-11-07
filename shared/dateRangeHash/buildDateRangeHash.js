@@ -15,6 +15,19 @@ const strDate = new Date("2000-01-01").getTime();
 const endDate = new Date("2100-01-01").getTime();
 const maxLen = endDate - strDate;
 
+const processHash = function (hash, defaultLen = 14) {
+    if(hash.startsWith('ft-') && hash.length > defaultLen) {
+        hash = hash.substr(3)
+    }
+
+    const splitted = hash.split('.')
+    if(splitted.length === 2) {
+        return splitted[1]
+    }else{
+        return hash
+    }
+}
+
 const xyEncBuilder = function(self){
     const base64Code =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-";
@@ -128,6 +141,7 @@ class DateRangeHashGenerator {
     }
 
     getIntervalLength(hash) {
+        hash = processHash(hash);
         const letters = hash.split("");
         return letters.reduce(
             (acc, v, idx) =>
@@ -149,6 +163,8 @@ class DateRangeHashGenerator {
     }
 
     calculateHashesValues(hashA, hashB){
+        hashA = processHash(hashA);
+        hashB = processHash(hashB);
         const lettersA = hashA.split("");
         const lettersB = hashB.split("");
         const lenA = lettersA.length;
@@ -201,6 +217,7 @@ class DateRangeHashGenerator {
     }
 
     decodeHash(hash) {
+        hash = processHash(hash);
         const letters = hash.split("");
         const [strStamp, endStamp] = letters.reduce((acc, v, idx) => {
             if (isNil(acc[0])) {

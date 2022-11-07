@@ -65,13 +65,13 @@
                   typeof item.image_url === 'string'
                     ? item.image_url
                     : item.image_url[0],
-                type: 'equipment',
+                type: item.type,
                 name: item.name,
                 description: item.description,
                 id: item.id,
                 price: item.price,
               }"
-              item-type="equipment"
+              :item-type="item.type"
             >
             </SummaryButton>
 
@@ -85,13 +85,13 @@
               type="summaryAdd"
               :item-data="{
                 image_url: item.image_url,
-                type: 'equipment',
+                type: item.type,
                 name: item.name,
                 description: item.description,
                 id: item.id,
                 price: item.price,
               }"
-              item-type="equipment"
+              :item-type="item.type"
             >
             </SummaryButton>
           </div>
@@ -126,32 +126,6 @@
             >Items {{ itemCount }}</span
           >
         </div>
-        <!-- <div>
-          <label class="font-medium inline-block mb-3 text-sm uppercase"
-            >Shipping</label
-          >
-          <select class="block p-2 text-gray-600 w-full text-sm">
-            <option>Standard shipping - $10.00</option>
-          </select>
-        </div>
-        <div class="py-10">
-          <label
-            for="promo"
-            class="font-semibold inline-block mb-3 text-sm uppercase"
-            >Promo Code</label
-          >
-          <input
-            type="text"
-            id="promo"
-            placeholder="Enter your code"
-            class="p-2 text-sm w-full"
-          />
-        </div>
-        <button
-          class="bg-red-500 hover:bg-red-600 px-5 py-2 text-sm text-white uppercase"
-        >
-          Apply
-        </button> -->
         <div class="border-t mt-8">
           <div
             class="flex font-semibold justify-between py-6 text-sm uppercase"
@@ -174,7 +148,7 @@
 import isArray from "lodash/isArray";
 import { useCartStore } from "@/store/cart";
 import { mapState } from "pinia";
-import SummaryButton from "./SummaryButton.vue";
+import SummaryButton from "@/components/shopping/SummaryButton.vue";
 export default {
   setup() {
     const cartStore = useCartStore();
@@ -191,9 +165,9 @@ export default {
     };
   },
   props: {
-    count: {
-      type: Number,
-      default: 1,
+    item: {
+      type: Object,
+      default: () => ({}),
     },
     description: {
       type: String,

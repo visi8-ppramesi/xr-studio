@@ -1,4 +1,5 @@
 //browser
+import { Buffer } from "buffer";
 import stringify from "fast-json-stable-stringify";
 import isObject from "lodash/isObject";
 import isArray from "lodash/isArray";
@@ -107,7 +108,16 @@ const signMessage = async (message, privKey, pass = null) => {
     privKey = await decrypt(privKey, pass);
   }
   if (isString(privKey)) {
-    privKey = JSON.parse(privKey);
+    try {
+      privKey = JSON.parse(privKey);
+    } catch (err) {
+      try {
+        const parsed = Buffer.from(privKey, "base64").toString("utf-8");
+        privKey = JSON.parse(parsed);
+      } catch (innerErr) {
+        throw new Error([err, innerErr]);
+      }
+    }
   }
   if (isObject(message) || isArray(message)) {
     message = stringify(message);
@@ -131,7 +141,16 @@ const signMessage = async (message, privKey, pass = null) => {
 
 const verifySignature = async (message, signature, publicKey) => {
   if (isString(publicKey)) {
-    publicKey = JSON.parse(publicKey);
+    try {
+      publicKey = JSON.parse(publicKey);
+    } catch (err) {
+      try {
+        const parsed = Buffer.from(publicKey, "base64").toString("utf-8");
+        publicKey = JSON.parse(parsed);
+      } catch (innerErr) {
+        throw new Error([err, innerErr]);
+      }
+    }
   }
   if (isString(signature)) {
     signature = Buffer.from(signature, "base64");

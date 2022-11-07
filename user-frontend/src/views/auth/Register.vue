@@ -12,6 +12,15 @@
           placeholder="Email address"
         />
         <input
+          name="username"
+          for="username"
+          v-model="username"
+          type="text"
+          id="username"
+          class="form-control block w-full px-3 py-1.5 mb-6 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+          placeholder="User Name"
+        />
+        <input
           name="fullName"
           for="fullName"
           v-model="fullName"
@@ -19,15 +28,6 @@
           id="fullName"
           class="form-control block w-full px-3 py-1.5 mb-6 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
           placeholder="Full Name"
-        />
-        <input
-          name="email"
-          for="email"
-          v-model="email"
-          type="email"
-          id="email"
-          class="form-control block w-full px-3 py-1.5 mb-6 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-          placeholder="Email address"
         />
         <input
           name="password"
@@ -64,6 +64,9 @@
 
 <script>
 import { useAuthStore } from "../../store/auth.js";
+import { generateKey, decrypt } from "@/utils/crypto";
+import startCase from "lodash/startCase";
+import { Buffer } from "buffer";
 
 const i18Texts = {
   messages: {
@@ -93,6 +96,7 @@ export default {
   },
   data() {
     return {
+      errorMsg: [],
       email: "",
       password: "",
       username: "",
@@ -114,15 +118,62 @@ export default {
     };
   },
   methods: {
-    register() {
-      if (this.confirmPassword !== this.password) {
+    checkFields() {
+      const message = [];
+      const test = ["password", "email", "fullName", "username"].reduce(
+        (acc, v) => {
+          const innerTest = this[v].length < 1;
+          if (innerTest) {
+            message.push(startCase(v));
+          }
+          acc ||= innerTest;
+          return acc;
+        },
+        false
+      );
+      if (message.length > 0) {
+        let result;
+        if (message.length == 1) {
+          result = message[0];
+        } else {
+          const last = message.pop();
+          result = message.join(", ") + " and " + last;
+        }
+        this.errorMsg.push(result);
+      }
+
+      return test;
+    },
+    checkPassword() {
+      this.errorMsg.push("password-different");
+      return this.confirmPassword != this.password;
+    },
+    async register() {
+      if (this.checkFields() || this.checkPassword()) {
+        console.log(this.errorMsg);
+        this.errorMsg = [];
         return;
       }
+      const keyPair = await generateKey(this.password);
+      const publicKey = keyPair[0];
+      const privateKey = keyPair[1];
       this.authStore.register(
         this.email,
         this.password,
-        { name: this.username, full_name: this.fullName },
+        {
+          username: this.username,
+          full_name: this.fullName,
+          public_key: publicKey,
+          encrypted_private_key: privateKey,
+        },
         () => {
+          decrypt(privateKey, this.password).then((privKey) => {
+            localStorage.setItem(
+              "publicKey",
+              Buffer.from(publicKey, "base64").toString("utf-8")
+            );
+            localStorage.setItem("privateKey", privKey);
+          });
           this.$router.push({ name: "Login", query: { registered: 1 } });
         },
         () => {

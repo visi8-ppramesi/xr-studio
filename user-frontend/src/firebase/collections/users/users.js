@@ -36,11 +36,9 @@ const validateUserProfileData = (data) => {
 };
 
 const fillData = (dataObject, email) => {
-  dataObject.bookmarks = [];
-  dataObject.favorites = [];
-  dataObject.comic_subscriptions = [];
   dataObject.profile_image_url = null;
   dataObject.email = email;
+  dataObject.groups = [];
 };
 
 export default class extends Collection {
@@ -245,8 +243,8 @@ export default class extends Collection {
       password
     )
       .then((promisedNewUser) => {
-        updateProfile(promisedNewUser, {
-          displayName: userData.name,
+        updateProfile(promisedNewUser.user, {
+          displayName: userData.username,
         });
         newUser = promisedNewUser;
         newUserDocRef = doc(this.db, "users", promisedNewUser.user.uid);
