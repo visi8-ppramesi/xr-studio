@@ -46,6 +46,9 @@ const formatters = {
     });
     return intlFormatter.format(number);
   },
+  round: function (num, dec) {
+    return Math.round(num * 10 ** dec) / 10 ** dec;
+  },
   startCase: function (str) {
     return startCase(str);
   },
