@@ -32,79 +32,11 @@
           :key="'cart-item-' + idx"
           class="flex items-center hover:bg-gray-100 -mx-8 px-6 py-5"
         >
-          <div class="flex w-2/5">
-            <!-- product -->
-            <div class="w-20">
-              <img
-                class="h-24 object-cover"
-                :src="
-                  typeof item.image_url === 'string'
-                    ? item.image_url
-                    : item.image_url[0]
-                "
-                alt=""
-              />
-            </div>
-            <div class="flex flex-col justify-between ml-4 flex-grow">
-              <span class="font-bold text-sm">{{ item.name }}</span>
-              <span class="text-red-500 text-xs">{{
-                filters.truncate(item.description, 25)
-              }}</span>
-              <a
-                href="#"
-                class="font-semibold hover:text-red-500 text-gray-500 text-xs"
-                >Remove</a
-              >
-            </div>
-          </div>
-          <div class="flex justify-center w-1/5">
-            <SummaryButton
-              type="summaryRemove"
-              :item-data="{
-                image_url:
-                  typeof item.image_url === 'string'
-                    ? item.image_url
-                    : item.image_url[0],
-                type: item.type,
-                name: item.name,
-                description: item.description,
-                id: item.id,
-                price: item.price,
-              }"
-              :item-type="item.type"
-            >
-            </SummaryButton>
-
-            <input
-              class="mx-2 border text-center w-8"
-              type="text"
-              :value="item.count"
-            />
-
-            <SummaryButton
-              type="summaryAdd"
-              :item-data="{
-                image_url: item.image_url,
-                type: item.type,
-                name: item.name,
-                description: item.description,
-                id: item.id,
-                price: item.price,
-              }"
-              :item-type="item.type"
-            >
-            </SummaryButton>
-          </div>
-          <span class="text-center w-1/5 font-semibold text-sm"
-            >${{ item.price }}</span
-          >
-          <span class="text-center w-1/5 font-semibold text-sm"
-            >${{ formatters.round((item.count, item.price), 2) }}</span
-          >
+          <CartItem :item="item" />
         </div>
 
-        <a
-          href="/equipments"
+        <router-link
+          to="/equipments"
           class="flex font-semibold text-indigo-600 text-sm mt-10"
         >
           <svg
@@ -116,7 +48,7 @@
             />
           </svg>
           Continue Shopping
-        </a>
+        </router-link>
       </div>
 
       <div id="summary" class="w-1/4 px-8 py-10">
@@ -148,7 +80,8 @@
 import isArray from "lodash/isArray";
 import { useCartStore } from "@/store/cart";
 import { mapState } from "pinia";
-import SummaryButton from "@/components/shopping/SummaryButton.vue";
+// import SummaryButton from "@/components/shopping/SummaryButton.vue";
+import CartItem from "@/components/shopping/CartItem.vue";
 export default {
   setup() {
     const cartStore = useCartStore();
@@ -157,7 +90,8 @@ export default {
     };
   },
   components: {
-    SummaryButton,
+    // SummaryButton,
+    CartItem,
   },
   data() {
     return {
@@ -208,13 +142,11 @@ export default {
       this.cartStore.addItem({ ...this.itemData, type: this.itemType });
     },
     cartTotalAmount() {
-      let total = 0;
-
-      total = this.cart.reduce((acc, item) => {
+      const total = this.cart.reduce((acc, item) => {
         return acc + item.count * item.price;
       }, 0);
 
-      return total.toFixed(2);
+      return this.formatters.currency(total);
     },
   },
 };

@@ -53,7 +53,6 @@ export const useCartStore = defineStore("cart", () => {
   }
 
   function addItem(item) {
-    console.log(item);
     //{ image_url, type, name, description, id, price }) {
     let itemStatus = DEFAULT_STATUS;
     if (!isNil(processor)) {

@@ -24,6 +24,37 @@ const processHash = function (hash, defaultLen = 14) {
     }
 }
 
+const checkStackableArray = function(arr){
+    const len = arr.reduce((acc, v) => {
+        return Math.max(acc, v.toString(2).length)
+    }, 0)
+    const orRed = arr.reduce((acc, v) => {
+        console.log(v.toString(2))
+        return acc | v
+    }, 0)
+    const p = (2 ** len) - 1
+    console.log(p.toString(2))
+    return (orRed ^ p) !== 0
+}
+
+const checkStackable = function(hashA, hashB) {
+    function getStackCode(hash){
+        const hashArr = hash.split('.');
+        if(hashArr.length > 2){
+            return parseInt(hashArr[hashArr.length - 1]);
+        }else{
+            return null;
+        }
+    }
+
+    hashA = getStackCode(hashA);
+    hashB = getStackCode(hashB);
+    if(isNil(hashA) || isNil(hashB)){
+        throw new Error('stackable code missing');
+    }
+    return (hashA + hashB) < 8 && (hashA ^ hashB) !== 0;
+}
+
 const xyEncBuilder = function(self){
     const base64Code =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-";
@@ -280,5 +311,5 @@ const medhg = new DateRangeHashGenerator("morton", 64);
 
 //browser
 export default DateRangeHashGenerator;
-export { hedhg, vedhg, medhg };
+export { hedhg, vedhg, medhg, checkStackable, checkStackableArray };
 //browser end
