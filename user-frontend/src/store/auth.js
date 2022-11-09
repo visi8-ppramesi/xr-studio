@@ -85,7 +85,7 @@ export const useAuthStore = defineStore("auth", {
           localStorage.setItem("uid", this.uid);
           this.status.loggingIn = false;
           this.isLoggedIn = true;
-          successFunc();
+          successFunc(user);
         })
         .catch((error) => {
           // handleError(error, 'loginError')

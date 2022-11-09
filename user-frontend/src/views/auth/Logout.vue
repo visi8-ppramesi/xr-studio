@@ -28,6 +28,8 @@ export default {
   mounted() {
     this.authStore.logout(
       () => {
+        localStorage.removeItem("publicKey");
+        localStorage.removeItem("privateKey");
         this.$router.push({ name: "Login" });
       },
       () => {}

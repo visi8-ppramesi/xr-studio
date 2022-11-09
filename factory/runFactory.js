@@ -25,7 +25,7 @@ factoryMap.set(ContractTemplateFactory, {
 })
 factoryMap.set(ProcedureTypeFactory, {
     dep: [],
-    buildFunc: ['createDocs', 5],
+    buildFunc: ['createDocs']
 })
 factoryMap.set(AssetFactory, {
     dep: [UserFactory],
