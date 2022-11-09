@@ -171,10 +171,10 @@ export default class extends Collection {
     });
   }
 
-  async updateProfileData({ email, name, full_name }) {
+  async updateProfileData({ email, username, full_name }) {
     const update = {};
-    if (name) {
-      update.name = name;
+    if (username) {
+      update.username = username;
     }
     if (full_name) {
       update.full_name = full_name;

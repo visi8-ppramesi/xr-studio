@@ -3,13 +3,13 @@
     <div class="block rounded-lg shadow-lg bg-white px-6 py-12 md:px-12">
       <form>
         <input
-          name="username"
-          for="username"
-          v-model="username"
-          type="username"
-          id="username"
+          name="email"
+          for="email"
+          v-model="email"
+          type="email"
+          id="email"
           class="form-control block w-full px-3 py-1.5 mb-6 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-          placeholder="Username"
+          placeholder="Email address"
         />
         <input
           name="username"
@@ -40,8 +40,8 @@
         />
         <input
           @keyup.enter="register"
-          name="confirm-password"
-          for="confirm-password"
+          name="password"
+          for="password"
           v-model="confirmPassword"
           type="password"
           id="confirm-password"
@@ -64,9 +64,8 @@
 
 <script>
 import { useAuthStore } from "../../store/auth.js";
-import { generateKey, decrypt } from "@/utils/crypto";
+import { generateKey } from "@/utils/crypto";
 import startCase from "lodash/startCase";
-import { Buffer } from "buffer";
 
 const i18Texts = {
   messages: {
@@ -167,13 +166,9 @@ export default {
           encrypted_private_key: privateKey,
         },
         () => {
-          decrypt(privateKey, this.password).then((privKey) => {
-            localStorage.setItem(
-              "publicKey",
-              Buffer.from(publicKey, "base64").toString("utf-8")
-            );
-            localStorage.setItem("privateKey", privKey);
-          });
+          localStorage.setItem("publicKey", publicKey);
+          localStorage.setItem("privateKey", privateKey);
+
           this.$router.push({ name: "Login", query: { registered: 1 } });
         },
         () => {

@@ -3,7 +3,8 @@
     <form class="bg-white rounded px-8 pt-6 pb-8 mb-4">
       <div v-for="field in fields" :key="field.id">
         <component
-          :is="components[field.name]"
+          :is="components[field.type]"
+          :field="field"
           v-model="formData[field.name]"
         />
       </div>
@@ -31,7 +32,13 @@ export default {
   data() {
     return {
       procTypes: [],
-      fields: [],
+      fields: [
+        {
+          type: "datepicker",
+          name: "datepickerTest",
+          label: "Testing",
+        },
+      ],
       formData: {},
       components: {
         text: StudioInputText,

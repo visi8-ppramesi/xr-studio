@@ -89,15 +89,15 @@
           </div>
         </div>
 
-        <div v-if="authProvider == 'email'" class="md:col-span-1 text-white">
+        <!-- <div v-if="authProvider == 'email'" class="md:col-span-1 text-white">
           <div
             id="my-account-password"
             class="font-bold text-xl px-3 pt-3 lg:px-5 lg:pt-5"
           >
             Password
           </div>
-        </div>
-        <div v-if="authProvider == 'email'" class="md:col-span-2">
+        </div> -->
+        <!-- <div v-if="authProvider == 'email'" class="md:col-span-2">
           <div class="p-3">
             <div class="bg-slate-100 rounded border-2">
               <div class="grid grid-cols-6 gap-6">
@@ -160,7 +160,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
       </form>
     </div>
   </div>

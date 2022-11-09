@@ -26,11 +26,9 @@ const checkStackableArray = function (arr) {
     return Math.max(acc, v.toString(2).length);
   }, 0);
   const orRed = arr.reduce((acc, v) => {
-    console.log(v.toString(2));
     return acc | v;
   }, 0);
   const p = 2 ** len - 1;
-  console.log(p.toString(2));
   return (orRed ^ p) !== 0;
 };
 

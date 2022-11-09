@@ -37,8 +37,6 @@
 
 <script>
 import { useAuthStore } from "../../store/auth.js";
-import { decrypt } from "@/utils/crypto";
-import { Buffer } from "buffer";
 
 const i18Texts = {
   messages: {
@@ -112,13 +110,9 @@ export default {
         this.email,
         this.password,
         (user) => {
-          decrypt(user.encrypted_private_key, this.password).then((privKey) => {
-            localStorage.setItem(
-              "publicKey",
-              Buffer.from(user.public_key, "base64").toString("utf-8")
-            );
-            localStorage.setItem("privateKey", privKey);
-          });
+          localStorage.setItem("publicKey", user.public_key);
+          localStorage.setItem("privateKey", user.encrypted_private_key);
+
           const fromRouteStr = localStorage.getItem("fromRoute");
           const fromRoute = fromRouteStr
             ? JSON.parse(fromRouteStr)
