@@ -3,13 +3,13 @@
     <div class="block rounded-lg shadow-lg bg-white px-6 py-12 md:px-12">
       <form>
         <input
-          name="email"
-          for="email"
-          v-model="email"
-          type="email"
-          id="email"
+          name="username"
+          for="username"
+          v-model="username"
+          type="username"
+          id="username"
           class="form-control block w-full px-3 py-1.5 mb-6 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-          placeholder="Email address"
+          placeholder="Username"
         />
         <input
           name="username"
@@ -40,8 +40,8 @@
         />
         <input
           @keyup.enter="register"
-          name="password"
-          for="password"
+          name="confirm-password"
+          for="confirm-password"
           v-model="confirmPassword"
           type="password"
           id="confirm-password"

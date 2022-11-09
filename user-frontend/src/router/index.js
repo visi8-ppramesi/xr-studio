@@ -122,6 +122,18 @@ const shopRoutes = [
   },
 ];
 
+const mineRoutes = [
+  {
+    path: "/my-account",
+    name: "MyAccount",
+    component: () => import("@/views/auth/MyAccount.vue"),
+    meta: {
+      requiresAuth: true,
+      class: "Mine",
+    },
+  },
+];
+
 const routes = [
   {
     path: "/",
@@ -135,6 +147,7 @@ const routes = [
   ...preproRoutes,
   ...studioRoutes,
   ...shopRoutes,
+  ...mineRoutes,
   {
     path: "/:catchAll(.*)",
     name: "NotFound",
