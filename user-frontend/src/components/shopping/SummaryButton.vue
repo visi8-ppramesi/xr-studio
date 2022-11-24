@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import { useCartStore } from "@/store/cart";
+import { useCartStore } from "../../store/cart";
 import { mapState } from "pinia";
 export default {
   setup() {

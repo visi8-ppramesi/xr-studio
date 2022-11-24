@@ -18,6 +18,7 @@
     "buffer": "^6.0.3",
     "core-js": "^3.8.3",
     "datatables.net-vue3": "^1.0.0",
+    "dotenv": "^16.0.3",
     "fast-json-stable-stringify": "^2.1.0",
     "file-loader": "^6.2.0",
     "firebase": "^9.12.1",
@@ -49,7 +50,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-vue": "^8.0.3",
-    "jest": "^27.0.5",
+    "jest": "^27.5.1",
     "lint-staged": "^11.1.2",
     "node-sass": "^7.0.3",
     "postcss": "^8.4.5",
@@ -99,9 +100,6 @@
     "not dead",
     "not ie 11"
   ],
-  "jest": {
-    "preset": "@vue/cli-plugin-unit-jest"
-  },
   "_id": "xr-studios-frontend@1.0.0",
   "gitHooks": {
     "pre-commit": "lint-staged"

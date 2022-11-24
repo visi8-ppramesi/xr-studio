@@ -7,13 +7,14 @@
         <div class="grid lg:grid-cols-2 gap-12 flex items-center">
           <div class="mt-12 lg:mt-0">
             <h1
+              id="front-page-title"
               class="text-5xl md:text-6xl xl:text-7xl font-bold tracking-tight mb-12"
             >
               The best solution <br /><span class="text-blue-600"
                 >for your productions</span
               >
             </h1>
-            <p class="text-gray-600">
+            <p id="front-page-description" class="text-gray-600">
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet,
               itaque accusantium odio, soluta, corrupti aliquam quibusdam
               tempora at cupiditate quis eum maiores libero veritatis? Dicta
@@ -83,6 +84,7 @@
                   </label>
                 </div>
                 <button
+                  id="register-button"
                   @click="register"
                   type="button"
                   data-mdb-ripple="true"
@@ -92,7 +94,7 @@
                   Sign up
                 </button>
                 <div class="text-center">
-                  <p class="mb-6">or sign up with:</p>
+                  <p id="register-option" class="mb-6">or sign up with:</p>
                 </div>
                 <div class="flex justify-center">
                   <a
@@ -178,7 +180,7 @@
 </template>
 
 <script>
-import { useAuthStore } from "@/store/auth";
+// import { useAuthStore } from "@/store/auth";
 export default {
   name: "front-page",
   data() {
@@ -190,10 +192,10 @@ export default {
     };
   },
   setup() {
-    const authStore = useAuthStore();
-    return {
-      authStore,
-    };
+    // const authStore = useAuthStore();
+    // return {
+    //   authStore,
+    // };
   },
   methods: {
     register() {

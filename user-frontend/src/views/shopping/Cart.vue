@@ -3,24 +3,27 @@
     <div class="flex shadow-md my-10">
       <div class="w-3/4 bg-white px-10 py-10">
         <div class="flex justify-between border-b pb-8">
-          <h1 class="font-semibold text-2xl">Shopping Cart</h1>
-          <h2 class="font-semibold text-2xl">{{ itemCount }} Items</h2>
+          <h1 id="cart-title" class="font-semibold text-2xl">Shopping Cart</h1>
+          <h2 id="cart-count" class="font-semibold text-2xl">{{ itemCount }} Items</h2>
         </div>
         <div class="flex mt-10 mb-5">
-          <h3 class="font-semibold text-gray-600 text-xs uppercase w-2/5">
+          <h3 id="cart-title-1" class="font-semibold text-gray-600 text-xs uppercase w-2/5">
             Product Details
           </h3>
           <h3
+            id="cart-title-2"
             class="font-semibold text-center text-gray-600 text-xs uppercase w-1/5 text-center"
           >
             Quantity
           </h3>
           <h3
+            id="cart-title-3"
             class="font-semibold text-center text-gray-600 text-xs uppercase w-1/5 text-center"
           >
             Price
           </h3>
           <h3
+            id="cart-title-4"
             class="font-semibold text-center text-gray-600 text-xs uppercase w-1/5 text-center"
           >
             Total
@@ -36,6 +39,7 @@
         </div>
 
         <router-link
+          id="cart-continue"
           to="/equipments"
           class="flex font-semibold text-indigo-600 text-sm mt-10"
         >
@@ -78,10 +82,10 @@
 
 <script>
 import isArray from "lodash/isArray";
-import { useCartStore } from "@/store/cart";
+import { useCartStore } from "../../store/cart";
 import { mapState } from "pinia";
 // import SummaryButton from "@/components/shopping/SummaryButton.vue";
-import CartItem from "@/components/shopping/CartItem.vue";
+import CartItem from "../../components/shopping/CartItem.vue";
 export default {
   setup() {
     const cartStore = useCartStore();

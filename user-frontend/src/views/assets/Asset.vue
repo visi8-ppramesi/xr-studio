@@ -6,9 +6,9 @@
 </template>
 
 <script>
-import AssetLeftSection from "@/components/assets/AssetLeftSection.vue";
-import AssetRightSection from "@/components/assets/AssetRightSection.vue";
-import { Assets } from "@/firebase/collections/assets/";
+import AssetLeftSection from "../../components/assets/AssetLeftSection.vue";
+import AssetRightSection from "../../components/assets/AssetRightSection.vue";
+import { Assets } from "../../firebase/collections/assets/assets";
 export default {
   name: "scene",
   components: {

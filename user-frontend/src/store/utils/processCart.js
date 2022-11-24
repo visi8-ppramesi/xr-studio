@@ -1,7 +1,7 @@
 import isNil from "lodash/isNil";
 import isFunction from "lodash/isFunction";
 import { ITEM_IN_CART, ITEM_NEW, ITEM_INVALID } from "./cartStatus";
-import { vedhg } from "@/utils/dateRangeHash";
+import { vedhg } from "../../utils/dateRangeHash";
 
 Array.prototype.exists = function (testFunc) {
   return !isNil(this.find(testFunc));

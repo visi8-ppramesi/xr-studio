@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import emitter from "@/utils/emitter";
+import emitter from "../utils/emitter";
 import Processor from "./utils/processCart";
 import { ref } from "vue";
 import isNil from "lodash/isNil";

@@ -1,6 +1,6 @@
 <template>
   <section class="mb-32 md:mx-20 text-gray-800 text-center">
-    <h2 class="text-3xl font-bold mb-12">
+    <h2 id="featured-title" class="text-3xl font-bold mb-12">
       Why is it so<u class="text-blue-600"> great?</u>
     </h2>
     <div class="grid md:grid-cols-3 lg:gap-x-12">
@@ -17,8 +17,8 @@
             ></path>
           </svg>
         </div>
-        <h5 class="text-lg font-bold mb-4">Support 24/7</h5>
-        <p class="text-gray-500">
+        <h5 id="featured-benefit-1" class="text-lg font-bold mb-4">Support 24/7</h5>
+        <p id="featured-description-1" class="text-gray-500">
           Laudantium totam quas cumque pariatur at doloremque hic quos quia
           eius. Reiciendis optio minus mollitia rerum labore facilis inventore
           voluptatem ad, quae quia sint. Ullam.
@@ -38,8 +38,8 @@
             ></path>
           </svg>
         </div>
-        <h5 class="text-lg font-bold mb-4">Safe and solid</h5>
-        <p class="text-gray-500">
+        <h5 id="featured-benefit-2" class="text-lg font-bold mb-4">Safe and solid</h5>
+        <p id="featured-description-2" class="text-gray-500">
           Eum nostrum fugit numquam, voluptates veniam neque quibusdam ullam
           aspernatur odio soluta, quisquam dolore animi mollitia a omnis
           praesentium, expedita nobis!
@@ -59,8 +59,8 @@
             ></path>
           </svg>
         </div>
-        <h5 class="text-lg font-bold mb-4">Extremely fast</h5>
-        <p class="text-gray-500">
+        <h5 id="featured-benefit-3" class="text-lg font-bold mb-4">Extremely fast</h5>
+        <p id="featured-description-3" class="text-gray-500">
           Enim cupiditate, minus nulla dolor cumque iure eveniet facere ullam
           beatae hic voluptatibus dolores exercitationem? Facilis debitis
           aspernatur amet nisi?

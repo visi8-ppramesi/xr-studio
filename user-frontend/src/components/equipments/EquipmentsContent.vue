@@ -2,7 +2,7 @@
   <section
     class="px-6 py-12 md:px-12 bg-gray-100 text-gray-800 text-center lg:text-left md:ml-60 min-h-screen"
   >
-    <h2 class="text-3xl font-bold mb-12 text-center">Equipment Rental</h2>
+    <h2 id="equipments-content-title" class="text-3xl font-bold mb-12 text-center">Equipment Rental</h2>
 
     <div
       class="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-8 mb-6 md:w-7/8 mx-auto"
@@ -19,10 +19,10 @@
           :created-date="null"
           :link-to-url="'/equipment/' + equipment.id"
         >
-          <div>
+          <div id="equipments-content-description">
             {{ filters.truncate(equipment.description, 100) }}
           </div>
-          <div>Price: {{ formatters.currency(equipment.price) }}</div>
+          <div id="equipments-content-price">Price: {{ formatters.currency(equipment.price) }}</div>
         </BoxContent>
       </div>
     </div>
@@ -31,6 +31,7 @@
       class="w-full flex content-center justify-center"
     >
       <div
+        id="equipments-content-more"
         data-mdb-ripple="true"
         data-mdb-ripple-color="light"
         class="inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded-full shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"

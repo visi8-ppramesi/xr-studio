@@ -11,15 +11,15 @@
               backdrop-filter: blur(30px);
             "
           >
-            <h2 class="text-3xl font-bold mb-6 pb-2">One-time payment</h2>
-            <p class="text-gray-500 mb-6 pb-2">
+            <h2 id="pricing-title" class="text-3xl font-bold mb-6 pb-2">One-time payment</h2>
+            <p id="pricing-description" class="text-gray-500 mb-6 pb-2">
               Lorem ipsum dolor sit amet, consectetur adipisicing elit. A soluta
               corporis voluptate ab error quam dolores doloremque, quae
               consectetur.
             </p>
             <div class="flex flex-wrap mb-6">
               <div class="w-full md:w-4/12 mb-4">
-                <p class="flex items-center justify-center lg:justify-start">
+                <p id="pricing-benefit-1" class="flex items-center justify-center lg:justify-start">
                   <svg
                     class="w-4 h-4 mr-2 text-gray-900"
                     role="img"
@@ -34,7 +34,7 @@
                 </p>
               </div>
               <div class="w-full md:w-4/12 mb-4">
-                <p class="flex items-center justify-center lg:justify-start">
+                <p id="pricing-benefit-2" class="flex items-center justify-center lg:justify-start">
                   <svg
                     class="w-4 h-4 mr-2 text-gray-900"
                     role="img"
@@ -49,7 +49,7 @@
                 </p>
               </div>
               <div class="w-full md:w-4/12 mb-4">
-                <p class="flex items-center justify-center lg:justify-start">
+                <p id="pricing-benefit-3" class="flex items-center justify-center lg:justify-start">
                   <svg
                     class="w-4 h-4 mr-2 text-gray-900"
                     role="img"
@@ -64,7 +64,7 @@
                 </p>
               </div>
               <div class="w-full md:w-4/12 mb-4">
-                <p class="flex items-center justify-center lg:justify-start">
+                <p id="pricing-benefit-4" class="flex items-center justify-center lg:justify-start">
                   <svg
                     class="w-4 h-4 mr-2 text-gray-900"
                     role="img"
@@ -79,7 +79,7 @@
                 </p>
               </div>
               <div class="w-full md:w-4/12 mb-4">
-                <p class="flex items-center justify-center lg:justify-start">
+                <p id="pricing-benefit-5" class="flex items-center justify-center lg:justify-start">
                   <svg
                     class="w-4 h-4 mr-2 text-gray-900"
                     role="img"
@@ -94,7 +94,7 @@
                 </p>
               </div>
               <div class="w-full md:w-4/12 mb-4">
-                <p class="flex items-center justify-center lg:justify-start">
+                <p id="pricing-benefit-6" class="flex items-center justify-center lg:justify-start">
                   <svg
                     class="w-4 h-4 mr-2 text-gray-900"
                     role="img"
@@ -110,6 +110,7 @@
               </div>
             </div>
             <button
+              id="pricing-button"
               type="button"
               class="inline-block px-7 py-3 bg-gray-800 text-white font-medium text-sm leading-snug uppercase rounded shadow-md hover:bg-gray-900 hover:shadow-lg focus:bg-gray-900 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-gray-900 active:shadow-lg transition duration-150 ease-in-out"
               data-mdb-ripple="true"

@@ -1,6 +1,6 @@
 <template>
   <section class="mb-32 text-gray-800 text-center md:text-left">
-    <h2 class="text-3xl font-bold mb-12 text-center">Latest Scenes</h2>
+    <h2 id="content-vertical-title" class="text-3xl font-bold mb-12 text-center">Latest Scenes</h2>
 
     <div class="flex flex-wrap mb-6">
       <div
@@ -28,8 +28,9 @@
       <div
         class="grow-0 shrink-0 basis-auto w-full md:w-9/12 xl:w-7/12 px-3 mb-6 md:mb-0 mr-auto"
       >
-        <h5 class="text-lg font-bold mb-3">Welcome to California</h5>
+        <h5 id="trip-title-1" class="text-lg font-bold mb-3">Welcome to California</h5>
         <div
+          id="trip-subtitle-1"
           class="mb-3 text-red-600 font-medium text-sm flex items-center justify-center md:justify-start"
         >
           <svg
@@ -43,13 +44,13 @@
             /></svg
           >Travels
         </div>
-        <p class="text-gray-500 mb-6">
+        <p id="trip-date-1" class="text-gray-500 mb-6">
           <small
             >Published <u>13.01.2022</u> by
             <a href="" class="text-gray-900">Anna Maria Doe</a></small
           >
         </p>
-        <p class="text-gray-500">
+        <p id="trip-description-1" class="text-gray-500">
           Ut pretium ultricies dignissim. Sed sit amet mi eget urna placerat
           vulputate. Ut vulputate est non quam dignissim elementum. Donec a
           ullamcorper diam.
@@ -83,8 +84,9 @@
       <div
         class="grow-0 shrink-0 basis-auto w-full md:w-9/12 xl:w-7/12 px-3 mb-6 md:mb-0 mr-auto"
       >
-        <h5 class="text-lg font-bold mb-3">Exhibition in Paris</h5>
+        <h5 id="trip-title-2" class="text-lg font-bold mb-3">Exhibition in Paris</h5>
         <div
+          id="trip-subtitle-2"
           class="mb-3 text-blue-600 font-medium text-sm flex items-center justify-center md:justify-start"
         >
           <svg
@@ -98,13 +100,13 @@
             /></svg
           >Art
         </div>
-        <p class="text-gray-500 mb-6">
+        <p id="trip-date-2" class="text-gray-500 mb-6">
           <small
             >Published <u>12.01.2022</u> by
             <a href="" class="text-gray-900">Halley Frank</a></small
           >
         </p>
-        <p class="text-gray-500">
+        <p id="trip-description-2" class="text-gray-500">
           Suspendisse in volutpat massa. Nulla facilisi. Sed aliquet diam orci,
           nec ornare metus semper sed. Integer volutpat ornare erat sit amet
           rutrum.
@@ -138,8 +140,9 @@
       <div
         class="grow-0 shrink-0 basis-auto w-full md:w-9/12 xl:w-7/12 px-3 mb-6 md:mb-0 mr-auto"
       >
-        <h5 class="text-lg font-bold mb-3">Stock market boom</h5>
+        <h5 id="trip-title-3" class="text-lg font-bold mb-3">Stock market boom</h5>
         <div
+          id="trip-subtitle-3"
           class="mb-3 text-yellow-500 font-medium text-sm flex items-center justify-center md:justify-start"
         >
           <svg
@@ -153,13 +156,13 @@
             /></svg
           >Business
         </div>
-        <p class="text-gray-500 mb-6">
+        <p id="trip-date-3" class="text-gray-500 mb-6">
           <small
             >Published <u>10.01.2022</u> by
             <a href="" class="text-gray-900">Joe Svan</a></small
           >
         </p>
-        <p class="text-gray-500">
+        <p id="trip-description-3" class="text-gray-500">
           Curabitur tristique, mi a mollis sagittis, metus felis mattis arcu,
           non vehicula nisl dui quis diam. Mauris ut risus eget massa volutpat
           feugiat. Donec.
