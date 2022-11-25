@@ -7,6 +7,8 @@ import sortBy from "lodash/sortBy";
 const strDate = new Date("2000-01-01").getTime();
 const endDate = new Date("2100-01-01").getTime();
 const maxLen = endDate - strDate;
+const base64Code =
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-";
 
 const processHash = function (hash, defaultLen = 14) {
   if (hash.startsWith("ft-") && hash.length > defaultLen) {
@@ -14,25 +16,14 @@ const processHash = function (hash, defaultLen = 14) {
   }
 
   const splitted = hash.split(".");
-  if (splitted.length === 2) {
+  if (splitted.length >= 2) {
     return splitted[1];
   } else {
     return hash;
   }
 };
 
-const checkStackableArray = function (arr) {
-  const len = arr.reduce((acc, v) => {
-    return Math.max(acc, v.toString(2).length);
-  }, 0);
-  const orRed = arr.reduce((acc, v) => {
-    return acc | v;
-  }, 0);
-  const p = 2 ** len - 1;
-  return (orRed ^ p) !== 0;
-};
-
-const checkStackable = function (hashA, hashB) {
+const checkStackable = function (hashA, hashB, masks) {
   function getStackCode(hash) {
     const hashArr = hash.split(".");
     if (hashArr.length > 2) {
@@ -47,12 +38,36 @@ const checkStackable = function (hashA, hashB) {
   if (isNil(hashA) || isNil(hashB)) {
     throw new Error("stackable code missing");
   }
-  return hashA + hashB < 8 && (hashA ^ hashB) !== 0;
+  const p = 2 ** masks - 1;
+  return hashA !== hashB && hashA + hashB < p && ((hashA | hashB) ^ p) !== 0;
+};
+
+const checkStackableArray = function (hashArr, masks) {
+  function getStackCode(hash) {
+    const hashArr = hash.split(".");
+    if (hashArr.length > 2) {
+      return parseInt(hashArr[hashArr.length - 1]);
+    } else {
+      return null;
+    }
+  }
+
+  hashArr = hashArr.map((v) => getStackCode(v));
+
+  if (hashArr.map(isNil).reduce((acc, v) => acc || v, false)) {
+    throw new Error("stackable code missing");
+  }
+
+  const p = 2 ** masks - 1;
+  let orAcc = true;
+  for (let i = 1; i < hashArr.length; i++) {
+    orAcc &&= hashArr[i] + hashArr[i - 1] < p;
+  }
+
+  return orAcc && (hashArr.reduce((acc, v) => acc | v, 0) ^ p) !== 0;
 };
 
 const xyEncBuilder = function (self) {
-  const base64Code =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-";
   const encoder = function (x, y) {
     const index = x + y * this.divisor;
     return this.base <= 36 ? index.toString(this.base) : base64Code[index];
@@ -69,8 +84,6 @@ const xyEncBuilder = function (self) {
 };
 
 const verticalEncBuilder = function (self) {
-  const base64Code =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-";
   const encoder = function (x, y) {
     const index = y + x * this.divisor;
     return this.base <= 36 ? index.toString(this.base) : base64Code[index];
@@ -87,8 +100,6 @@ const verticalEncBuilder = function (self) {
 };
 
 const mortonEncBuilder = function (self) {
-  const base64Code =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-";
   const encoder = function (x, y) {
     const B = [0x55555555, 0x33333333, 0x0f0f0f0f, 0x00ff00ff];
     const S = [1, 2, 4, 8];
@@ -167,14 +178,41 @@ class DateRangeHashGenerator {
     return availableDates;
   }
 
-  getIntervalLength(hash) {
+  getIntervalLength(hash, unit = "unix") {
     hash = processHash(hash);
     const letters = hash.split("");
-    return letters.reduce(
-      (acc, v, idx) =>
-        (acc +=
-          this.decoder(v)[1] * Math.floor(maxLen / this.divisor ** (idx + 1))),
-      0
+    let divisor;
+    switch (unit) {
+      case "unix":
+        divisor = 1;
+        break;
+      case "seconds":
+        divisor = 1000;
+        break;
+      case "minutes":
+        divisor = 60 * 1000;
+        break;
+      case "hours":
+        divisor = 60 * 60 * 1000;
+        break;
+      case "days":
+        divisor = 24 * 60 * 60 * 1000;
+        break;
+      case "months":
+        divisor = 30 * 24 * 60 * 60 * 1000;
+        break;
+      default:
+        divisor = 1;
+        break;
+    }
+    return (
+      letters.reduce(
+        (acc, v, idx) =>
+          (acc +=
+            this.decoder(v)[1] *
+            Math.floor(maxLen / this.divisor ** (idx + 1))),
+        0
+      ) / divisor
     );
   }
 
@@ -264,7 +302,7 @@ class DateRangeHashGenerator {
     ];
   }
 
-  encodeDates(str, end) {
+  encodeDates(str, end, type = null) {
     if (typeof str == "string" || typeof str == "number") {
       str = new Date(str);
     }
@@ -300,7 +338,31 @@ class DateRangeHashGenerator {
       localMaxLen = newBlockSize;
     }
 
-    return letters;
+    const codeArray = [letters];
+    switch (type) {
+      case "rent_non_xr_studio":
+        codeArray.unshift("001");
+        codeArray.push(8);
+        break;
+      case "rent_xr_studio":
+        codeArray.unshift("002");
+        codeArray.push(8);
+        break;
+      case "rent_studio_art_setup_non_xr":
+        codeArray.unshift("003");
+        codeArray.push(4);
+        break;
+      case "rent_studio_rehearsal":
+        codeArray.unshift("004");
+        codeArray.push(3);
+        break;
+      case "rent_studio_art_setup_xr":
+        codeArray.unshift("005");
+        codeArray.push(4);
+        break;
+    }
+
+    return codeArray.join(".");
   }
 }
 const hedhg = new DateRangeHashGenerator("normal", 64);

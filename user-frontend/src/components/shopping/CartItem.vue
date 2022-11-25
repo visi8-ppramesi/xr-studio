@@ -1,7 +1,7 @@
 <template>
   <div class="flex w-2/5">
     <!-- product -->
-    <div class="w-20">
+    <div v-if="item.image_url" class="w-20">
       <img
         class="h-24 object-cover"
         :src="
@@ -28,17 +28,7 @@
   <div class="flex justify-center w-1/5">
     <SummaryButton
       type="summaryRemove"
-      :item-data="{
-        image_url:
-          typeof item.image_url === 'string'
-            ? item.image_url
-            : item.image_url[0],
-        type: item.type,
-        name: item.name,
-        description: item.description,
-        id: item.id,
-        price: item.price,
-      }"
+      :item-data="item"
       :item-type="item.type"
     >
     </SummaryButton>

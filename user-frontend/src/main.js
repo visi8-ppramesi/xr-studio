@@ -20,25 +20,6 @@ const vuePropertySetter = (app, name, instance) => {
   app.provide(name, instance);
   app.config.globalProperties[name] = instance;
 };
-const filters = {
-  truncate: function (text, length, clamp) {
-    clamp = clamp || "...";
-    let counter = 0;
-    let stop;
-    const splitted = text.split(" ");
-    splitted.every((word, idx) => {
-      counter += word.length;
-      if (counter > length) {
-        stop = idx;
-        return false;
-      }
-      return true;
-    });
-    return text.length > length
-      ? splitted.slice(0, stop + 1).join(" ") + clamp
-      : text;
-  },
-};
 const formatters = {
   currency: function (number, locale = "id-ID", currency = "IDR") {
     const intlFormatter = new Intl.NumberFormat(locale, {
@@ -60,6 +41,50 @@ const formatters = {
     return toRelativeTime(dateObj, locale);
   },
   longMonth: toLongMonth,
+};
+const filters = {
+  truncate: function (text, length, clamp) {
+    clamp = clamp || "...";
+    let counter = 0;
+    let stop;
+    const splitted = text.split(" ");
+    splitted.every((word, idx) => {
+      counter += word.length;
+      if (counter > length) {
+        stop = idx;
+        return false;
+      }
+      return true;
+    });
+    return text.length > length
+      ? splitted.slice(0, stop + 1).join(" ") + clamp
+      : text;
+  },
+  priceUnitFilter: function (hashCode, unit, price, dateHasherInstance) {
+    let myUnit = "unix";
+    switch (unit.toLowerCase()) {
+      case "per day":
+      case "day":
+        myUnit = "days";
+        break;
+      case "per month":
+      case "month":
+        myUnit = "months";
+        break;
+      case "per year":
+      case "year":
+        myUnit = "years";
+        break;
+    }
+
+    return (
+      price *
+      formatters.round(
+        dateHasherInstance.getIntervalLength(hashCode, myUnit),
+        2
+      )
+    );
+  },
 };
 const injector = {
   install(app) {

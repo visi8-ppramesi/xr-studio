@@ -82,6 +82,7 @@ import { useCartStore } from "@/store/cart";
 import { mapState } from "pinia";
 // import SummaryButton from "@/components/shopping/SummaryButton.vue";
 import CartItem from "@/components/shopping/CartItem.vue";
+import isNil from "lodash/isNil";
 export default {
   setup() {
     const cartStore = useCartStore();
@@ -138,6 +139,16 @@ export default {
     ...mapState(useCartStore, ["itemCount", "cart"]),
   },
   methods: {
+    submit() {
+      const currentCart = JSON.parse(localStorage.getItem("cart") || "{}");
+      const groupedCart = currentCart.reduce((acc, v) => {
+        if (isNil(acc[v.type])) {
+          acc[v.type] = [];
+        }
+        acc[v.type].push(v);
+        return acc;
+      }, {});
+    },
     addToCart() {
       this.cartStore.addItem({ ...this.itemData, type: this.itemType });
     },

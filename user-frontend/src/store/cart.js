@@ -62,7 +62,7 @@ export const useCartStore = defineStore("cart", () => {
       itemStatus = filter(item);
     }
 
-    const { image_url, type, name, description, id, price } = item;
+    const { image_url, type, name, description, id, price, extra_data } = item;
     if (itemStatus === ITEM_NEW || itemStatus === DEFAULT_STATUS) {
       this.cart.push({
         name,
@@ -73,6 +73,7 @@ export const useCartStore = defineStore("cart", () => {
         image_url,
         count: 1,
         created_date: new Date().getTime(),
+        extra_data,
       });
       localStorage.setItem("cart", JSON.stringify(this.cart));
       this.itemCount = this.cart.reduce((acc, v) => {

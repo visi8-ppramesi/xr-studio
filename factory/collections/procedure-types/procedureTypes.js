@@ -166,6 +166,43 @@ const procedures = {
         stackable: 3,
         price: 2.5e7,
         price_unit: 'per day'
+    },
+    "rent_studio_art_setup_xr": {
+        name: "Studio Rent for Art Setup",
+        description: "Studio time for setting up art",
+        items_included: [
+            {
+                name: "studio_rent",
+                description: "Studio Rent",
+                price: 1.5e7
+            }
+        ],
+        procedure_code: "005",
+        procedures: [
+            {
+                name: "registration",
+                required_fields: [
+                    {
+                        name: "start_date",
+                        type: "datepicker"
+                    },
+                    {
+                        name: "end_date",
+                        type: "datepicker"
+                    }
+                ],
+                optional_fields: [
+                    {
+                        name: "notes",
+                        label: "Notes",
+                        type: "textarea"
+                    }
+                ]
+            }
+        ],
+        stackable: 4,
+        price: 1.5e7,
+        price_unit: 'per day'
     }
 }
 

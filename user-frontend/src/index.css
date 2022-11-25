@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.collapse.show {
+    visibility: unset;
+}
+.collapse {
+    visibility: unset;
+}

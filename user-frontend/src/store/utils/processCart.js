@@ -45,6 +45,7 @@ function createFilters(context) {
           (v) => v.type === "studio" && vedhg.hashesOverlap(v.id, item.id)
         )
       ) {
+        console.log(item.id);
         return ITEM_INVALID;
       }
       return ITEM_NEW;

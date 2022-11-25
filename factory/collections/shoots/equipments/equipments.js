@@ -12,10 +12,14 @@ module.exports = class ShootEquipmentFactory extends Factory{
         const equipment = new EquipmentFactory()
         const equipmentProjection = await equipment.getRandomProjection()
         const equipmentId = equipmentProjection.id
+        const numA = 1 + Math.floor(Math.random() * 10)
+        const numB = Math.round(Math.random() * 10_000) * 100
         return {
             equipment: equipmentProjection,
             equipment_id: equipmentId,
-            price: Math.round(Math.random() * 100) * 100
+            quantity: numA,
+            price_item: numB,
+            total_price: numA * numB
         }
     }
 }

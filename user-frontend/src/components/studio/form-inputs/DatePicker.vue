@@ -1,30 +1,19 @@
 <template>
-  <!-- <div class="flex items-center justify-center">
-    <div
-      class="datepicker relative form-floating mb-3 xl:w-96"
-      data-mdb-toggle-button="false"
-    >
-      <input
-        type="text"
-        class="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-        placeholder="Select a date"
-        :value="modelValue"
-        @input="$emit('update:modelValue', $event.target.value)"
-      />
-      <label for="floatingInput" class="text-gray-700">{{ field.label }}</label>
-      <button class="datepicker-toggle-button" data-mdb-toggle="datepicker">
-        <i class="fas fa-calendar datepicker-toggle-icon">aaa</i>
-      </button>
-    </div>
-  </div> -->
   <div class="flex items-center justify-center">
     <div
-      class="datepicker relative form-floating mb-3 xl:w-96"
+      class="datepicker form-floating mb-3 xl:w-96"
       data-mdb-toggle-button="false"
     >
+      <div
+        class="relative block text-gray-700 text-sm font-bold mb-2"
+        :for="field.name"
+      >
+        {{ field.label }}
+      </div>
       <VueTailwindDatePicker
         as-single
         :placeholder="field.label"
+        :formatter="formatter"
         v-model="myDate"
       />
     </div>
@@ -33,7 +22,14 @@
 
 <script>
 import VueTailwindDatePicker from "vue-tailwind-datepicker";
+import recursionLock from "@/composables/recursionLock";
+import isNil from "lodash/isNil";
 export default {
+  setup() {
+    const recursionLocker = recursionLock("datePicker");
+
+    return { recursionLocker };
+  },
   components: { VueTailwindDatePicker },
   name: "DatePickerInput",
   props: ["modelValue", "field"],
@@ -41,26 +37,34 @@ export default {
   data() {
     return {
       myDate: [],
+      formatter: {
+        date: "DD MMM YYYY",
+        month: "MMM",
+      },
     };
   },
   watch: {
     modelValue() {
       let date;
-      if (this.modelValue instanceof Date) {
-        date = this.modelValue.toISOString();
+      if (isNaN(this.modelValue) || isNil(this.modelValue)) {
+        console.log(this.myDate, "myDate");
+        this.myDate = [];
       } else {
-        date = this.modelValue;
+        if (this.modelValue instanceof Date) {
+          date = this.modelValue.toISOString();
+        } else {
+          date = this.modelValue;
+        }
+        this.myDate = [date];
       }
-      this.myDate = [date];
     },
     myDate() {
-      this.$emit("update:modelValue", new Date(this.myDate[0]));
+      this.recursionLocker(this.modelValueUpdateEmitter);
     },
   },
   methods: {
-    inputEmit(v, $event) {
-      console.log(v, $event);
-      // this.$emit('update:modelValue', $event.target.value)
+    modelValueUpdateEmitter() {
+      this.$emit("update:modelValue", new Date(this.myDate[0]));
     },
   },
 };

@@ -12,6 +12,8 @@ export default class extends TrackedSubcollection {
       name: String,
     }),
     equipment_id: Collection.resolve("../../equipments/equipments"),
-    price: Number,
+    total_price: Number,
+    quantity: Number,
+    price_item: Number,
   };
 }

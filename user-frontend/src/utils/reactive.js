@@ -1,5 +1,6 @@
 let activeEffect;
 const subs = new Map();
+const recursionLock = new WeakMap();
 function getSubscribersForProperty(target, key) {
   if (!subs.has(target)) {
     const locMap = new Map();
@@ -17,12 +18,23 @@ function track(target, key) {
   if (activeEffect) {
     const effects = getSubscribersForProperty(target, key);
     effects.add(activeEffect);
+    recursionLock.set(activeEffect, true);
   }
 }
 
 function trigger(target, key) {
   const effects = getSubscribersForProperty(target, key);
-  effects.forEach((effect) => effect());
+  effects.forEach((effect) => {
+    const lock = recursionLock.get(effect);
+    if (lock) {
+      recursionLock.set(effect, false);
+      const eff = effect();
+      recursionLock.set(effect, true);
+      return eff;
+    } else {
+      recursionLock.set(effect, true);
+    }
+  });
 }
 
 function reactive(obj) {
@@ -61,4 +73,10 @@ function watchEffect(update) {
   effect();
 }
 
-export { ref, reactive, watchEffect };
+function watch(source, cb) {
+  activeEffect = cb;
+  track(source, "value");
+  activeEffect = null;
+}
+
+export { ref, reactive, watchEffect, watch };

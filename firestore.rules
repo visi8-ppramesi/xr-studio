@@ -50,7 +50,8 @@ service cloud.firestore {
     }
 
     match /procedure_types/{procedure_type} {
-      allow read, create: if isAdmin();
+      allow read: if true;
+      allow create: if isAdmin();
     }
 
     match /payments/{payment} {

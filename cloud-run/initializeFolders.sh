@@ -25,6 +25,6 @@ do
     touch ./index.js
     touch ./.env
     npm init -y
-    npm install cors dotenv express firebase-admin lodash
+    npm install cors dotenv express firebase-admin lodash uuid
     cd ..
 done
