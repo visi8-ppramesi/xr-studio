@@ -7,19 +7,69 @@ const { decode: bufferDecoder } = require('../utils/bufferEncoder')
 const isNil = require('lodash/isNil')
 const isArray = require('lodash/isArray')
 const { v4 } = require('uuid')
-const { FieldValue } = require('firebase-admin/firestore');
+const fbadmin = require('firebase-admin');
+const { FieldValue } = fbadmin.firestore
 const stringify = require('../utils/betterStableStringify')
 const { diff } = require("deep-object-diff")
 const { isUserAdmin } = require('../utils/roles')
 
-function setIdIfNotSet(obj){
-    if(isNil(obj.id)){
-        obj.id = v4()
+function setIdIfNotSet(obj, isProcedure = false) {
+    if (isNil(obj.id)) {
+        if(isProcedure){
+            let { procedure_code: procedureCode, procedure_start: procedureStart, procedure_end: procedureEnd } = obj
+            procedureCode = procedureCode || '000'
+            const encoded = vedhg.encodeDates(procedureStart, procedureEnd)
+            console.log(encoded)
+            obj.id = [procedureCode, encoded].join('.')
+        }else{
+            obj.id = v4()
+        }
     }
     return obj
 }
 
-module.exports = function() {
+/*
+    data structure: {
+        procedures: {
+            added: [
+
+            ],
+            updated: [
+
+            ],
+            deleted: [
+
+            ]
+        },
+        equipments: {
+            added: [
+
+            ],
+            updated: [
+
+            ],
+            deleted: [
+
+            ]
+        },
+        assets: {
+            added: [
+
+            ],
+            updated: [
+
+            ],
+            deleted: [
+
+            ]
+        },
+        shoot: {
+
+        }
+    }
+*/
+
+module.exports = function () {
     const db = admin.firestore();
     const auth = admin.auth()
 
@@ -29,7 +79,7 @@ module.exports = function() {
         let uid;
         if (isNil(tokenId)) {
             //token is nil, exit
-            res.send({status: 401, message: "unauthorized"})
+            res.send({ status: 401, message: "unauthorized" })
             throw new Error("unauthorized")
         } else {
             try {
@@ -37,45 +87,49 @@ module.exports = function() {
                 uid = decodedToken.uid
             } catch (error) {
                 //token is unverifiable, exit
-                res.send({status: 401, message: "unauthorized"})
+                res.send({ status: 401, message: "unauthorized" })
                 throw new Error("unauthorized")
             }
+        }
+
+        const data = bufferDecoder(req.body.message.data)
+        const { shoot: { id: shootId } } = data
+        
+        if (isNil(shootId)) {
+            throw new Error("Null shoot id")
         }
 
         const userAdmin = await isUserAdmin(uid, db)
         const userCreatedShoot = await db
             .collection("shoots")
-            .doc(shootId)
+            .doc(data.shoot.id)
             .get()
             .then((snap) => {
                 return snap.get('created_by').id === uid
             })
-        
-        if(!(userAdmin || userCreatedShoot)){
-            res.send({status: 402, message: "unauthorized"})
+
+        if (!(userAdmin || userCreatedShoot)) {
+            res.send({ status: 402, message: "unauthorized" })
             throw new Error("unauthorized")
         }
 
-        const editShootWithSubcollections = async function(data){
-            const { procedures, equipments, assets, shoot} = data
-            if(isNil(shoot)){
+        const editShootWithSubcollections = async function (data) {
+            const { procedures, equipments, assets, shoot } = data
+            if (isNil(shoot)) {
                 throw new Error("Null shoot")
             }
 
-            const { id: shootId, status, ...shootData } = shoot
-            if(isNil(shootId)){
-                throw new Error("Null shoot id")
-            }
+            const { status, ...shootData } = shoot
 
-            const createChanges = function(collectionObj){
+            const createChanges = function (collectionObj) {
                 const collectionName = Object.keys(collectionObj)[0]
                 const collection = collectionObj[collectionName]
                 const { added, updated, deleted } = collection
                 const promises = []
 
-                if(!isNil(added)){
+                if (!isNil(added)) {
                     const addedPromises = added.map((addObj) => {
-                        setIdIfNotSet(addObj)
+                        setIdIfNotSet(addObj, collectionName === 'procedures')
                         const { id, ...addDuplicate } = addObj
                         return db
                             .collection("shoots")
@@ -84,25 +138,24 @@ module.exports = function() {
                             .doc(id)
                             .set({
                                 ...addDuplicate
+                            }).then(() => {
+                                return db
+                                    .collection("shoots")
+                                    .doc(shootId)
+                                    .collection(collectionName)
+                                    .doc(id)
+                                    .collection("changes")
+                                    .doc("0")
+                                    .set({
+                                        updated_date: new Date(),
+                                        diff: stringify(diff({}, addDuplicate))
+                                    })
                             })
                     })
                     promises.push(...addedPromises)
-    
-                    const changesPromise = db
-                        .collection("shoots")
-                        .doc(shootId)
-                        .collection(collectionName)
-                        .doc(id)
-                        .collection("changes")
-                        .doc("0")
-                        .set({
-                            updated_date: new Date(),
-                            diff: stringify(diff({}, addDuplicate))
-                        })
-                    promises.push(changesPromise)
                 }
 
-                if(!isNil(updated)){
+                if (!isNil(updated)) {
                     const updatePromises = updated.reduce((acc, updObj) => {
                         const { id, ...updDuplicate } = updObj
 
@@ -137,15 +190,15 @@ module.exports = function() {
                             .doc(id)
                             .set({
                                 ...updDuplicate
-                            })
-                        
+                            }, { merge: true })
+
                         acc.push(changesPromise, mainPromise)
                         return acc
                     }, [])
                     promises.push(...updatePromises)
                 }
-                
-                if(!isNil(deleted)){
+
+                if (!isNil(deleted)) {
                     const delPromises = deleted.map((delId) => {
                         return db
                             .collection("shoots")
@@ -157,7 +210,7 @@ module.exports = function() {
                             .then((snap) => {
                                 const batch = db.batch();
                                 snap.docs.forEach((doc) => {
-                                  batch.delete(doc.ref);
+                                    batch.delete(doc.ref);
                                 });
                                 return batch.commit();
                             }).then(() => {
@@ -188,7 +241,7 @@ module.exports = function() {
             })
 
             const diffObj = diff(oldData, newData)
-            if(Object.keys(diffObj).length > 0){
+            if (Object.keys(diffObj).length > 0) {
                 const count = (await db.collection("shoots").doc(shootId).collection("changes").count().get()).data().count
                 await db
                     .collection("shoots")
@@ -201,10 +254,24 @@ module.exports = function() {
                     })
             }
 
-            if(!isNil(status)){
+            const promises = []
+
+            if (!isNil(procedures)) {
+                promises.push(...createChanges({ procedures }))
+            }
+
+            if (!isNil(equipments)) {
+                promises.push(...createChanges({ equipments }))
+            }
+
+            if (!isNil(assets)) {
+                promises.push(...createChanges({ assets }))
+            }
+
+            if (!isNil(status)) {
                 const statusObj = isArray(status) ? status : [status]
                 await db.collection("shoots").doc(shootId).set({
-                    current_statuses: FieldValue.arrayUnion(...statusObj),
+                    current_statuses: statusObj,
                     status_history: FieldValue.arrayUnion(...statusObj.map((statusStr) => {
                         return {
                             note: "",
@@ -213,27 +280,12 @@ module.exports = function() {
                             processed_by: db.collection("users").doc(uid)
                         }
                     }))
-                })
-            }
-
-            const promises = []
-    
-            if(!isNil(procedures)){
-                promises.push(...createChanges({ procedures }))
-            }
-    
-            if(!isNil(equipments)){
-                promises.push(...createChanges({ equipments }))
-            }
-    
-            if(!isNil(assets)){
-                promises.push(...createChanges({ assets }))
+                }, { merge: true })
             }
 
             return promises
         }
 
-        const data = bufferDecoder(req.body.message.data)
         await editShootWithSubcollections(data)
         res.send({ status: 200, message: "we good" })
     }

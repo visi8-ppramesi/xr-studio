@@ -1,6 +1,7 @@
 "use strict";
 
 const admin = require("firebase-admin");
+console.log('init admin called')
 if(process.env.USE_DOTENV == 'true'){
     const dotenv = require("dotenv")
     dotenv.config()

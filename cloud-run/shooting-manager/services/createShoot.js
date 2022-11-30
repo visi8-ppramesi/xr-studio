@@ -9,9 +9,17 @@ const isNil = require('lodash/isNil')
 const { v4 } = require('uuid')
 const stringify = require('../utils/betterStableStringify')
 
-function setIdIfNotSet(obj){
-    if(isNil(obj.id)){
-        obj.id = v4()
+function setIdIfNotSet(obj, isProcedure = false) {
+    if (isNil(obj.id)) {
+        if(isProcedure){
+            let { procedure_code: procedureCode, procedure_start: procedureStart, procedure_end: procedureEnd } = obj
+            procedureCode = procedureCode || '000'
+            const encoded = vedhg.encodeDates(procedureStart, procedureEnd)
+            console.log(encoded)
+            obj.id = [procedureCode, encoded].join('.')
+        }else{
+            obj.id = v4()
+        }
     }
     return obj
 }
@@ -86,13 +94,22 @@ module.exports = function () {
             }
         }
 
-        const createShootWithSubcollections = async function (data){
+        const createShootWithSubcollections = async function (data) {
             const { procedures, equipments, assets, shoot } = data
 
-            if(isNil(shoot)){
+            if (isNil(shoot)) {
                 throw new Error("Null shoot")
             }
-    
+
+            const status = ["initialized", "unpaid"]
+            const promises = []
+            const retVal = {
+                shoot: {},
+                equipments: [],
+                procedures: [],
+                assets: []
+            }
+
             //create shoot first
             const { id, ...shootDuplicate } = setIdIfNotSet(shoot)
             await db.collection("shoots").doc(shoot.id).set({
@@ -101,21 +118,21 @@ module.exports = function () {
                 created_by: db.collection('users').doc(uid),
                 ...shootDuplicate
             })
-    
-            const status = ["initialized", "unpaid"]
-            const promises = []
-    
+
+            retVal.shoot.shoot_id = id
+
             //add equipments
-            if(!isNil(equipments)){
+            if (!isNil(equipments)) {
                 status.push("with_equipments")
-                for(const equipment of equipments){
+                for (const equipment of equipments) {
                     const { id, ...equipmentDuplicate } = setIdIfNotSet(equipment)
                     const promise = db.collection("shoots").doc(shoot.id).collection("equipments").doc(equipment.id).set({
                         creation_date: new Date(),
                         ...equipmentDuplicate
                     })
                     promises.push(promise)
-    
+                    retVal.equipments.push({ equipment_id: equipment.id })
+
                     const changesPromise = db
                         .collection("shoots")
                         .doc(shoot.id)
@@ -130,18 +147,19 @@ module.exports = function () {
                     promises.push(changesPromise)
                 }
             }
-    
+
             //add procedures
-            if(!isNil(procedures)){
+            if (!isNil(procedures)) {
                 status.push("with_procedures")
-                for(const procedure of procedures){
-                    const { id, ...procedureDuplicate } = setIdIfNotSet(procedure)
+                for (const procedure of procedures) {
+                    const { id, ...procedureDuplicate } = setIdIfNotSet(procedure, true)
                     const promise = db.collection("shoots").doc(shoot.id).collection("procedures").doc(procedure.id).set({
                         creation_date: new Date(),
                         ...procedureDuplicate
                     })
                     promises.push(promise)
-    
+                    retVal.procedures.push({ procedure_id: procedure.id })
+
                     const changesPromise = db
                         .collection("shoots")
                         .doc(shoot.id)
@@ -156,18 +174,19 @@ module.exports = function () {
                     promises.push(changesPromise)
                 }
             }
-    
+
             //add assets
-            if(!isNil(assets)){
+            if (!isNil(assets)) {
                 status.push("with_assets")
-                for(const asset of assets){
+                for (const asset of assets) {
                     const { id, ...assetDuplicate } = setIdIfNotSet(asset)
                     const promise = db.collection("shoots").doc(shoot.id).collection("assets").doc(asset.id).set({
                         creation_date: new Date(),
                         ...assetDuplicate
                     })
                     promises.push(promise)
-    
+                    retVal.assets.push({ asset_id: asset.id })
+
                     const changesPromise = db
                         .collection("shoots")
                         .doc(shoot.id)
@@ -182,7 +201,7 @@ module.exports = function () {
                     promises.push(changesPromise)
                 }
             }
-    
+
             const statusPromise = db.collection("shoots").doc(shoot.id).set({
                 status,
                 status_history: [
@@ -209,12 +228,13 @@ module.exports = function () {
                     })
             })
             promises.push(statusPromise)
-    
+
             await Promise.all(promises)
+            return retVal
         }
 
         const data = bufferDecoder(req.body.message.data)
-        await createShootWithSubcollections(data)
-        res.send({ status: 200, message: "we good" })
+        const result = await createShootWithSubcollections(data)
+        res.send({ status: 200, message: "shoot created", result })
     }
 }
