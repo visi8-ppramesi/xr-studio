@@ -20,8 +20,8 @@ export const shootCalendarBetweenQuery = (startAtParam, endAtParam) => {
 
 export const shootCalendarCreatedByQuery = (startAtParam, endAtParam) => {
   return [
-    where("creation_date", ">=", startAtParam),
-    where("creation_date", "<=", endAtParam),
+    where("created_date", ">=", startAtParam),
+    where("created_date", "<=", endAtParam),
   ];
 };
 

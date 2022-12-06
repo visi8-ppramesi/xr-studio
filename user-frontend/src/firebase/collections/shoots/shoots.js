@@ -9,7 +9,7 @@ import {
 export default class extends TrackedCollection {
   static collection = "shoots";
   static fields = {
-    creation_date: Date,
+    created_date: Date,
     locked_in_start_date: Date,
     locked_in_end_date: Date,
     location: String,

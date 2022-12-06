@@ -1,0 +1,14 @@
+version: '3.4'
+services:
+  shooting-manager:
+    image: asia.gcr.io/xr-studio-a9c5e/shooting-manager:0.0.1
+    build: 
+      context: ./cloud-run/shooting-manager
+    ports:
+      - "8080:8080"
+  test-manager:
+    image: test-manager:0.0.1
+    build:
+      context: ./cloud-run/test-manager
+    ports:
+      - "8081:8081"

@@ -3,20 +3,16 @@
 const express = require('express');
 const app = express();
 const cors = require('cors')
-const createShoot = require('./services/createShoot')
-const editShoot = require('./services/editShoot')
-const restructureBody = require('./utils/restructureBody')
 
 const createApp = function(){
     app.use(express.json())
     app.use(cors({origin: true}));
-    app.use(restructureBody)
     
-    app.get('/', (req, res) => {res.send('hello')})
-    app.post('/create', createShoot())
-    app.post('/edit', editShoot())
+    app.get('/', (req, res) => {
+        res.json({ test: "test" })
+    })
     
-    const port = parseInt(process.env.PORT) || 8080;
+    const port = parseInt(process.env.PORT) || 8081;
     app.listen(port, () => {
         console.log(`listening on port ${port}`);
     });

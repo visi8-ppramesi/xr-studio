@@ -7,7 +7,7 @@ const { decode: bufferDecoder } = require('../utils/bufferEncoder')
 const { diff } = require("deep-object-diff")
 const isNil = require('lodash/isNil')
 const { v4 } = require('uuid')
-const stringify = require('../utils/betterStableStringify')
+const stringify = obj => JSON.stringify(obj, (k, v) => {if(v === undefined){return null}; return v})//require('../utils/betterStableStringify')
 
 function setIdIfNotSet(obj, isProcedure = false) {
     if (isNil(obj.id)) {
@@ -15,7 +15,6 @@ function setIdIfNotSet(obj, isProcedure = false) {
             let { procedure_code: procedureCode, procedure_start: procedureStart, procedure_end: procedureEnd } = obj
             procedureCode = procedureCode || '000'
             const encoded = vedhg.encodeDates(procedureStart, procedureEnd)
-            console.log(encoded)
             obj.id = [procedureCode, encoded].join('.')
         }else{
             obj.id = v4()
@@ -112,12 +111,25 @@ module.exports = function () {
 
             //create shoot first
             const { id, ...shootDuplicate } = setIdIfNotSet(shoot)
+            const rightNow = new Date()
             await db.collection("shoots").doc(shoot.id).set({
                 location: 'main-location',
-                creation_date: new Date(),
+                created_date: rightNow,
                 created_by: db.collection('users').doc(uid),
                 ...shootDuplicate
             })
+            const forChanges = {
+                shoot: {
+                    created_date: rightNow,
+                    location: 'main-location',
+                    created_by: db.collection('users').doc(uid),
+                    status,
+                    ...shootDuplicate
+                },
+                equipments: {},
+                procedures: {},
+                assets: {}
+            }
 
             retVal.shoot.shoot_id = id
 
@@ -127,7 +139,7 @@ module.exports = function () {
                 for (const equipment of equipments) {
                     const { id, ...equipmentDuplicate } = setIdIfNotSet(equipment)
                     const promise = db.collection("shoots").doc(shoot.id).collection("equipments").doc(equipment.id).set({
-                        creation_date: new Date(),
+                        created_date: rightNow,
                         ...equipmentDuplicate
                     })
                     promises.push(promise)
@@ -145,6 +157,11 @@ module.exports = function () {
                             diff: stringify(diff({}, equipmentDuplicate))
                         })
                     promises.push(changesPromise)
+
+                    forChanges.equipments[id] = {
+                        created_date: rightNow,
+                        ...equipmentDuplicate
+                    }
                 }
             }
 
@@ -154,7 +171,7 @@ module.exports = function () {
                 for (const procedure of procedures) {
                     const { id, ...procedureDuplicate } = setIdIfNotSet(procedure, true)
                     const promise = db.collection("shoots").doc(shoot.id).collection("procedures").doc(procedure.id).set({
-                        creation_date: new Date(),
+                        created_date: rightNow,
                         ...procedureDuplicate
                     })
                     promises.push(promise)
@@ -172,6 +189,11 @@ module.exports = function () {
                             diff: stringify(diff({}, procedureDuplicate))
                         })
                     promises.push(changesPromise)
+
+                    forChanges.procedures[id] = {
+                        created_date: rightNow,
+                        ...procedureDuplicate
+                    }
                 }
             }
 
@@ -181,7 +203,7 @@ module.exports = function () {
                 for (const asset of assets) {
                     const { id, ...assetDuplicate } = setIdIfNotSet(asset)
                     const promise = db.collection("shoots").doc(shoot.id).collection("assets").doc(asset.id).set({
-                        creation_date: new Date(),
+                        created_date: rightNow,
                         ...assetDuplicate
                     })
                     promises.push(promise)
@@ -199,6 +221,11 @@ module.exports = function () {
                             diff: stringify(diff({}, assetDuplicate))
                         })
                     promises.push(changesPromise)
+
+                    forChanges.assets[id] = {
+                        created_date: rightNow,
+                        ...assetDuplicate
+                    }
                 }
             }
 
@@ -220,11 +247,7 @@ module.exports = function () {
                     .doc("0")
                     .set({
                         updated_date: new Date(),
-                        diff: stringify(diff({}, {
-                            location: 'main-location',
-                            creation_date: new Date(),
-                            ...shootDuplicate
-                        }))
+                        diff: stringify(diff({}, forChanges))
                     })
             })
             promises.push(statusPromise)

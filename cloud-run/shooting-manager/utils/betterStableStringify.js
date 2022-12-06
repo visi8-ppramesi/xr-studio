@@ -1,4 +1,10 @@
-const jsonParser = (function(){
+//nodejs
+const cloneDeep = require("lodash/cloneDeep")
+//nodejs end
+
+
+
+const dateReviver = (function(){
     const reISO = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*))(?:Z|(\+|-)([\d|:]*))?$/
     const reMsAjax = /^\/Date\((d|-|.*)\)[\/|\\]$/
 
@@ -33,7 +39,8 @@ const betterStableStringify = function (data, opts) {
     })(opts.cmp);
 
     var seen = [];
-    const stringify = function(node){
+    const stringify = function(rawNode){
+        let node = cloneDeep(rawNode)
         if (node && node.toJSON && typeof node.toJSON === 'function') {
             node = node.toJSON();
         }
@@ -110,9 +117,8 @@ const betterStableStringify = function (data, opts) {
     return stringify(data)
 };
 
-
 //nodejs
-betterStableStringify.betterJSONParser = (jsonStr) => JSON.parse(jsonStr, jsonParser)
+betterStableStringify.betterJSONParser = (jsonStr) => JSON.parse(jsonStr, dateReviver)
 module.exports = betterStableStringify
 //nodejs end
 

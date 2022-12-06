@@ -1,5 +1,6 @@
 exports.encode = function(data) {
-    if(typeof data === "object"){
+    const isObjOrArray = ['[object Object]', '[object Array]'].includes(({}).toString.apply(data))
+    if(isObjOrArray){
         return Buffer.from(JSON.stringify(data))
     }else{
         return Buffer.from(JSON.stringify({data}))

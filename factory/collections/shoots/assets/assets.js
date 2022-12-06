@@ -11,7 +11,7 @@ module.exports = class ShootAssetFactory extends Factory{
 
     static async createData(){
         const asset = new AssetFactory()
-        const assetProjection = await asset.getRandomProjection()
+        const assetProjection = await asset.getRandomProjection(['id', 'name', 'preview_url'])
         const assetId = assetProjection.id
         return {
             asset: assetProjection,

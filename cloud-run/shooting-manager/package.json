@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "start": "node index.js",
     "runlocal": "MODE=development USE_DOTENV=true node ./index.js"
   },
   "keywords": [],
@@ -19,6 +20,7 @@
     "fast-json-stable-stringify": "^2.1.0",
     "firebase-admin": "^11.3.0",
     "lodash": "^4.17.21",
+    "pluralize": "^8.0.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {

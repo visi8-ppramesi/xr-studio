@@ -24,7 +24,7 @@ module.exports = class ShootFactory extends Factory{
         const lockedStart = new Date(new Date().setDate(new Date().getDate() + randomDays + 7))
         const lockedEnd = new Date(new Date().setDate(new Date().getDate() + randomDays + 14))
         return {
-            creation_date: new Date(),
+            created_date: new Date(),
             locked_in_start_date: lockedStart,
             locked_in_end_date: lockedEnd,
             locked_in_hash: vedhg.encodeDates(lockedStart, lockedEnd),

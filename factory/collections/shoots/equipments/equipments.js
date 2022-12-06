@@ -10,7 +10,7 @@ module.exports = class ShootEquipmentFactory extends Factory{
 
     static async createData(){
         const equipment = new EquipmentFactory()
-        const equipmentProjection = await equipment.getRandomProjection()
+        const equipmentProjection = await equipment.getRandomProjection(['id', 'name'])
         const equipmentId = equipmentProjection.id
         const numA = 1 + Math.floor(Math.random() * 10)
         const numB = Math.round(Math.random() * 10_000) * 100

@@ -1,5 +1,5 @@
 variable "project_id" {
-    default = ""
+    default = "xr-studio-a9c5e"
 }
 
 variable "region" {

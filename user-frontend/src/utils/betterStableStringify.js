@@ -1,3 +1,26 @@
+//browser
+import cloneDeep from "lodash/cloneDeep";
+//browser end
+
+const dateReviver = (function () {
+  const reISO =
+    /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*))(?:Z|(\+|-)([\d|:]*))?$/;
+  const reMsAjax = /^\/Date\((d|-|.*)\)[\/|\\]$/;
+
+  return function (key, value) {
+    if (typeof value === "string") {
+      let a = reISO.exec(value);
+      if (a) return new Date(value);
+      a = reMsAjax.exec(value);
+      if (a) {
+        const b = a[1].split(/[-+,.]/);
+        return new Date(b[0] ? +b[0] : 0 - +b[1]);
+      }
+    }
+    return value;
+  };
+})();
+
 const betterStableStringify = function (data, opts) {
   if (!opts) opts = {};
   if (typeof opts === "function") opts = { cmp: opts };
@@ -16,14 +39,18 @@ const betterStableStringify = function (data, opts) {
     })(opts.cmp);
 
   var seen = [];
-  const stringify = function (node) {
+  const stringify = function (rawNode) {
+    let node = cloneDeep(rawNode);
     if (node && node.toJSON && typeof node.toJSON === "function") {
       node = node.toJSON();
     }
 
-    if (node === undefined) return;
+    if (node === undefined) return "null";
     if (typeof node == "number") return isFinite(node) ? "" + node : "null";
-    if (typeof node !== "object") return JSON.stringify(node);
+    if (typeof node !== "object")
+      return JSON.stringify(node, function (k, v) {
+        return v === undefined ? null : v;
+      });
 
     var i, out;
     if (Array.isArray(node)) {
@@ -84,7 +111,12 @@ const betterStableStringify = function (data, opts) {
 
       if (!value) continue;
       if (out) out += ",";
-      out += JSON.stringify(key) + ":" + value;
+      out +=
+        JSON.stringify(key, function (k, v) {
+          return v === undefined ? null : v;
+        }) +
+        ":" +
+        value;
     }
     seen.splice(seenIndex, 1);
     return "{" + out + "}";
@@ -94,5 +126,6 @@ const betterStableStringify = function (data, opts) {
 };
 
 //browser
+export const betterJSONParser = (jsonStr) => JSON.parse(jsonStr, dateReviver);
 export default betterStableStringify;
 //browser end
