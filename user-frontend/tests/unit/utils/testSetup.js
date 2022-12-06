@@ -1,4 +1,5 @@
 import dotenv from 'dotenv'
+import { TextEncoder, TextDecoder } from 'util'
 
 class LocalStorageMock {
     constructor() {
@@ -25,6 +26,8 @@ class LocalStorageMock {
 const noop = () => { };
 Object.defineProperty(window, 'scrollTo', { value: noop, writable: true });
 Object.defineProperty(window, 'localStorage', { value: new LocalStorageMock(), writable: true });
+Object.defineProperty(global, 'TextEncoder', { value: TextEncoder })
+Object.defineProperty(global, 'TextDecoder', { value: TextDecoder })
 Object.defineProperty(window, 'URL', {
     value: {
         createObjectURL(url){

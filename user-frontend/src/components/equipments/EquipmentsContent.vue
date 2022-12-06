@@ -19,10 +19,10 @@
           :created-date="null"
           :link-to-url="'/equipment/' + equipment.id"
         >
-          <div id="equipments-content-description">
+          <div class="equipments-content-description">
             {{ filters.truncate(equipment.description, 100) }}
           </div>
-          <div id="equipments-content-price">Price: {{ formatters.currency(equipment.price) }}</div>
+          <div class="equipments-content-price">Price: {{ formatters.currency(equipment.price) }}</div>
         </BoxContent>
       </div>
     </div>

@@ -20,6 +20,7 @@
                       @change="onFileChange"
                     />
                     <button
+                      id="my-account-profile-button"
                       class="font-bold px-3 my-3 border-2 rounded"
                       @click="selectProfilePicture"
                     >

@@ -19,7 +19,7 @@
           :created-date="formatters.absoluteDate(asset.created_date)"
           :link-to-url="'/asset/' + asset.id"
         >
-          <div id="assets-content-description">
+          <div class="assets-content-description">
             {{ filters.truncate(asset.description, 25) }}
           </div>
         </BoxComponentMultipleImages>

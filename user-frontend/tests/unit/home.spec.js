@@ -1,32 +1,38 @@
 import { mount, flushPromises } from "@vue/test-utils";
 import Home from "../../src/views/Home.vue";
+import options from './utils/pluginInitializer.js'
 
 test("front-page", async () => {
-  const wrapper = mount(Home, {});
+  const wrapper = mount(Home, {
+    global: {
+        plugins: [...Object.values(options.plugins)],
+        components: {...options.components}
+    }
+  });
 
   expect(wrapper.find("#front-page-title").text()).toBe("The best solution for your productions");
   expect(wrapper.find("#front-page-description").text()).toBe(`Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet, itaque accusantium odio, soluta, corrupti aliquam quibusdam tempora at cupiditate quis eum maiores libero veritatis? Dicta facilis sint aliquid ipsum atque?`);
 
-  // const promises = [
-  //   wrapper.find('input[name="username"]').setValue('testestest'),
-  //   wrapper.find('input[name="fullName"]').setValue('email@email.com'),
-  //   wrapper.find('input[name="email"]').setValue('full name'),
-  //   wrapper.find('input[name="password"]').setValue('password')
-  // ]
+  const promises = [
+    wrapper.find('input[name="username"]').setValue('testestest'),
+    wrapper.find('input[name="fullName"]').setValue('email@email.com'),
+    wrapper.find('input[name="email"]').setValue('full name'),
+    wrapper.find('input[name="password"]').setValue('password')
+  ]
 
-  // await Promise.all(promises)
+  await Promise.all(promises)
 
-  // await wrapper.find('#register-button').trigger('click')
+  await wrapper.find('#register-button').trigger('click')
 
-  // await flushPromises()
-  // await flushPromises()
-  // await flushPromises()
-  // await flushPromises()
+  await flushPromises()
+  await flushPromises()
+  await flushPromises()
+  await flushPromises()
 
-  // expect(wrapper.find('input[name="username"]')).getValue('Forgot Password?'),
-  // expect(wrapper.find('input[name="fullName"]')).getValue('Forgot Password?'),
-  // expect(wrapper.find('input[name="email"]')).getValue('Forgot Password?'),
-  // expect(wrapper.find('input[name="password"]')).getValue('Forgot Password?')
+  expect(wrapper.find('input[name="username"]').element.value).toBe('testestest'),
+  expect(wrapper.find('input[name="fullName"]').element.value).toBe('email@email.com'),
+  expect(wrapper.find('input[name="email"]').element.value).toBe('full name'),
+  expect(wrapper.find('input[name="password"]').element.value).toBe('password'),
 
   expect(wrapper.find("#register-option").text()).toBe("or sign up with:");
 });

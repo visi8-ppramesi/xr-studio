@@ -22,6 +22,7 @@
           placeholder="Password"
         />
         <button
+          id="login-button"
           @click="login"
           type="button"
           data-mdb-ripple="true"

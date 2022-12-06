@@ -25,7 +25,7 @@
     "frappe-gantt": "^0.6.1",
     "lodash": "^4.17.21",
     "mitt": "^3.0.0",
-    "pinia": "^2.0.22",
+    "pinia": "^2.0.27",
     "postprocessing": "^6.26.3",
     "tw-elements": "^1.0.0-alpha12",
     "vue": "^3.2.13",

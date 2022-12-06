@@ -12,13 +12,13 @@
           placeholder="Username"
         />
         <input
-          name="username"
-          for="username"
-          v-model="username"
+          name="email"
+          for="email"
+          v-model="email"
           type="text"
-          id="username"
+          id="email"
           class="form-control block w-full px-3 py-1.5 mb-6 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-          placeholder="User Name"
+          placeholder="Email"
         />
         <input
           name="fullName"
@@ -48,7 +48,8 @@
           class="form-control block w-full px-3 py-1.5 mb-6 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
           placeholder="Confirm Password"
         />
-        <button
+        <button 
+          id="register-button"
           @click="register"
           type="button"
           data-mdb-ripple="true"

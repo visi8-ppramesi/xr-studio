@@ -2,7 +2,7 @@ import { mount } from "@vue/test-utils";
 import Creator from "../../../src/views/creators/Creator.vue";
 
 test("Creator-left", async () => {
-  const wrapper = mount(Creator, {});
+  const wrapper = mount(Creator);
 
   expect(wrapper.find("#creator-left-title").text()).toBe("title");
   expect(wrapper.find("#creator-left-subtitle").text()).toBe("subtitle");
@@ -21,7 +21,7 @@ test("Creator-left", async () => {
 });
 
 test("Creator-right", async () => {
-    const wrapper = mount(Creator, {});
+    const wrapper = mount(Creator);
   
     expect(wrapper.find("#creator-right-title").text()).toBe("RELATED SCENES");
     expect(wrapper.find("#creator-right-title-item1").text()).toBe("Title");
