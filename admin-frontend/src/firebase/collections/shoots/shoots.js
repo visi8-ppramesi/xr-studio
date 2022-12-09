@@ -21,11 +21,16 @@ export default class extends TrackedCollection {
     }),
     creator: new InstanceProjection({
       username: String,
-      id: String
+      id: String,
     }),
     order: TrackedCollection.resolve("../../orders/orders"),
     current_statuses: Array,
     status_history: Array,
     // procedure_type: TrackedCollection.resolve("../../procedure-types/procedureTypes"),
   };
+
+  static async getShoots() {
+    const shoots = await this.getDocuments();
+    return shoots;
+  }
 }
