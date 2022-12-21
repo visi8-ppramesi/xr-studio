@@ -31,7 +31,16 @@ const routes = [
     name: "list",
     component: () => import("../views/shoots/ShootsList.vue"),
     meta: {
-      requiresAuth: true,
+      // requiresAuth: true,
+      class: "Shoot",
+    },
+  },
+  {
+    path: "/shoots/detail/:shootId",
+    name: "shootsDetail",
+    component: () => import("../views/shoots/ShootsDetail.vue"),
+    meta: {
+      // requiresAuth: true,
       class: "Shoot",
     },
   },
@@ -40,7 +49,7 @@ const routes = [
     name: "subList",
     component: () => import("../views/shoots/ShootsList.vue"),
     meta: {
-      requiresAuth: true,
+      // requiresAuth: true,
       class: "Shoot",
     },
   },
@@ -49,7 +58,7 @@ const routes = [
     name: "assetSubList",
     component: () => import("../views/shoots/ShootsList.vue"),
     meta: {
-      requiresAuth: true,
+      // requiresAuth: true,
       class: "Shoot",
     },
   },
@@ -58,7 +67,7 @@ const routes = [
     name: "equipmentsSubList",
     component: () => import("../views/shoots/ShootsList.vue"),
     meta: {
-      requiresAuth: true,
+      // requiresAuth: true,
       class: "Shoot",
     },
   },
@@ -67,7 +76,7 @@ const routes = [
     name: "proceduresSubList",
     component: () => import("../views/shoots/ShootsList.vue"),
     meta: {
-      requiresAuth: true,
+      // requiresAuth: true,
       class: "Shoot",
     },
   },

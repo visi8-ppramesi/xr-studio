@@ -22,7 +22,11 @@
           >
             <div>
               <td class="p-3 px-5">
-                {{ item.id }}
+                <router-link
+                  :to="{ name: 'shootsDetail', params: { shootId: item.id } }"
+                >
+                  {{ item.id }}
+                </router-link>
               </td>
               <td class="p-3 px-5">
                 {{ item.location }}
@@ -187,7 +191,8 @@
                             <th class="text-center p-3 px-5">Id</th>
                             <th class="text-center p-3 px-5">Type</th>
                             <th class="text-center p-3 px-5">Price</th>
-                            <th class="text-center p-3 px-5">Date</th>
+                            <th class="text-center p-3 px-5">Start Date</th>
+                            <th class="text-center p-3 px-5">End Date</th>
                           </tr>
                           <tr v-for="item in procedures" :key="item.id">
                             <td class="text-center p-3 px-5">{{ item.id }}</td>
@@ -199,6 +204,9 @@
                             </td>
                             <td class="text-center p-3 px-5">
                               {{ item.procedure_start }}
+                            </td>
+                            <td class="text-center p-3 px-5">
+                              {{ item.procedure_end }}
                             </td>
                           </tr>
                         </tbody>
@@ -234,6 +242,11 @@ export default {
   },
   mounted() {
     this.fetchShoots();
+    // if (this.$route.params.shootId) {
+    //   this.fetchAssets();
+    //   this.fetchEquipments();
+    //   this.fetchProcedures();
+    // };
     this.fetchAssets();
     this.fetchEquipments();
     this.fetchProcedures();

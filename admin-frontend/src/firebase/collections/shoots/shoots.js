@@ -33,4 +33,9 @@ export default class extends TrackedCollection {
     const shoots = await this.getDocuments();
     return shoots;
   }
+
+  static async getShootsDetail(id) {
+    const shoots = await this.getDocument(id);
+    return shoots;
+  }
 }
