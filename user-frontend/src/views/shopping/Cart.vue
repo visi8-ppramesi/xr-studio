@@ -3,24 +3,27 @@
     <div class="flex shadow-md my-10">
       <div class="w-3/4 bg-white px-10 py-10">
         <div class="flex justify-between border-b pb-8">
-          <h1 class="font-semibold text-2xl">Shopping Cart</h1>
-          <h2 class="font-semibold text-2xl">{{ itemCount }} Items</h2>
+          <h1 id="cart-title" class="font-semibold text-2xl">Shopping Cart</h1>
+          <h2 id="cart-count" class="font-semibold text-2xl">{{ itemCount }} Items</h2>
         </div>
         <div class="flex mt-10 mb-5">
-          <h3 class="font-semibold text-gray-600 text-xs uppercase w-2/5">
+          <h3 id="cart-title-1" class="font-semibold text-gray-600 text-xs uppercase w-2/5">
             Product Details
           </h3>
           <h3
+            id="cart-title-2"
             class="font-semibold text-center text-gray-600 text-xs uppercase w-1/5 text-center"
           >
             Quantity
           </h3>
           <h3
+            id="cart-title-3"
             class="font-semibold text-center text-gray-600 text-xs uppercase w-1/5 text-center"
           >
             Price
           </h3>
           <h3
+            id="cart-title-4"
             class="font-semibold text-center text-gray-600 text-xs uppercase w-1/5 text-center"
           >
             Total
@@ -36,6 +39,7 @@
         </div>
 
         <router-link
+          id="cart-continue"
           to="/equipments"
           class="flex font-semibold text-indigo-600 text-sm mt-10"
         >
@@ -52,9 +56,9 @@
       </div>
 
       <div id="summary" class="w-1/4 px-8 py-10">
-        <h1 class="font-semibold text-2xl border-b pb-8">Order Summary</h1>
+        <h1 id="cart-summary" class="font-semibold text-2xl border-b pb-8">Order Summary</h1>
         <div class="flex justify-between mt-10 mb-5">
-          <span class="font-semibold text-sm uppercase"
+          <span id="cart-count-items" class="font-semibold text-sm uppercase"
             >Items {{ itemCount }}</span
           >
         </div>
@@ -62,10 +66,11 @@
           <div
             class="flex font-semibold justify-between py-6 text-sm uppercase"
           >
-            <span>Total cost</span>
-            <span>${{ cartTotalAmount() }}</span>
+            <span id="cart-total-cost">Total cost</span>
+            <span id="cart-total-amount">${{ cartTotalAmount() }}</span>
           </div>
           <button
+            id="cart-checkout"
             class="bg-indigo-500 font-semibold hover:bg-indigo-600 py-3 text-sm text-white uppercase w-full"
           >
             Checkout
@@ -78,7 +83,7 @@
 
 <script>
 import isArray from "lodash/isArray";
-import { useCartStore } from "@/store/cart";
+import { useCartStore } from "../../store/cart";
 import { mapState } from "pinia";
 // import SummaryButton from "@/components/shopping/SummaryButton.vue";
 import CartItem from "@/components/shopping/CartItem.vue";

@@ -63,8 +63,8 @@
 </template>
 
 <script>
-import { useCartStore } from "@/store/cart";
-import SummaryButton from "@/components/shopping/SummaryButton.vue";
+import { useCartStore } from "../../store/cart";
+import SummaryButton from "../../components/shopping/SummaryButton.vue";
 export default {
   setup() {
     const cartStore = useCartStore();

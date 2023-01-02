@@ -10,9 +10,9 @@
 </template>
 
 <script>
-import EquipmentsSidenav from "@/components/equipments/EquipmentsSidenav.vue";
-import EquipmentsContent from "@/components/equipments/EquipmentsContent.vue";
-import { Equipments } from "@/firebase/collections/equipments";
+import EquipmentsSidenav from "../../components/equipments/EquipmentsSidenav.vue";
+import EquipmentsContent from "../../components/equipments/EquipmentsContent.vue";
+import { Equipments } from "../../firebase/collections/equipments";
 import { paginationQuery } from "@/utils/queries";
 // import isNil from "lodash/isNil";
 export default {

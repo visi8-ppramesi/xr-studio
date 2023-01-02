@@ -1,3 +1,3 @@
 import ContractTemplates from "./contractTemplates";
 
-export { ContractTemplates }
+export { ContractTemplates };

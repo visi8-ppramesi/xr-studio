@@ -1,3 +1,3 @@
 import Payments from "./payments";
 
-export { Payments }
+export { Payments };

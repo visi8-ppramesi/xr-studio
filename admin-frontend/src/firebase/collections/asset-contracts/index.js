@@ -1,3 +1,3 @@
 import AssetsContracts from "./assetsContracts";
 
-export { AssetsContracts }
+export { AssetsContracts };

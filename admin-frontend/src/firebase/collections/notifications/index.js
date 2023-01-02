@@ -4,4 +4,10 @@ import PaymentNotifications from "./subcollections/paymentNotifications";
 import ShootNotifications from "./subcollections/shootNotifications";
 import Notifications from "./notifications";
 
-export { Notifications, FormSubmissionNotifications, OrderNotifications, PaymentNotifications, ShootNotifications }
+export {
+  Notifications,
+  FormSubmissionNotifications,
+  OrderNotifications,
+  PaymentNotifications,
+  ShootNotifications,
+};

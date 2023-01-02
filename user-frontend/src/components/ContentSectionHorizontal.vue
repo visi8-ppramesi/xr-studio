@@ -1,6 +1,6 @@
 <template>
   <section class="mb-32 md:mx-20 text-gray-800 text-center">
-    <h2 class="text-3xl font-bold mb-12 pb-4 text-center">Latest Scenes</h2>
+    <h2 id="content-horizontal-title" class="text-3xl font-bold mb-12 pb-4 text-center">Latest Scenes</h2>
 
     <div class="grid lg:grid-cols-3 gap-6 xl:gap-x-12">
       <div class="mb-6 lg:mb-0">
@@ -24,19 +24,20 @@
             </div>
           </div>
           <div class="p-6">
-            <h5 class="font-bold text-lg mb-3">My paradise</h5>
-            <p class="text-gray-500 mb-4">
+            <h5 id="trip-title-1" class="font-bold text-lg mb-3">My paradise</h5>
+            <p id="trip-date-1" class="text-gray-500 mb-4">
               <small
                 >Published <u>13.01.2022</u> by
                 <a href="" class="text-gray-900">Anna Maria Doe</a></small
               >
             </p>
-            <p class="mb-4 pb-2">
+            <p id="trip-description-1" class="mb-4 pb-2">
               Ut pretium ultricies dignissim. Sed sit amet mi eget urna placerat
               vulputate. Ut vulputate est non quam dignissim elementum. Donec a
               ullamcorper diam.
             </p>
             <a
+              id="trip-read-1"
               href="#!"
               data-mdb-ripple="true"
               data-mdb-ripple-color="light"
@@ -68,19 +69,20 @@
             </div>
           </div>
           <div class="p-6">
-            <h5 class="font-bold text-lg mb-3">Travel to Italy</h5>
-            <p class="text-gray-500 mb-4">
+            <h5 id="trip-title-2" class="font-bold text-lg mb-3">Travel to Italy</h5>
+            <p id="trip-date-2" class="text-gray-500 mb-4">
               <small
                 >Published <u>12.01.2022</u> by
                 <a href="" class="text-gray-900">Halley Frank</a></small
               >
             </p>
-            <p class="mb-4 pb-2">
+            <p id="trip-description-2" class="mb-4 pb-2">
               Suspendisse in volutpat massa. Nulla facilisi. Sed aliquet diam
               orci, nec ornare metus semper sed. Integer volutpat ornare erat
               sit amet rutrum.
             </p>
             <a
+              id="trip-read-2"
               href="#!"
               data-mdb-ripple="true"
               data-mdb-ripple-color="light"
@@ -112,19 +114,20 @@
             </div>
           </div>
           <div class="p-6">
-            <h5 class="font-bold text-lg mb-3">Chasing the sun</h5>
-            <p class="text-gray-500 mb-4">
+            <h5 id="trip-title-3" class="font-bold text-lg mb-3">Chasing the sun</h5>
+            <p id="trip-date-3" class="text-gray-500 mb-4">
               <small
                 >Published <u>10.01.2022</u> by
                 <a href="" class="text-gray-900">Joe Svan</a></small
               >
             </p>
-            <p class="mb-4 pb-2">
+            <p id="trip-description-3" class="mb-4 pb-2">
               Curabitur tristique, mi a mollis sagittis, metus felis mattis
               arcu, non vehicula nisl dui quis diam. Mauris ut risus eget massa
               volutpat feugiat. Donec.
             </p>
             <a
+              id="trip-read-3"
               href="#!"
               data-mdb-ripple="true"
               data-mdb-ripple-color="light"
@@ -136,6 +139,7 @@
       </div>
     </div>
     <router-link
+      id="trip-scenes"
       to="/scenes"
       data-mdb-ripple="true"
       data-mdb-ripple-color="light"

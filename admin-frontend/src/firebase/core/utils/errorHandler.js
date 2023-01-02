@@ -1,9 +1,9 @@
-let errorHandler = (t, v) => v
+let errorHandler = (t, v) => v;
 
 export const setErrorHandler = (func) => {
-    errorHandler = func
-}
+  errorHandler = func;
+};
 
-export default function(type, error){
-    return errorHandler(type, error)
+export default function (type, error) {
+  return errorHandler(type, error);
 }
