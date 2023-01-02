@@ -1,16 +1,18 @@
 import { mount } from "@vue/test-utils";
 import Creators from "../../../src/views/creators/Creators.vue";
-import options from '../utils/pluginInitializer.js'
+import options from "../utils/pluginInitializer.js";
 
 test("Creators", async () => {
   const wrapper = mount(Creators, {
     global: {
-        plugins: [...Object.values(options.plugins)],
-        components: {...options.components}
-    }
+      plugins: [...Object.values(options.plugins)],
+      components: { ...options.components },
+    },
   });
 
-  expect(wrapper.find("#creators-content-title").text()).toBe("Equipment Rental");
+  expect(wrapper.find("#creators-content-title").text()).toBe(
+    "Equipment Rental"
+  );
   expect(wrapper.find("#non-collapsible").text()).toBe("Non-collapsible link");
   expect(wrapper.find("#item1-link").text()).toBe("Collapsible item 1");
   expect(wrapper.find("#link-1").text()).toBe("Link 1");

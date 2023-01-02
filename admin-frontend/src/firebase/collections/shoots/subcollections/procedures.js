@@ -15,12 +15,5 @@ export default class extends TrackedSubcollection {
     }),
     procedure_data: Object,
     price: Number,
-    procedure_start: Date,
-    procedure_end: Date,
   };
-
-  static async getProcedures(path) {
-    const procedures = await this.getDocuments(path);
-    return procedures;
-  }
 }

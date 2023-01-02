@@ -28,9 +28,9 @@ export default {
     loadMore() {
       this.getAssets(true);
     },
-    async getAssets() {
-      this.assets = await Assets.getDocuments();
-    },
+    // async getAssets() {
+    //   this.assets = await Assets.getDocuments();
+    // },
     async getAssets(loadMore = false) {
       let pQuery;
       if (!loadMore) {

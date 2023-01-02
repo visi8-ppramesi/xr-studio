@@ -1,6 +1,11 @@
 <template>
   <section class="mb-32 md:mx-20 text-gray-800 text-center">
-    <h2 id="content-horizontal-title" class="text-3xl font-bold mb-12 pb-4 text-center">Latest Scenes</h2>
+    <h2
+      id="content-horizontal-title"
+      class="text-3xl font-bold mb-12 pb-4 text-center"
+    >
+      Latest Scenes
+    </h2>
 
     <div class="grid lg:grid-cols-3 gap-6 xl:gap-x-12">
       <div class="mb-6 lg:mb-0">
@@ -24,7 +29,9 @@
             </div>
           </div>
           <div class="p-6">
-            <h5 id="trip-title-1" class="font-bold text-lg mb-3">My paradise</h5>
+            <h5 id="trip-title-1" class="font-bold text-lg mb-3">
+              My paradise
+            </h5>
             <p id="trip-date-1" class="text-gray-500 mb-4">
               <small
                 >Published <u>13.01.2022</u> by
@@ -69,7 +76,9 @@
             </div>
           </div>
           <div class="p-6">
-            <h5 id="trip-title-2" class="font-bold text-lg mb-3">Travel to Italy</h5>
+            <h5 id="trip-title-2" class="font-bold text-lg mb-3">
+              Travel to Italy
+            </h5>
             <p id="trip-date-2" class="text-gray-500 mb-4">
               <small
                 >Published <u>12.01.2022</u> by
@@ -114,7 +123,9 @@
             </div>
           </div>
           <div class="p-6">
-            <h5 id="trip-title-3" class="font-bold text-lg mb-3">Chasing the sun</h5>
+            <h5 id="trip-title-3" class="font-bold text-lg mb-3">
+              Chasing the sun
+            </h5>
             <p id="trip-date-3" class="text-gray-500 mb-4">
               <small
                 >Published <u>10.01.2022</u> by

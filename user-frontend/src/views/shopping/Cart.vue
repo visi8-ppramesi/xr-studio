@@ -4,10 +4,15 @@
       <div class="w-3/4 bg-white px-10 py-10">
         <div class="flex justify-between border-b pb-8">
           <h1 id="cart-title" class="font-semibold text-2xl">Shopping Cart</h1>
-          <h2 id="cart-count" class="font-semibold text-2xl">{{ itemCount }} Items</h2>
+          <h2 id="cart-count" class="font-semibold text-2xl">
+            {{ itemCount }} Items
+          </h2>
         </div>
         <div class="flex mt-10 mb-5">
-          <h3 id="cart-title-1" class="font-semibold text-gray-600 text-xs uppercase w-2/5">
+          <h3
+            id="cart-title-1"
+            class="font-semibold text-gray-600 text-xs uppercase w-2/5"
+          >
             Product Details
           </h3>
           <h3
@@ -56,7 +61,9 @@
       </div>
 
       <div id="summary" class="w-1/4 px-8 py-10">
-        <h1 id="cart-summary" class="font-semibold text-2xl border-b pb-8">Order Summary</h1>
+        <h1 id="cart-summary" class="font-semibold text-2xl border-b pb-8">
+          Order Summary
+        </h1>
         <div class="flex justify-between mt-10 mb-5">
           <span id="cart-count-items" class="font-semibold text-sm uppercase"
             >Items {{ itemCount }}</span

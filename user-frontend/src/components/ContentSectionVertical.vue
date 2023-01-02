@@ -1,6 +1,11 @@
 <template>
   <section class="mb-32 text-gray-800 text-center md:text-left">
-    <h2 id="content-vertical-title" class="text-3xl font-bold mb-12 text-center">Latest Scenes</h2>
+    <h2
+      id="content-vertical-title"
+      class="text-3xl font-bold mb-12 text-center"
+    >
+      Latest Scenes
+    </h2>
 
     <div class="flex flex-wrap mb-6">
       <div
@@ -28,7 +33,9 @@
       <div
         class="grow-0 shrink-0 basis-auto w-full md:w-9/12 xl:w-7/12 px-3 mb-6 md:mb-0 mr-auto"
       >
-        <h5 id="trip-title-1" class="text-lg font-bold mb-3">Welcome to California</h5>
+        <h5 id="trip-title-1" class="text-lg font-bold mb-3">
+          Welcome to California
+        </h5>
         <div
           id="trip-subtitle-1"
           class="mb-3 text-red-600 font-medium text-sm flex items-center justify-center md:justify-start"
@@ -84,7 +91,9 @@
       <div
         class="grow-0 shrink-0 basis-auto w-full md:w-9/12 xl:w-7/12 px-3 mb-6 md:mb-0 mr-auto"
       >
-        <h5 id="trip-title-2" class="text-lg font-bold mb-3">Exhibition in Paris</h5>
+        <h5 id="trip-title-2" class="text-lg font-bold mb-3">
+          Exhibition in Paris
+        </h5>
         <div
           id="trip-subtitle-2"
           class="mb-3 text-blue-600 font-medium text-sm flex items-center justify-center md:justify-start"
@@ -140,7 +149,9 @@
       <div
         class="grow-0 shrink-0 basis-auto w-full md:w-9/12 xl:w-7/12 px-3 mb-6 md:mb-0 mr-auto"
       >
-        <h5 id="trip-title-3" class="text-lg font-bold mb-3">Stock market boom</h5>
+        <h5 id="trip-title-3" class="text-lg font-bold mb-3">
+          Stock market boom
+        </h5>
         <div
           id="trip-subtitle-3"
           class="mb-3 text-yellow-500 font-medium text-sm flex items-center justify-center md:justify-start"

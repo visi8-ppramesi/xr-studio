@@ -6,6 +6,7 @@ const cloneDeep = require("lodash/cloneDeep")
 
 const dateReviver = (function(){
     const reISO = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*))(?:Z|(\+|-)([\d|:]*))?$/
+    // eslint-disable-next-line no-useless-escape
     const reMsAjax = /^\/Date\((d|-|.*)\)[\/|\\]$/
 
     return function(key, value){

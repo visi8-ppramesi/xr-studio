@@ -16,9 +16,4 @@ export default class extends TrackedSubcollection {
     quantity: Number,
     price_item: Number,
   };
-
-  static async getEquipments(path) {
-    const equipments = await this.getDocuments(path);
-    return equipments;
-  }
 }

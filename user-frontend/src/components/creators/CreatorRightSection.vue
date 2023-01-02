@@ -1,7 +1,9 @@
 <template>
   <div class="right hidden md:block md:w-1/3 ml-8">
     <div class="mb-3">
-      <span id="creator-right-title" class="text-gray-400 text-md mb-3">RELATED SCENES</span>
+      <span id="creator-right-title" class="text-gray-400 text-md mb-3"
+        >RELATED SCENES</span
+      >
     </div>
 
     <div
@@ -30,7 +32,9 @@
       </div>
 
       <div class="grow-0 shrink-0 basis-auto w-3/5 px-3">
-        <h5 id="creator-right-title-item1" class="text-lg font-bold mb-3">Title</h5>
+        <h5 id="creator-right-title-item1" class="text-lg font-bold mb-3">
+          Title
+        </h5>
         <p id="creator-right-date-item1" class="text-gray-500">
           <small
             >Published <u>13.01.2022</u> by

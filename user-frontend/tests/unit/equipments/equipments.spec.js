@@ -1,20 +1,20 @@
 import { mount } from "@vue/test-utils";
 import Equipments from "../../../src/views/equipments/Equipments.vue";
-import options from '../utils/pluginInitializer.js'
+import options from "../utils/pluginInitializer.js";
 
 test("Equipments", async () => {
   const wrapper = mount(Equipments, {
     global: {
-        plugins: [...Object.values(options.plugins)],
-        components: {...options.components}
-    }
+      plugins: [...Object.values(options.plugins)],
+      components: { ...options.components },
+    },
   });
 
-  expect(wrapper.find("#equipments-content-title").text()).toBe("Equipment Rental");
-  expect(wrapper.find("#equipments-content-more").text()).toBe("Load more");
-  expect(wrapper.find("#equipments-side-category").text()).toBe(
-    "Category"
+  expect(wrapper.find("#equipments-content-title").text()).toBe(
+    "Equipment Rental"
   );
+  expect(wrapper.find("#equipments-content-more").text()).toBe("Load more");
+  expect(wrapper.find("#equipments-side-category").text()).toBe("Category");
   expect(wrapper.find("#equipments-side-category-item1").text()).toBe(
     "Category 1"
   );
@@ -30,13 +30,9 @@ test("Equipments", async () => {
   expect(wrapper.find("#equipments-side-category-item5").text()).toBe(
     "Category 5"
   );
-  expect(wrapper.find("#equipments-side-price").text()).toBe(
-    "Price"
-  );
-  expect(wrapper.find("#equipments-side-button").text()).toBe(
-    "Submit"
-  );
+  expect(wrapper.find("#equipments-side-price").text()).toBe("Price");
+  expect(wrapper.find("#equipments-side-button").text()).toBe("Submit");
 
-  await wrapper.find('input[type="checkbox"]').setChecked()
-  expect(wrapper.find('input[type="checkbox"]').element.checked).toBeTruthy()
+  await wrapper.find('input[type="checkbox"]').setChecked();
+  expect(wrapper.find('input[type="checkbox"]').element.checked).toBeTruthy();
 });

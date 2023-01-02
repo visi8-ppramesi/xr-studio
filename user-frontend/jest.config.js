@@ -1,4 +1,4 @@
-const path = require('path')
+const path = require("path");
 /*
  * For a detailed explanation regarding each configuration property, visit:
  * https://jestjs.io/docs/configuration
@@ -85,23 +85,24 @@ module.exports = {
     // "ts",
     // "tsx",
     "json",
-    "vue"
+    "vue",
     // "node"
   ],
 
   // A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
   moduleNameMapper: {
-    "\\.(jpg|ico|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/test/__mocks__/fileMock.js",
+    "\\.(jpg|ico|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$":
+      "<rootDir>/test/__mocks__/fileMock.js",
     "@/(.*)$": "<rootDir>/src/$1",
-    '\\.(css|less)$': '<rootDir>/tests/__mocks__/cssMock.js',
-    "firebase/app-check": '<rootDir>/tests/__mocks__/appCheckMock.js',
-    "firebase/app": '<rootDir>/tests/__mocks__/appMock.js',
-    "firebase/firestore": '<rootDir>/tests/__mocks__/firestoreMock.js',
-    "firebase/analytics": '<rootDir>/tests/__mocks__/analyticsMock.js',
-    "firebase/functions": '<rootDir>/tests/__mocks__/functionsMock.js',
-    "firebase/auth": '<rootDir>/tests/__mocks__/authMock.js',
-    "firebase/storage": '<rootDir>/tests/__mocks__/storageMock.js',
-    "firebase/performance": '<rootDir>/tests/__mocks__/performanceMock.js',
+    "\\.(css|less)$": "<rootDir>/tests/__mocks__/cssMock.js",
+    "firebase/app-check": "<rootDir>/tests/__mocks__/appCheckMock.js",
+    "firebase/app": "<rootDir>/tests/__mocks__/appMock.js",
+    "firebase/firestore": "<rootDir>/tests/__mocks__/firestoreMock.js",
+    "firebase/analytics": "<rootDir>/tests/__mocks__/analyticsMock.js",
+    "firebase/functions": "<rootDir>/tests/__mocks__/functionsMock.js",
+    "firebase/auth": "<rootDir>/tests/__mocks__/authMock.js",
+    "firebase/storage": "<rootDir>/tests/__mocks__/storageMock.js",
+    "firebase/performance": "<rootDir>/tests/__mocks__/performanceMock.js",
     // "axios": '<rootDir>/test/__mocks__/axiosMock.js',
     // "idb": '<rootDir>/test/__mocks__/idbMock.js'
   },
@@ -140,21 +141,15 @@ module.exports = {
   // rootDir: undefined,
 
   // A list of paths to directories that Jest should use to search for files in
-  roots: [
-    "<rootDir>",
-    path.resolve()
-  ],
+  roots: ["<rootDir>", path.resolve()],
 
-  "modulePaths": [
-    "<rootDir>",
-    path.resolve()
-  ],
+  modulePaths: ["<rootDir>", path.resolve()],
 
   // Allows you to use a custom runner instead of Jest's default test runner
   // runner: "jest-runner",
 
   // The paths to modules that run some code to configure or set up the testing environment before each test
-  setupFiles: ['<rootDir>/tests/unit/utils/testSetup.js'],
+  setupFiles: ["<rootDir>/tests/unit/utils/testSetup.js"],
 
   // A list of paths to modules that run some code to configure or set up the testing framework before each test
   // setupFilesAfterEnv: [],
@@ -167,8 +162,8 @@ module.exports = {
 
   // The test environment that will be used for testing
   testEnvironment: "jsdom",
-  "testEnvironmentOptions": {
-    "customExportConditions": ["node", "node-addons"]
+  testEnvironmentOptions: {
+    customExportConditions: ["node", "node-addons"],
   },
 
   // Options that will be passed to the testEnvironment
@@ -203,7 +198,7 @@ module.exports = {
     // "/node_modules/@pinia/testing/.+\\.js$": "babel-jest",
     // "/node_modules/vue-demi/.+\\.js$": "babel-jest",
     "^.+\\.js$": "babel-jest",
-    "^.+\\.vue$": "@vue/vue3-jest"
+    "^.+\\.vue$": "@vue/vue3-jest",
   },
 
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
@@ -211,11 +206,11 @@ module.exports = {
   //   "/node_modules/",
   //   "\\.pnp\\.[^\\/]+$"
   // ],
-  "transformIgnorePatterns": [
+  transformIgnorePatterns: [
     "/node_modules/(?!pinia/.*)",
     "<rootDir>/node_modules/(?!@pinia/testing)",
     "<rootDir>/node_modules/(?!vue-demi/.*)",
-    "<rootDir>/node_modules/(?!@vue/test-utils)"
+    "<rootDir>/node_modules/(?!@vue/test-utils)",
   ],
 
   // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them

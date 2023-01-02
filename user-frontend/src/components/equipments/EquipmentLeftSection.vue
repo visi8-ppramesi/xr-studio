@@ -30,12 +30,19 @@
         />
       </div>
       <div class="pt-3 border-t border-gray-300 mb-2">
-        <div id="equipment-left-description" class="my-4 max-w-xl text-gray-600 text-justify">
+        <div
+          id="equipment-left-description"
+          class="my-4 max-w-xl text-gray-600 text-justify"
+        >
           {{ equipment.description }}
         </div>
       </div>
       <div class="flex items-center text-gray-500 max-w-xl mb-1">
-        <span id="equipment-left-category" class="flex items-center text-sm h-8 mb-1 mr-2">Categories:</span>
+        <span
+          id="equipment-left-category"
+          class="flex items-center text-sm h-8 mb-1 mr-2"
+          >Categories:</span
+        >
         <ul class="flex flex-wrap">
           <li
             v-for="(category, idx) in equipment.categories"

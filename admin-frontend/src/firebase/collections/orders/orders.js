@@ -8,14 +8,4 @@ export default class extends Collection {
     created_date: Date,
     current_order: Subcollection.resolve("./subcollections/orderVersions"),
   };
-
-  static async getOrders() {
-    const orders = await this.getDocuments();
-    return orders;
-  }
-
-  static async getOrdersId(id) {
-    const orders = await this.getDocument(id);
-    return orders;
-  }
 }

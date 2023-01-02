@@ -9,7 +9,9 @@
             >
               <div class="flex flex-row text-left">
                 <div>
-                  <span class="notification-title font-semibold">{{ item.title }}</span>
+                  <span class="notification-title font-semibold">{{
+                    item.title
+                  }}</span>
                   <span class="notification-description block text-gray-500">{{
                     item.description
                   }}</span>

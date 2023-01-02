@@ -1,13 +1,13 @@
 import { mount } from "@vue/test-utils";
 import Cart from "../../../src/views/shopping/Cart.vue";
-import options from '../utils/pluginInitializer.js'
+import options from "../utils/pluginInitializer.js";
 
 test("Cart", async () => {
   const wrapper = mount(Cart, {
     global: {
-        plugins: [...Object.values(options.plugins)],
-        components: {...options.components}
-    }
+      plugins: [...Object.values(options.plugins)],
+      components: { ...options.components },
+    },
   });
 
   expect(wrapper.find("#cart-title").text()).toBe("Shopping Cart");

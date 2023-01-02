@@ -14,9 +14,4 @@ export default class extends TrackedSubcollection {
     asset_id: Collection.resolve("../../assets/assets"),
     price: Number,
   };
-
-  static async getAssets(path) {
-    const assets = await this.getDocuments(path);
-    return assets;
-  }
 }

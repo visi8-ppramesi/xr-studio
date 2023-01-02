@@ -11,7 +11,7 @@ import VueI18n from "../../../src/utils/i18n";
 import { logger } from "../../../src/utils/logger";
 import "vue-loading-overlay/dist/vue-loading.css";
 import startCase from "lodash/startCase";
-// import { toRelativeTime, toAbsoluteTime, toLongMonth } from "./utils/time";
+import { toRelativeTime, toAbsoluteTime } from "./time";
 
 const vuePropertySetter = (app, name, instance) => {
   app.provide(name, instance);
@@ -69,18 +69,18 @@ const injector = {
 };
 
 const pinia = createPinia();
-setActivePinia(pinia)
+setActivePinia(pinia);
 const authStore = useAuthStore();
 const calendarStore = useCalendarStore();
 authStore.authAction();
 calendarStore.getCalendar();
 
 export default {
-    plugins: {
-      injector,
-      router,
-      VueLoading,
-      VueI18n,
-      pinia,
-    }
-}
+  plugins: {
+    injector,
+    router,
+    VueLoading,
+    VueI18n,
+    pinia,
+  },
+};

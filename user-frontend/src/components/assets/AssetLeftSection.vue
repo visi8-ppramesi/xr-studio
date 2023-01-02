@@ -62,7 +62,9 @@
     </div>
     <div v-if="asset" class="content-wrapper">
       <div class="pt-5 mb-4">
-        <h1 id="asset-left-name" class="font-medium leading-none text-5xl mt-0">{{ asset.name }}</h1>
+        <h1 id="asset-left-name" class="font-medium leading-none text-5xl mt-0">
+          {{ asset.name }}
+        </h1>
       </div>
       <div class="flex">
         <CartButton
@@ -82,16 +84,24 @@
           {{ asset.description }}
         </div>
       </div>
-      <div id="asset-left-date" class="mb-2 text-gray-600">Published 2 months ago</div>
+      <div id="asset-left-date" class="mb-2 text-gray-600">
+        Published 2 months ago
+      </div>
       <div class="flex items-center text-gray-500 max-w-xl mb-1">
-        <span id="asset-left-categories" class="flex items-center text-sm h-8 mb-1 mr-2">Categories:</span>
+        <span
+          id="asset-left-categories"
+          class="flex items-center text-sm h-8 mb-1 mr-2"
+          >Categories:</span
+        >
         <ul class="flex flex-wrap">
           <li
             v-for="(asset, idx) in asset.categories"
             :key="'asset-' + idx"
             class="leading-none mb-1 mr-2 px-2 py-1 border border-gray-400 rounded-md"
           >
-            <a id="asset-left-categories-item" href="/test">{{ formatters.startCase(asset) }}</a>
+            <a id="asset-left-categories-item" href="/test">{{
+              formatters.startCase(asset)
+            }}</a>
           </li>
         </ul>
       </div>

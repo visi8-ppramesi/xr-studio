@@ -2,7 +2,12 @@
   <section
     class="px-6 py-12 md:px-12 bg-gray-100 text-gray-800 text-center lg:text-left md:ml-60 min-h-screen"
   >
-    <h2 id="equipments-content-title" class="text-3xl font-bold mb-12 text-center">Equipment Rental</h2>
+    <h2
+      id="equipments-content-title"
+      class="text-3xl font-bold mb-12 text-center"
+    >
+      Equipment Rental
+    </h2>
 
     <div
       class="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-8 mb-6 md:w-7/8 mx-auto"
@@ -22,7 +27,9 @@
           <div class="equipments-content-description">
             {{ filters.truncate(equipment.description, 100) }}
           </div>
-          <div class="equipments-content-price">Price: {{ formatters.currency(equipment.price) }}</div>
+          <div class="equipments-content-price">
+            Price: {{ formatters.currency(equipment.price) }}
+          </div>
         </BoxContent>
       </div>
     </div>
