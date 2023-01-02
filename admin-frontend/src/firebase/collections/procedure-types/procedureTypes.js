@@ -12,4 +12,9 @@ export default class extends Collection {
     price: Number,
     price_unit: String,
   };
+
+  static async getProcedureTypes(id) {
+    const procedure_type = await this.getDocument(id);
+    return procedure_type;
+  }
 }

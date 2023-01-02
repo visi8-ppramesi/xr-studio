@@ -100,9 +100,9 @@
                             <th class="text-center p-3 px-5">Price</th>
                           </tr>
                           <tr v-for="item in assets" :key="item.id">
-                            <td class="text-center p-3 px-5">{{ asset.id }}</td>
+                            <td class="text-center p-3 px-5">{{ item.id }}</td>
                             <td class="text-center p-3 px-5">
-                              {{ asset.price }}
+                              {{ item.price }}
                             </td>
                           </tr>
                         </tbody>
@@ -235,21 +235,21 @@ export default {
       shoots: {},
       id: Math.random().toString(16).substring(2),
       assets: {},
-      equipments: [],
-      procedures: [],
+      equipments: {},
+      procedures: {},
       shootId: String,
     };
   },
   mounted() {
     this.fetchShoots();
-    // if (this.$route.params.shootId) {
-    //   this.fetchAssets();
-    //   this.fetchEquipments();
-    //   this.fetchProcedures();
-    // };
-    this.fetchAssets();
-    this.fetchEquipments();
-    this.fetchProcedures();
+    if (this.$route.params.shootId) {
+      this.fetchAssets();
+      this.fetchEquipments();
+      this.fetchProcedures();
+    }
+    // this.fetchAssets();
+    // this.fetchEquipments();
+    // this.fetchProcedures();
   },
   methods: {
     async fetchShoots() {

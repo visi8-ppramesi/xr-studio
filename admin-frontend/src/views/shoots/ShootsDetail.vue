@@ -106,17 +106,25 @@
                   <td
                     class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"
                   >
-                    {{ shoots.procedure_type }}
+                    {{ orders.created_date }}
                   </td>
                   <td
                     class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"
                   >
-                    {{ shoots.procedure_type }}
+                    {{ procedure_type.name }}
                   </td>
                   <td
                     class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"
                   >
-                    {{ shoots.id }}
+                    <select class="bg-transparent">
+                      <option
+                        v-for="items in shoots.status_history"
+                        :key="items.id"
+                        value="user"
+                      >
+                        {{ items.status }}
+                      </option>
+                    </select>
                   </td>
                 </tr>
               </tbody>
@@ -352,6 +360,8 @@
 </template>
 
 <script>
+import { Orders } from "@/firebase/collections/orders";
+import { ProcedureTypes } from "@/firebase/collections/procedure-types";
 import { Shoots } from "../../firebase/collections/shoots/";
 import Assets from "../../firebase/collections/shoots/subcollections/assets";
 import Equipments from "../../firebase/collections/shoots/subcollections/equipments";
@@ -362,24 +372,33 @@ export default {
     return {
       shoots: {},
       assets: {},
-      equipments: [],
-      procedures: [],
+      equipments: {},
+      procedures: {},
+      orders: {},
+      procedure_type: {},
     };
   },
   mounted() {
     this.fetchShoots();
-    // if (this.$route.params.shootId) {
-    //   this.fetchAssets();
-    //   this.fetchEquipments();
-    //   this.fetchProcedures();
-    // };
     this.fetchAssets();
     this.fetchEquipments();
     this.fetchProcedures();
+    this.fetchOrders();
+    this.fetchProcedureTypes();
   },
   methods: {
+    async fetchOrders(orderId) {
+      this.orders = await Orders.getOrdersId(orderId);
+    },
+    async fetchProcedureTypes(procedureId) {
+      this.procedure_type = await ProcedureTypes.getProcedureTypes(procedureId);
+    },
     async fetchShoots() {
       this.shoots = await Shoots.getShootsDetail(this.$route.params.shootId);
+      const orderId = this.shoots.order.id; //getReference order
+      const procedureId = this.shoots.procedure_type.id; //getReference procedure
+      this.fetchOrders(orderId);
+      this.fetchProcedureTypes(procedureId);
     },
     async fetchAssets() {
       this.assets = await Assets.getAssets([

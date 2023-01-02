@@ -27,6 +27,24 @@ const routes = [
     },
   },
   {
+    path: "/orders/list",
+    name: "ordersList",
+    component: () => import("../views/orders/OrdersList.vue"),
+    meta: {
+      // requiresAuth: true,
+      class: "Order",
+    },
+  },
+  {
+    path: "/orders/detail/:orderId",
+    name: "ordersDetail",
+    component: () => import("../views/orders/OrdersDetail.vue"),
+    meta: {
+      // requiresAuth: true,
+      class: "Order",
+    },
+  },
+  {
     path: "/shoots/list",
     name: "list",
     component: () => import("../views/shoots/ShootsList.vue"),
