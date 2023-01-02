@@ -1,3 +1,3 @@
 import ProcedureTypes from "./procedureTypes";
 
-export { ProcedureTypes }
+export { ProcedureTypes };

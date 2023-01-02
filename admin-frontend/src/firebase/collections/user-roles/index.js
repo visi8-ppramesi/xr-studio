@@ -1,3 +1,3 @@
 import UserRoles from "./userRoles";
 
-export { UserRoles }
+export { UserRoles };

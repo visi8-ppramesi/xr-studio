@@ -9,8 +9,8 @@
             >
               <div class="flex flex-row text-left">
                 <div>
-                  <span class="font-semibold">{{ item.title }}</span>
-                  <span class="block text-gray-500">{{
+                  <span class="notification-title font-semibold">{{ item.title }}</span>
+                  <span class="notification-description block text-gray-500">{{
                     item.description
                   }}</span>
                 </div>
@@ -25,7 +25,7 @@
       class="hidden md:block w-60 h-full bg-white pt-8"
       id="sidenavSecExample"
     >
-      <span class="text-lg">Search By Filter</span>
+      <span id="notification-filter" class="text-lg">Search By Filter</span>
       <ul class="relative px-1">
         <li
           v-for="(item, idx) in filters"
@@ -41,7 +41,7 @@
             aria-expanded="false"
             :aria-controls="'collapseSidenavSecEx' + idx"
           >
-            <span>{{ item.title }}</span>
+            <span class="notification-item-title">{{ item.title }}</span>
             <svg
               aria-hidden="true"
               focusable="false"

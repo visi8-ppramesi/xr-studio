@@ -6,9 +6,9 @@
 </template>
 
 <script>
-import EquipmentLeftSection from "@/components/equipments/EquipmentLeftSection.vue";
-import EquipmentRightSection from "@/components/equipments/EquipmentRightSection.vue";
-import { Equipments } from "@/firebase/collections/equipments";
+import EquipmentLeftSection from "../../components/equipments/EquipmentLeftSection.vue";
+import EquipmentRightSection from "../../components/equipments/EquipmentRightSection.vue";
+import { Equipments } from "../../firebase/collections/equipments";
 
 export default {
   name: "scene",

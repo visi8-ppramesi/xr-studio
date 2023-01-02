@@ -16,7 +16,7 @@
       </div>
     </div>
     <div class="p-6">
-      <h5 class="font-bold text-lg mb-3">{{ title }}</h5>
+      <h5 class="box-content-title font-bold text-lg mb-3">{{ title }}</h5>
       <p v-if="createdDate" class="text-gray-500 mb-4">
         <small
           >Published <u>{{ createdDate }}</u></small

@@ -1,3 +1,3 @@
 import ShootKeys from "./shootKeys";
 
-export { ShootKeys }
+export { ShootKeys };

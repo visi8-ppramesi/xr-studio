@@ -1,3 +1,3 @@
 import SubmissionForms from "./submissionForms";
 
-export { SubmissionForms }
+export { SubmissionForms };

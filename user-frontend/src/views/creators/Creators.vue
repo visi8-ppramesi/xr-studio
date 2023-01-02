@@ -6,8 +6,8 @@
 </template>
 
 <script>
-import CreatorsSidenav from "@/components/creators/CreatorsSidenav.vue";
-import CreatorsContent from "@/components/creators/CreatorsContent.vue";
+import CreatorsSidenav from "../../components/creators/CreatorsSidenav.vue";
+import CreatorsContent from "../../components/creators/CreatorsContent.vue";
 export default {
   name: "creators",
   components: {
