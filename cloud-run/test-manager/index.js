@@ -9,7 +9,7 @@ const createApp = function(){
     app.use(cors({origin: true}));
     
     app.get('/', (req, res) => {
-        res.json({ test: "test" })
+        res.json({ test: process.env })
     })
     
     const port = parseInt(process.env.PORT) || 8081;

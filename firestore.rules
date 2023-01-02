@@ -73,8 +73,50 @@ service cloud.firestore {
       allow update: if shootOwnedByUser() || isAdmin();
       allow delete: if isAdmin();
 
+      match /assets/{asset} {
+        allow read: if true;
+        allow create: if (isLoggedIn() && isClient()) || isAdmin();
+        allow update: if shootOwnedByUser() || isAdmin();
+        allow delete: if isAdmin();
+
+        match /changes/{change} {
+          allow read: if shootOwnedByUser() || isAdmin();
+          allow create: if isAdmin();
+          allow update: if isAdmin();
+          allow delete: if isAdmin();
+        }
+      }
+
+      match /equipments/{equipment} {
+        allow read: if true;
+        allow create: if (isLoggedIn() && isClient()) || isAdmin();
+        allow update: if shootOwnedByUser() || isAdmin();
+        allow delete: if isAdmin();
+
+        match /changes/{change} {
+          allow read: if shootOwnedByUser() || isAdmin();
+          allow create: if isAdmin();
+          allow update: if isAdmin();
+          allow delete: if isAdmin();
+        }
+      }
+
+      match /procedures/{procedure} {
+        allow read: if true;
+        allow create: if (isLoggedIn() && isClient()) || isAdmin();
+        allow update: if shootOwnedByUser() || isAdmin();
+        allow delete: if isAdmin();
+
+        match /changes/{change} {
+          allow read: if shootOwnedByUser() || isAdmin();
+          allow create: if isAdmin();
+          allow update: if isAdmin();
+          allow delete: if isAdmin();
+        }
+      }
+
       function shootOwnedByUser(){
-        let shootUserId = get(/databases/$(database)/documents/shoots/$(shoot)).data.creator.id;
+        let shootUserId = get(/databases/$(database)/documents/shoots/$(shoot)).data.created_by.id;
         return request.auth.uid == shootUserId;
       }
     }

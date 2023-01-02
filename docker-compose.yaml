@@ -6,9 +6,16 @@ services:
       context: ./cloud-run/shooting-manager
     ports:
       - "8080:8080"
+    environment:
+      - GOOGLE_CLOUD_PROJECT=xr-studio-a9c5e
+      - MODE=production
+      - BUCKET=xr-studio-a9c5e.appspot.com
   test-manager:
     image: test-manager:0.0.1
     build:
       context: ./cloud-run/test-manager
     ports:
       - "8081:8081"
+    environment:
+      - TEST=test
+      - TEST_TEST=test_test

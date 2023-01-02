@@ -141,6 +141,7 @@ export default {
   methods: {
     submit() {
       const currentCart = JSON.parse(localStorage.getItem("cart") || "{}");
+      // eslint-disable-next-line no-unused-vars
       const groupedCart = currentCart.reduce((acc, v) => {
         if (isNil(acc[v.type])) {
           acc[v.type] = [];

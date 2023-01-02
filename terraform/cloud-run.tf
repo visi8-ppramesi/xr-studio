@@ -16,6 +16,14 @@ resource "google_cloud_run_service" "shooting_manager" {
           name = "MODE"
           value = "production"
         }
+        env {
+          name = "GOOGLE_CLOUD_PROJECT"
+          value = var.project_id
+        }
+        env {
+          name = "BUCKET"
+          value = "${var.project_id}.appspot.com"
+        }
       }
       container_concurrency = 80
     }

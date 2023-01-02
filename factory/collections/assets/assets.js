@@ -22,6 +22,7 @@ module.exports = class AssetFactory extends Factory{
             ],
             assets_url: 'asset://visi8-server/stuff/asset/',
             user_data: await userFactory.getRandomProjection(['username', 'email'], 'creator'),
+            price: Math.round(Math.random() * 100) * 100000
         }
     }
 }
