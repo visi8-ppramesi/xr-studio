@@ -140,6 +140,11 @@ const routes = [
     name: "Home",
     component: Home,
   },
+  {
+    path: "/contact-us",
+    name: "contact",
+    component: () => import("@/views/ContactUs.vue"),
+  },
   ...authRoutes,
   ...assetRoutes,
   ...equipmentRoutes,
