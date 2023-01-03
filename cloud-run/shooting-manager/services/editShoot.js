@@ -2,32 +2,33 @@
 
 const { admin } = require('../utils/initializeAdmin.js')
 const { getTokenId } = require('../utils/getTokenId.js')
-const { vedhg } = require('../utils/dateRangeHash.js')
+// const { vedhg } = require('../utils/dateRangeHash.js')
+const setIdIfNotSet = require("../utils/id.js")
 const { decode: bufferDecoder } = require('../utils/bufferEncoder')
 const isNil = require('lodash/isNil')
 const isArray = require('lodash/isArray')
 const isEmpty = require('lodash/isEmpty')
 const omit = require('lodash/omit')
-const { v4 } = require('uuid')
+// const { v4 } = require('uuid')
 const { FieldValue } = admin.firestore
 const stringify = obj => JSON.stringify(obj, (k, v) => {if(v === undefined){return null}; return v})//require('../utils/betterStableStringify')
 const { diff } = require("deep-object-diff")
 const { isUserAdmin } = require('../utils/roles')
 const pluralize = require("pluralize")
 
-function setIdIfNotSet(obj, isProcedure = false) {
-    if (isNil(obj.id)) {
-        if(isProcedure){
-            let { procedure_code: procedureCode, procedure_start: procedureStart, procedure_end: procedureEnd } = obj
-            procedureCode = procedureCode || '000'
-            const encoded = vedhg.encodeDates(procedureStart, procedureEnd)
-            obj.id = [procedureCode, encoded].join('.')
-        }else{
-            obj.id = v4()
-        }
-    }
-    return obj
-}
+// function setIdIfNotSet(obj, isProcedure = false) {
+//     if (isNil(obj.id)) {
+//         if(isProcedure){
+//             let { procedure_code: procedureCode, procedure_start: procedureStart, procedure_end: procedureEnd } = obj
+//             procedureCode = procedureCode || '000'
+//             const encoded = vedhg.encodeDates(procedureStart, procedureEnd)
+//             obj.id = [procedureCode, encoded].join('.')
+//         }else{
+//             obj.id = v4()
+//         }
+//     }
+//     return obj
+// }
 
 /*
     data structure: {

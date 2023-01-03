@@ -2,26 +2,27 @@
 
 const { admin } = require('../utils/initializeAdmin.js')
 const { getTokenId } = require('../utils/getTokenId.js')
-const { vedhg } = require('../utils/dateRangeHash.js')
+// const { vedhg } = require('../utils/dateRangeHash.js')
+const setIdIfNotSet = require("../utils/id.js")
 const { decode: bufferDecoder } = require('../utils/bufferEncoder')
 const { diff } = require("deep-object-diff")
 const isNil = require('lodash/isNil')
-const { v4 } = require('uuid')
+// const { v4 } = require('uuid')
 const stringify = obj => JSON.stringify(obj, (k, v) => {if(v === undefined){return null}; return v})//require('../utils/betterStableStringify')
 
-function setIdIfNotSet(obj, isProcedure = false) {
-    if (isNil(obj.id)) {
-        if(isProcedure){
-            let { procedure_code: procedureCode, procedure_start: procedureStart, procedure_end: procedureEnd } = obj
-            procedureCode = procedureCode || '000'
-            const encoded = vedhg.encodeDates(procedureStart, procedureEnd)
-            obj.id = [procedureCode, encoded].join('.')
-        }else{
-            obj.id = v4()
-        }
-    }
-    return obj
-}
+// function setIdIfNotSet(obj, isProcedure = false, debug = false) {
+//     if (isNil(obj.id)) {
+//         if(isProcedure){
+//             let { procedure_code: procedureCode, procedure_start: procedureStart, procedure_end: procedureEnd } = obj
+//             procedureCode = procedureCode || '000'
+//             const encoded = vedhg.encodeDates(procedureStart, procedureEnd)
+//             obj.id = [procedureCode, encoded].join('.')
+//         }else{
+//             obj.id = (debug ? "ft-" : "") + v4()
+//         }
+//     }
+//     return obj
+// }
 
 /*
     data structure: {
@@ -94,7 +95,7 @@ module.exports = function () {
         }
 
         const createShootWithSubcollections = async function (data) {
-            const { procedures, equipments, assets, shoot } = data
+            const { procedures, equipments, assets, shoot, debug } = data
 
             if (isNil(shoot)) {
                 throw new Error("Null shoot")
@@ -110,7 +111,7 @@ module.exports = function () {
             }
 
             //create shoot first
-            const { id, ...shootDuplicate } = setIdIfNotSet(shoot)
+            const { id, ...shootDuplicate } = setIdIfNotSet(shoot, null, debug)
             const rightNow = new Date()
             await db.collection("shoots").doc(shoot.id).set({
                 location: 'main-location',
@@ -137,7 +138,7 @@ module.exports = function () {
             if (!isNil(equipments)) {
                 status.push("with_equipments")
                 for (const equipment of equipments) {
-                    const { id, ...equipmentDuplicate } = setIdIfNotSet(equipment)
+                    const { id, ...equipmentDuplicate } = setIdIfNotSet(equipment, null, debug)
                     const promise = db.collection("shoots").doc(shoot.id).collection("equipments").doc(equipment.id).set({
                         created_date: rightNow,
                         ...equipmentDuplicate
@@ -169,7 +170,7 @@ module.exports = function () {
             if (!isNil(procedures)) {
                 status.push("with_procedures")
                 for (const procedure of procedures) {
-                    const { id, ...procedureDuplicate } = setIdIfNotSet(procedure, true)
+                    const { id, ...procedureDuplicate } = setIdIfNotSet(procedure, true, debug)
                     const promise = db.collection("shoots").doc(shoot.id).collection("procedures").doc(procedure.id).set({
                         created_date: rightNow,
                         ...procedureDuplicate
@@ -201,7 +202,7 @@ module.exports = function () {
             if (!isNil(assets)) {
                 status.push("with_assets")
                 for (const asset of assets) {
-                    const { id, ...assetDuplicate } = setIdIfNotSet(asset)
+                    const { id, ...assetDuplicate } = setIdIfNotSet(asset, null, debug)
                     const promise = db.collection("shoots").doc(shoot.id).collection("assets").doc(asset.id).set({
                         created_date: rightNow,
                         ...assetDuplicate
