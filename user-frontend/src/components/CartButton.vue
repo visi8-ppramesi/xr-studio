@@ -15,15 +15,52 @@
     </svg>
     Add To Cart
   </button>
+
+  <transition class="inset-0 pt-3" name="fade">
+    <div class="rounded-xl absolute inset-x-0 bottom-0" v-if="isModalVisible">
+      <div
+        class="bg-green-400 text-white w-fit p-3 relative mx-auto my-auto rounded-xl shadow-lg bg-white px-5 py-2 flex items-center justify-between"
+      >
+        <div class="items-center font-bold px-4 py-2">Item Added</div>
+        <svg
+          @click="closeModal"
+          xmlns="http://www.w3.org/2000/svg"
+          class="icon icon-tabler icon-tabler-x"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+          stroke="currentColor"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </div>
+    </div>
+  </transition>
 </template>
 
 <script>
 import { useCartStore } from "../store/cart";
 export default {
+  data() {
+    return {
+      isOpen: false,
+    };
+  },
   setup() {
     const cartStore = useCartStore();
 
     return { cartStore };
+  },
+  computed: {
+    isModalVisible() {
+      return this.isOpen;
+    },
   },
   props: {
     itemData: {
@@ -38,7 +75,23 @@ export default {
   methods: {
     addToCart() {
       this.cartStore.addItem({ ...this.itemData, type: this.itemType });
+      this.isOpen = !this.isOpen;
+    },
+    closeModal() {
+      this.isOpen = !this.isOpen;
     },
   },
 };
 </script>
+
+<style>
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 500ms ease-out;
+}
+</style>

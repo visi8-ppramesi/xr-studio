@@ -10,8 +10,8 @@
               id="front-page-title"
               class="text-5xl md:text-6xl xl:text-7xl font-bold tracking-tight mb-12"
             >
-              The best solution <br /><span class="text-blue-600"
-                >for your productions</span
+              ImXR Productions <br /><span class="text-blue-600"
+                >for your XR production needs</span
               >
             </h1>
             <p id="front-page-description" class="text-gray-600">
