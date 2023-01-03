@@ -19,7 +19,7 @@
     "buffer": "^6.0.3",
     "core-js": "^3.8.3",
     "datatables.net-vue3": "^1.0.0",
-    "dayjs": "^1.11.6",
+    "dayjs": "^1.11.7",
     "dotenv": "^16.0.3",
     "fast-json-stable-stringify": "^2.1.0",
     "file-loader": "^6.2.0",
@@ -34,7 +34,7 @@
     "vue-i18n": "^9.1.0",
     "vue-loading-overlay": "^5.0.3",
     "vue-router": "^4.0.3",
-    "vue-tailwind-datepicker": "^1.1.2"
+    "vue-tailwind-datepicker": "^1.2.6"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

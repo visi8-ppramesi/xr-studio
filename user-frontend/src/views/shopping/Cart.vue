@@ -74,11 +74,12 @@
             class="flex font-semibold justify-between py-6 text-sm uppercase"
           >
             <span id="cart-total-cost">Total cost</span>
-            <span id="cart-total-amount">${{ cartTotalAmount() }}</span>
+            <span id="cart-total-amount">{{ cartTotalAmount() }}</span>
           </div>
           <button
             id="cart-checkout"
             class="bg-indigo-500 font-semibold hover:bg-indigo-600 py-3 text-sm text-white uppercase w-full"
+            @click="checkout"
           >
             Checkout
           </button>
@@ -90,7 +91,8 @@
 
 <script>
 import isArray from "lodash/isArray";
-import { useCartStore } from "../../store/cart";
+import { useAuthStore } from "@/store/auth";
+import { useCartStore } from "@/store/cart";
 import { mapState } from "pinia";
 // import SummaryButton from "@/components/shopping/SummaryButton.vue";
 import CartItem from "@/components/shopping/CartItem.vue";
@@ -149,11 +151,19 @@ export default {
       return isArray(this.imageUrl) ? this.imageUrl[0] : this.imageUrl;
     },
     ...mapState(useCartStore, ["itemCount", "cart"]),
+    ...mapState(useAuthStore, ["isLoggedIn"]),
   },
   methods: {
-    submit() {
+    checkout() {
+      if (!isNil(this.isLoggedIn) && this.isLoggedIn) {
+        const cart = this.getCart();
+        console.log(cart);
+      } else {
+        this.$router.push({ name: "Login" });
+      }
+    },
+    getCart() {
       const currentCart = JSON.parse(localStorage.getItem("cart") || "{}");
-      // eslint-disable-next-line no-unused-vars
       const groupedCart = currentCart.reduce((acc, v) => {
         if (isNil(acc[v.type])) {
           acc[v.type] = [];
@@ -161,6 +171,7 @@ export default {
         acc[v.type].push(v);
         return acc;
       }, {});
+      return groupedCart;
     },
     addToCart() {
       this.cartStore.addItem({ ...this.itemData, type: this.itemType });

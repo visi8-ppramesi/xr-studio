@@ -21,7 +21,7 @@
 <script>
 export default {
   name: "CheckboxInput",
-  props: ["field"],
+  props: ["modelValue", "field"],
   emits: ["change"],
   data() {
     return {
@@ -29,6 +29,12 @@ export default {
     };
   },
   watch: {
+    modelValue: {
+      immediate: true,
+      handler() {
+        this.myValue = this.modelValue;
+      },
+    },
     myValue() {
       this.$emit("change", { target: { value: this.myValue } });
     },

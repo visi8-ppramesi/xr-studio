@@ -112,6 +112,11 @@ const studioRoutes = [
     name: "RegisterShoot",
     component: () => import("@/views/studio/RegisterShoot.vue"),
   },
+  {
+    path: "/studio/confirm-shoot",
+    name: "ConfirmShoot",
+    component: () => import("@/views/studio/ConfirmShoot.vue"),
+  },
 ];
 
 const shopRoutes = [

@@ -251,7 +251,7 @@
 </template>
 
 <script>
-import { useAuthStore } from "../store/auth";
+import { useAuthStore } from "@/store/auth";
 import { useCartStore } from "@/store/cart";
 import { mapState } from "pinia";
 export default {

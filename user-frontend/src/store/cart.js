@@ -95,6 +95,23 @@ export const useCartStore = defineStore("cart", () => {
     }
   }
 
+  function getShootings() {
+    return this.cart.filter((v) => v.type == "studio");
+  }
+  function getEquipments() {
+    return this.cart.filter((v) => v.type == "equipment");
+  }
+  function getAssets() {
+    return this.cart.filter((v) => v.type == "asset");
+  }
+
+  function clearShootings() {
+    this.cart
+      .filter((v) => v.type == "studio")
+      .map((v) => v.id)
+      .map(this.removeItem);
+  }
+
   const cartObj = {
     cart,
     itemCount,
@@ -102,6 +119,10 @@ export const useCartStore = defineStore("cart", () => {
     removeItem,
     addItem,
     decreaseItemQty,
+    getShootings,
+    getEquipments,
+    getAssets,
+    clearShootings,
   };
 
   processor = new Processor(cartObj);

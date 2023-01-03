@@ -1,6 +1,8 @@
 <template>
   <section class="px-6 py-12 md:px-12 bg-gray-100 text-gray-800">
-    <h2 class="text-3xl font-bold mb-12 text-center">Schedule Shoot</h2>
+    <h2 class="text-3xl font-bold mb-12 text-center" @click="checkFormData">
+      Schedule Shoot
+    </h2>
     <div class="relative block text-gray-700 text-sm font-bold mb-2">
       Select Shoot Type:
     </div>
@@ -31,7 +33,7 @@
       <div>
         <button
           v-if="showSubmit"
-          @click="register"
+          @click="submit"
           type="button"
           class="mb-8 inline-block px-20 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
         >
@@ -53,9 +55,11 @@ import StudioInputLabel from "@/components/studio/form-inputs/Label.vue";
 import StudioInputBreak from "@/components/studio/form-inputs/Break.vue";
 import { markRaw } from "vue";
 import isNil from "lodash/isNil";
+import isFunction from "lodash/isFunction";
 import startCase from "lodash/startCase";
 import { vedhg } from "@/utils/dateRangeHash";
 import { useCartStore } from "@/store/cart";
+// import dayjs from "dayjs";
 
 export default {
   setup() {
@@ -70,16 +74,6 @@ export default {
       shootType: null,
       selectedFields: {
         nonxr: [
-          {
-            type: "datepicker",
-            name: "start_date",
-            label: "Shoot Start Date (Tentative)",
-          },
-          {
-            type: "datepicker",
-            name: "end_date",
-            label: "Shoot End Date",
-          },
           //art setup
           {
             type: "checkbox",
@@ -99,23 +93,23 @@ export default {
             show: false,
           },
           {
-            type: "textarea",
-            name: "notes",
-            label: "Description",
-            placeholder: "Do stuff",
-          },
-        ],
-        xr: [
-          {
             type: "datepicker",
-            name: "shootStartDate",
+            name: "start_date",
             label: "Shoot Start Date (Tentative)",
           },
           {
             type: "datepicker",
-            name: "shootEndDate",
+            name: "end_date",
             label: "Shoot End Date",
           },
+          {
+            type: "textarea",
+            name: "notes",
+            label: "Description",
+            placeholder: "How can we help you?",
+          },
+        ],
+        xr: [
           //rehearsal
           {
             type: "checkbox",
@@ -153,10 +147,20 @@ export default {
             show: false,
           },
           {
+            type: "datepicker",
+            name: "shootStartDate",
+            label: "Shoot Start Date (Tentative)",
+          },
+          {
+            type: "datepicker",
+            name: "shootEndDate",
+            label: "Shoot End Date",
+          },
+          {
             type: "textarea",
             name: "notes",
             label: "Description",
-            placeholder: "Do stuff",
+            placeholder: "How can we help you?",
           },
         ],
       },
@@ -175,15 +179,93 @@ export default {
   },
   mounted() {
     this.getProcTypes();
+    this.checkCartForSchedule();
   },
   methods: {
+    checkFormData() {
+      console.log(this.formData);
+      const shoots = this.cartStore.getShootings();
+      console.log(shoots);
+      window.shitSandwich = this.formData;
+      window.poopSandwich = shoots;
+    },
+    checkCartForSchedule() {
+      const shoots = this.cartStore.getShootings();
+      let rentStudio = shoots.find(
+        (v) => v.extra_data.schedule_type == "rent_xr_studio"
+      );
+      const rentRehearsal = shoots.find(
+        (v) => v.extra_data.schedule_type == "rent_studio_rehearsal"
+      );
+      let rentArtSetup;
+      let shootType;
+      if (rentStudio) {
+        rentArtSetup = shoots.find(
+          (v) => v.extra_data.schedule_type == "rent_studio_art_setup_xr"
+        );
+        shootType = "xr";
+      } else {
+        rentStudio = shoots.find(
+          (v) => v.extra_data.schedule_type == "rent_non_xr_studio"
+        );
+        rentArtSetup = shoots.find(
+          (v) => v.extra_data.schedule_type == "rent_studio_art_setup_non_xr"
+        );
+        shootType = "nonxr";
+      }
+
+      if (rentStudio) {
+        console.log(1);
+        this.shootType = shootType;
+        this.changeShootType();
+        const [shootStartDate, shootEndDate] = vedhg.decodeHash(rentStudio.id);
+        this.formData.shootStartDate = shootStartDate;
+        this.formData.shootEndDate = shootEndDate;
+        this.formData.notes = rentStudio.extra_data.notes;
+
+        if (rentArtSetup) {
+          console.log(2);
+          const [artSetupStartDate, artSetupEndDate] = vedhg.decodeHash(
+            rentArtSetup.id
+          );
+          this.formData.toggleArtSetup = true;
+          this.onChangeToggleArtSetup(true);
+          this.formData.artSetupStartDate = artSetupStartDate;
+          this.formData.artSetupEndDate = artSetupEndDate;
+        }
+
+        if (rentRehearsal) {
+          console.log(3);
+          const [rehearsalStartDate, rehearsalEndDate] = vedhg.decodeHash(
+            rentRehearsal.id
+          );
+          this.formData.toggleRehearsal = true;
+          this.onChangeToggleRehearsal(true);
+          this.formData.rehearsalStartDate = rehearsalStartDate;
+          this.formData.rehearsalEndDate = rehearsalEndDate;
+        }
+      }
+    },
     changeShootType() {
+      console.log("changeShootType");
       if (!isNil(this.shootType)) {
         this.fields = [...this.selectedFields[this.shootType]];
         this.formData = {};
-        this.showSubmit = true;
+        // this.showSubmit = true;
       } else {
         this.showSubmit = false;
+      }
+    },
+    onChangeShootStartDate() {
+      const { shootStartDate, shootEndDate } = this.formData;
+      if (shootStartDate && shootEndDate) {
+        this.showSubmit = true;
+      }
+    },
+    onChangeShootEndDate() {
+      const { shootStartDate, shootEndDate } = this.formData;
+      if (shootStartDate && shootEndDate) {
+        this.showSubmit = true;
       }
     },
     onChangeToggleArtSetup(val) {
@@ -223,7 +305,8 @@ export default {
     onComponentChange(fieldName, value) {
       const functionName =
         "onChange" + startCase(fieldName).split(" ").join("");
-      if (!isNil(this[functionName])) {
+      console.log(functionName);
+      if (!isNil(this[functionName]) && isFunction(this[functionName])) {
         this[functionName](value);
       }
     },
@@ -236,142 +319,171 @@ export default {
     async getProcTypes() {
       this.procTypesPrices = await ProcedureTypes.getDocuments().then(
         (procTypes) => {
-          return procTypes.reduce((acc, v) => {
+          const prices = procTypes.reduce((acc, v) => {
             acc[v.id] = v.price;
             return acc;
           }, {});
+          return prices;
         }
       );
     },
-    register() {
+    submit() {
       const { shootStartDate, shootEndDate } = this.formData;
       const { rehearsalStartDate, rehearsalEndDate } = this.formData;
       const { artSetupStartDate, artSetupEndDate } = this.formData;
 
       let shootCode, artSetupCode;
       const prices = {};
-      if (this.shootType == "xr") {
-        shootCode = vedhg.encodeDates(
-          shootStartDate,
-          shootEndDate,
-          "rent_xr_studio"
-        );
-        prices.shootCode =
-          this.procTypesPrices["rent_xr_studio"] *
-          this.formatters.round(vedhg.getIntervalLength(shootCode, "days"), 2);
-
-        if (!isNil(artSetupStartDate) && !isNil(artSetupEndDate)) {
-          artSetupCode = vedhg.encodeDates(
-            artSetupStartDate,
-            artSetupEndDate,
-            "rent_studio_art_setup_xr"
+      try {
+        if (this.shootType == "xr") {
+          shootCode = vedhg.encodeDates(
+            shootStartDate,
+            shootEndDate,
+            "rent_xr_studio"
           );
-          prices.artSetupCode =
-            this.procTypesPrices["rent_studio_art_setup_xr"] *
+          prices.shootPrice =
+            this.procTypesPrices["rent_xr_studio"] *
             this.formatters.round(
-              vedhg.getIntervalLength(artSetupCode, "days"),
+              vedhg.getIntervalLength(shootCode, "days"),
               2
             );
-        }
-      } else if (this.shootType == "nonxr") {
-        shootCode = vedhg.encodeDates(
-          shootStartDate,
-          shootEndDate,
-          "rent_non_xr_studio"
-        );
-        prices.shootCode =
-          this.procTypesPrices["rent_non_xr_studio"] *
-          this.formatters.round(vedhg.getIntervalLength(shootCode, "days"), 2);
 
-        if (!isNil(artSetupStartDate) && !isNil(artSetupEndDate)) {
-          artSetupCode = vedhg.encodeDates(
-            artSetupStartDate,
-            artSetupEndDate,
-            "rent_studio_art_setup_non_xr"
+          if (!isNil(artSetupStartDate) && !isNil(artSetupEndDate)) {
+            artSetupCode = vedhg.encodeDates(
+              artSetupStartDate,
+              artSetupEndDate,
+              "rent_studio_art_setup_xr"
+            );
+            prices.artSetupPrice =
+              this.procTypesPrices["rent_studio_art_setup_xr"] *
+              this.formatters.round(
+                vedhg.getIntervalLength(artSetupCode, "days"),
+                2
+              );
+          }
+        } else if (this.shootType == "nonxr") {
+          shootCode = vedhg.encodeDates(
+            shootStartDate,
+            shootEndDate,
+            "rent_non_xr_studio"
           );
-          prices.artSetupCode =
-            this.procTypesPrices["rent_studio_art_setup_non_xr"] *
+          prices.shootPrice =
+            this.procTypesPrices["rent_non_xr_studio"] *
             this.formatters.round(
-              vedhg.getIntervalLength(artSetupCode, "days"),
+              vedhg.getIntervalLength(shootCode, "days"),
               2
             );
+
+          if (!isNil(artSetupStartDate) && !isNil(artSetupEndDate)) {
+            artSetupCode = vedhg.encodeDates(
+              artSetupStartDate,
+              artSetupEndDate,
+              "rent_studio_art_setup_non_xr"
+            );
+            prices.artSetupPrice =
+              this.procTypesPrices["rent_studio_art_setup_non_xr"] *
+              this.formatters.round(
+                vedhg.getIntervalLength(artSetupCode, "days"),
+                2
+              );
+          }
+        } else {
+          throw new Error("Shoot type wrong");
         }
-      } else {
-        throw new Error("Shoot type wrong");
-      }
 
-      let rehearsalCode;
-      let checkB = true;
-      let checkC = true;
-      let checkA = true;
-      if (!isNil(rehearsalStartDate) && !isNil(rehearsalEndDate)) {
-        rehearsalCode = vedhg.encodeDates(
-          rehearsalStartDate,
-          rehearsalEndDate,
-          "rent_studio_rehearsal"
-        );
-        checkB = !vedhg.hashesOverlap(shootCode, rehearsalCode);
-        checkC = !vedhg.hashesOverlap(artSetupCode, rehearsalCode);
-      }
-
-      if (!isNil(artSetupCode)) {
-        checkA = !vedhg.hashesOverlap(shootCode, artSetupCode);
-      }
-
-      if (checkA && checkB && checkC) {
-        if (!isNil(shootCode)) {
-          this.cartStore.addItem({
-            image_url: null,
-            type: "studio",
-            name:
-              "Schedule Shoot " +
-              (this.shootType == "xr" ? "(XR)" : "(Non-XR)"),
-            description: `${this.formatters.absoluteDate(
-              shootStartDate
-            )} - ${this.formatters.absoluteDate(shootEndDate)}`,
-            id: shootCode,
-            price: prices.shootCode,
-            extra_data: {
-              notes: this.formData.notes,
-            },
-          });
+        let rehearsalCode;
+        let checkB = true;
+        let checkC = true;
+        let checkA = true;
+        if (!isNil(rehearsalStartDate) && !isNil(rehearsalEndDate)) {
+          rehearsalCode = vedhg.encodeDates(
+            rehearsalStartDate,
+            rehearsalEndDate,
+            "rent_studio_rehearsal"
+          );
+          prices.rehearsalPrice =
+            this.procTypesPrices["rent_studio_rehearsal"] *
+            this.formatters.round(
+              vedhg.getIntervalLength(rehearsalCode, "days"),
+              2
+            );
+          checkB = !vedhg.hashesOverlap(shootCode, rehearsalCode);
+          checkC = !vedhg.hashesOverlap(artSetupCode, rehearsalCode);
         }
+
         if (!isNil(artSetupCode)) {
-          this.cartStore.addItem({
-            image_url: null,
-            type: "studio",
-            name:
-              "Schedule Art Setup " +
-              (this.shootType == "xr" ? "(XR)" : "(Non-XR)"),
-            description: `${this.formatters.absoluteDate(
-              artSetupStartDate
-            )} - ${this.formatters.absoluteDate(artSetupEndDate)}`,
-            id: artSetupCode,
-            price: prices.artSetupCode,
-            extra_data: {
-              notes: this.formData.notes,
-            },
-          });
+          checkA = !vedhg.hashesOverlap(shootCode, artSetupCode);
         }
-        if (!isNil(rehearsalCode)) {
-          this.cartStore.addItem({
-            image_url: null,
-            type: "studio",
-            name: "Schedule Rehearsal",
-            description: `${this.formatters.absoluteDate(
-              rehearsalStartDate
-            )} - ${this.formatters.absoluteDate(rehearsalEndDate)}`,
-            id: rehearsalCode,
-            price: prices.rehearsalCode,
-            extra_data: {
-              notes: this.formData.notes,
-            },
-          });
+
+        if (checkA && checkB && checkC) {
+          this.cartStore.clearShootings();
+          if (!isNil(shootCode)) {
+            this.cartStore.addItem({
+              image_url: null,
+              type: "studio",
+              name:
+                "Schedule Shoot " +
+                (this.shootType == "xr" ? "(XR)" : "(Non-XR)"),
+              description: `${this.formatters.absoluteDate(
+                shootStartDate
+              )} - ${this.formatters.absoluteDate(shootEndDate)}`,
+              id: shootCode,
+              price: prices.shootPrice,
+              extra_data: {
+                notes: this.formData.notes,
+                schedule_type:
+                  this.shootType == "xr"
+                    ? "rent_xr_studio"
+                    : "rent_non_xr_studio",
+              },
+            });
+          }
+          if (!isNil(artSetupCode)) {
+            this.cartStore.addItem({
+              image_url: null,
+              type: "studio",
+              name:
+                "Schedule Art Setup " +
+                (this.shootType == "xr" ? "(XR)" : "(Non-XR)"),
+              description: `${this.formatters.absoluteDate(
+                artSetupStartDate
+              )} - ${this.formatters.absoluteDate(artSetupEndDate)}`,
+              id: artSetupCode,
+              price: prices.artSetupPrice,
+              extra_data: {
+                notes: this.formData.notes,
+                schedule_type:
+                  this.shootType == "xr"
+                    ? "rent_studio_art_setup_xr"
+                    : "rent_studio_art_setup_non_xr",
+              },
+            });
+          }
+          if (!isNil(rehearsalCode)) {
+            this.cartStore.addItem({
+              image_url: null,
+              type: "studio",
+              name: "Schedule Rehearsal",
+              description: `${this.formatters.absoluteDate(
+                rehearsalStartDate
+              )} - ${this.formatters.absoluteDate(rehearsalEndDate)}`,
+              id: rehearsalCode,
+              price: prices.rehearsalPrice,
+              extra_data: {
+                notes: this.formData.notes,
+                schedule_type: "rent_studio_rehearsal",
+              },
+            });
+          }
+        } else {
+          throw new Error("Dates overlap");
         }
-      } else {
-        throw new Error("Dates overlap");
+      } catch (err) {
+        alert(err);
+        return;
       }
 
+      this.$router.push({ name: "ConfirmShoot" });
       //add to cart
     },
   },
