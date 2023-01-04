@@ -124,8 +124,8 @@ module.exports = function () {
                     created_date: rightNow,
                     location: 'main-location',
                     created_by: db.collection('users').doc(uid),
+                    ...shootDuplicate,
                     status,
-                    ...shootDuplicate
                 },
                 equipments: {},
                 procedures: {},
@@ -140,8 +140,9 @@ module.exports = function () {
                 for (const equipment of equipments) {
                     const { id, ...equipmentDuplicate } = setIdIfNotSet(equipment, null, debug)
                     const promise = db.collection("shoots").doc(shoot.id).collection("equipments").doc(equipment.id).set({
+                        ...equipmentDuplicate,
                         created_date: rightNow,
-                        ...equipmentDuplicate
+                        equipment_id: db.collection("equipments").doc(equipment.equipment_id)
                     })
                     promises.push(promise)
                     retVal.equipments.push({ equipment_id: equipment.id })
@@ -172,8 +173,9 @@ module.exports = function () {
                 for (const procedure of procedures) {
                     const { id, ...procedureDuplicate } = setIdIfNotSet(procedure, true, debug)
                     const promise = db.collection("shoots").doc(shoot.id).collection("procedures").doc(procedure.id).set({
+                        ...procedureDuplicate,
                         created_date: rightNow,
-                        ...procedureDuplicate
+                        procedure_type: db.collection("procedure_type").doc(procedure.procedure_type)
                     })
                     promises.push(promise)
                     retVal.procedures.push({ procedure_id: procedure.id })
@@ -204,8 +206,9 @@ module.exports = function () {
                 for (const asset of assets) {
                     const { id, ...assetDuplicate } = setIdIfNotSet(asset, null, debug)
                     const promise = db.collection("shoots").doc(shoot.id).collection("assets").doc(asset.id).set({
+                        ...assetDuplicate,
                         created_date: rightNow,
-                        ...assetDuplicate
+                        asset_id: db.collection("assets").doc(asset.asset_id),
                     })
                     promises.push(promise)
                     retVal.assets.push({ asset_id: asset.id })

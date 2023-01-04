@@ -17,5 +17,6 @@ export default class extends Collection{
             profile_image_url: ProfilePicture
         }),
         assets_url: ExternalURL,
+        price: Number,
     }
 }

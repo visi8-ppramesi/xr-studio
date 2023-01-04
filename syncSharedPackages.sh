@@ -23,3 +23,7 @@ cp ./shared/betterStableStringify/browser/betterStableStringify.js ./user-fronte
 
 cd ./user-frontend
 npm run lint -- --fix
+
+cd ..
+cd ./admin-frontend
+npm run lint -- --fix

@@ -93,6 +93,7 @@
 import isArray from "lodash/isArray";
 import { useAuthStore } from "@/store/auth";
 import { useCartStore } from "@/store/cart";
+import { createShoot } from "@/composables/submitShoot";
 import { mapState } from "pinia";
 // import SummaryButton from "@/components/shopping/SummaryButton.vue";
 import CartItem from "@/components/shopping/CartItem.vue";
@@ -157,6 +158,7 @@ export default {
     checkout() {
       if (!isNil(this.isLoggedIn) && this.isLoggedIn) {
         const cart = this.getCart();
+        createShoot(cart);
         console.log(cart);
       } else {
         this.$router.push({ name: "Login" });

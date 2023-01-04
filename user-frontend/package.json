@@ -5,9 +5,9 @@
   "description": "",
   "author": "",
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "serve": "VUE_APP_MODE=development vue-cli-service serve",
     "build": "vue-cli-service build",
-    "clearlintserve": "clear;vue-cli-service lint --fix && vue-cli-service serve",
+    "clearlintserve": "clear;VUE_APP_MODE=development vue-cli-service lint --fix && vue-cli-service serve",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
     "i18n:report": "vue-cli-service i18n:report --src \"./src/**/*.?(js|vue)\" --locales \"./src/locales/**/*.json\"",
@@ -16,6 +16,7 @@
   "main": "index.js",
   "dependencies": {
     "@toast-ui/calendar": "^2.1.3",
+    "axios": "^1.2.2",
     "buffer": "^6.0.3",
     "core-js": "^3.8.3",
     "datatables.net-vue3": "^1.0.0",

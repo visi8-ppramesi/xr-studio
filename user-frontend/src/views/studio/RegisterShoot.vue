@@ -408,10 +408,12 @@ export default {
               2
             );
           checkB = !vedhg.hashesOverlap(shootCode, rehearsalCode);
-          checkC = !vedhg.hashesOverlap(artSetupCode, rehearsalCode);
         }
 
         if (!isNil(artSetupCode)) {
+          if (!isNil(rehearsalStartDate) && !isNil(rehearsalEndDate)) {
+            checkC = !vedhg.hashesOverlap(artSetupCode, rehearsalCode);
+          }
           checkA = !vedhg.hashesOverlap(shootCode, artSetupCode);
         }
 
@@ -479,6 +481,7 @@ export default {
           throw new Error("Dates overlap");
         }
       } catch (err) {
+        console.error(err);
         alert(err);
         return;
       }

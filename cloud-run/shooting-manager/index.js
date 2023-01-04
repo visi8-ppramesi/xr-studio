@@ -5,6 +5,7 @@ const app = express();
 const cors = require('cors')
 const createShoot = require('./services/createShoot')
 const editShoot = require('./services/editShoot')
+const testService = require('./services/testService')
 const restructureBody = require('./utils/restructureBody')
 
 const createApp = function(){
@@ -13,6 +14,7 @@ const createApp = function(){
     app.use(restructureBody)
     
     app.get('/', (req, res) => {res.send('hello')})
+    app.post('/test', testService())
     app.post('/create', createShoot())
     app.post('/edit', editShoot())
     
