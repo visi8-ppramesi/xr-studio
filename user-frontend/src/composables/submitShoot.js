@@ -1,6 +1,7 @@
 import { firebase } from "@/firebase";
 import { vedhg } from "@/utils/dateRangeHash";
 import axios from "axios";
+import isNil from "lodash/isNil";
 /*
     procedures: [
         {
@@ -49,7 +50,7 @@ const handleError = (e) => {
 };
 
 const envDev = process.env.VUE_APP_MODE == "development";
-console.log(process.env);
+console.log(envDev, process.env);
 
 const structureData = function (data) {
   let { studio: procedures, asset: assets, equipment: equipments } = data;
@@ -64,35 +65,40 @@ const structureData = function (data) {
       price,
     };
   });
-  assets = assets.map((asset) => {
-    return {
-      asset: {
-        name: asset.name,
-        id: asset.id,
-      },
-      asset_id: asset.id,
-      price: asset.price,
-    };
-  });
-  equipments = equipments.map((equipment) => {
-    return {
-      equipment: {
-        name: equipment.name,
-        id: equipment.id,
-      },
-      equipment_id: equipment.id,
-      quantity: equipment.count,
-      price_item: equipment.price,
-      total_price: equipment.count * equipment.price,
-    };
-  });
-
-  return {
+  const retVal = {
     procedures,
-    assets,
-    equipments,
     shoot: {},
   };
+  if (!isNil(assets)) {
+    assets = assets.map((asset) => {
+      return {
+        asset: {
+          name: asset.name,
+          id: asset.id,
+        },
+        asset_id: asset.id,
+        price: asset.price,
+      };
+    });
+    retVal.assets = assets;
+  }
+  if (!isNil(equipments)) {
+    equipments = equipments.map((equipment) => {
+      return {
+        equipment: {
+          name: equipment.name,
+          id: equipment.id,
+        },
+        equipment_id: equipment.id,
+        quantity: equipment.count,
+        price_item: equipment.price,
+        total_price: equipment.count * equipment.price,
+      };
+    });
+    retVal.equipments = equipments;
+  }
+
+  return retVal;
 };
 
 export async function createShoot(data) {

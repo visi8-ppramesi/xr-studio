@@ -93,8 +93,14 @@ module.exports = function () {
                 throw new Error("unauthorized")
             }
         }
-
-        const data = bufferDecoder(req.body.message.data)
+        let data
+        try {
+            data = bufferDecoder(req.body.message.data)
+        } catch (error) {
+            res.send({ status: 500, message: "shoot edit failed", error })
+            return
+        }
+        
         const { shoot: { id: shootId } } = data
         
         if (isNil(shootId)) {
@@ -396,8 +402,14 @@ module.exports = function () {
 
             return promises
         }
+        try {
+            await editShootWithSubcollections(data)
+            res.send({ status: 200, message: "shoot edited" })
+        } catch (error) {
+            res.send({ status: 500, message: "shoot edit failed", error })
+        }
 
-        await editShootWithSubcollections(data)
-        res.send({ status: 200, message: "we good", result })
+        // await editShootWithSubcollections(data)
+        // res.send({ status: 200, message: "we good", result })
     }
 }

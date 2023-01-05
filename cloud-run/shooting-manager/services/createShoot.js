@@ -175,7 +175,7 @@ module.exports = function () {
                     const promise = db.collection("shoots").doc(shoot.id).collection("procedures").doc(procedure.id).set({
                         ...procedureDuplicate,
                         created_date: rightNow,
-                        procedure_type: db.collection("procedure_type").doc(procedure.procedure_type)
+                        procedure_type: db.collection("procedure_types").doc(procedure.procedure_type)
                     })
                     promises.push(promise)
                     retVal.procedures.push({ procedure_id: procedure.id })
@@ -259,9 +259,12 @@ module.exports = function () {
             await Promise.all(promises)
             return retVal
         }
-
-        const data = bufferDecoder(req.body.message.data)
-        const result = await createShootWithSubcollections(data)
-        res.send({ status: 200, message: "shoot created", result })
+        try {
+            const data = bufferDecoder(req.body.message.data)
+            const result = await createShootWithSubcollections(data)
+            res.send({ status: 200, message: "shoot created", result })
+        } catch (error) {
+            res.send({ status: 500, message: "shoot creation failed", error })
+        }
     }
 }

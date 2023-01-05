@@ -66,7 +66,7 @@
         </h1>
         <div class="flex justify-between mt-10 mb-5">
           <span id="cart-count-items" class="font-semibold text-sm uppercase"
-            >Items {{ itemCount }}</span
+            >{{ itemCount }} Items</span
           >
         </div>
         <div class="border-t mt-8">
@@ -77,11 +77,21 @@
             <span id="cart-total-amount">{{ cartTotalAmount() }}</span>
           </div>
           <button
-            id="cart-checkout"
+            v-if="!shootingScheduled"
+            id="cart-go-to-schedule"
             class="bg-indigo-500 font-semibold hover:bg-indigo-600 py-3 text-sm text-white uppercase w-full"
-            @click="checkout"
+            @click="goToSchedule"
           >
-            Checkout
+            Schedule Shoot
+          </button>
+          <button
+            v-else
+            :disabled="submitted"
+            id="cart-submit"
+            class="bg-indigo-500 font-semibold hover:bg-indigo-600 py-3 text-sm text-white uppercase w-full relative"
+            @click="submit"
+          >
+            <span class="button__text">Submit</span>
           </button>
         </div>
       </div>
@@ -98,11 +108,14 @@ import { mapState } from "pinia";
 // import SummaryButton from "@/components/shopping/SummaryButton.vue";
 import CartItem from "@/components/shopping/CartItem.vue";
 import isNil from "lodash/isNil";
+import isEmpty from "lodash/isEmpty";
 export default {
   setup() {
     const cartStore = useCartStore();
+    const shootingScheduled = !isEmpty(cartStore.getShootings());
     return {
       cartStore,
+      shootingScheduled,
     };
   },
   components: {
@@ -112,6 +125,7 @@ export default {
   data() {
     return {
       total: "",
+      submitted: false,
     };
   },
   props: {
@@ -155,11 +169,26 @@ export default {
     ...mapState(useAuthStore, ["isLoggedIn"]),
   },
   methods: {
-    checkout() {
+    async submit() {
+      this.submitted = true;
+      document
+        .getElementById("cart-submit")
+        .classList.toggle("button--loading");
       if (!isNil(this.isLoggedIn) && this.isLoggedIn) {
         const cart = this.getCart();
-        createShoot(cart);
-        console.log(cart);
+        try {
+          const createShootResult = await createShoot(cart);
+          this.cartStore.clearCart();
+          this.cartStore.submissionResult.push(createShootResult);
+          document
+            .getElementById("cart-submit")
+            .classList.toggle("button--loading");
+          this.submitted = false;
+          this.$router.push({ name: "CheckoutSuccess" });
+        } catch (error) {
+          //throw error here
+          console.error(error);
+        }
       } else {
         this.$router.push({ name: "Login" });
       }
@@ -185,6 +214,42 @@ export default {
 
       return this.formatters.currency(total);
     },
+    goToSchedule() {
+      this.$router.push({ name: "RegisterShoot" });
+    },
   },
 };
 </script>
+
+<style scoped>
+.button--loading .button__text {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.button--loading::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  border: 4px solid transparent;
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: button-loading-spinner 1s ease infinite;
+}
+
+@keyframes button-loading-spinner {
+  from {
+    transform: rotate(0turn);
+  }
+
+  to {
+    transform: rotate(1turn);
+  }
+}
+</style>

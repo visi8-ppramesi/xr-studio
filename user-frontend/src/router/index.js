@@ -125,6 +125,11 @@ const shopRoutes = [
     name: "Cart",
     component: () => import("@/views/shopping/Cart.vue"),
   },
+  {
+    path: "/shopping/success",
+    name: "CheckoutSuccess",
+    component: () => import("@/views/shopping/CheckoutSuccess.vue"),
+  },
 ];
 
 const mineRoutes = [

@@ -11,9 +11,11 @@ import {
 } from "./utils/cartStatus";
 
 const items = JSON.parse(localStorage.getItem("cart") || "[]");
+const res = [];
 
 export const useCartStore = defineStore("cart", () => {
   const cart = ref(items);
+  const submissionResult = ref(res);
   const count = items.reduce((acc, v) => {
     acc += v?.count ?? 0;
     return acc;
@@ -114,6 +116,7 @@ export const useCartStore = defineStore("cart", () => {
 
   const cartObj = {
     cart,
+    submissionResult,
     itemCount,
     clearCart,
     removeItem,

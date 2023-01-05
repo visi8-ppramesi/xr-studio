@@ -16,7 +16,7 @@
 # The regular expression matches a string that consists of one or more
 # digits, followed by a period, followed by one or more digits, etc.
 
-version=${1:-0.0.2}
+version=${1:-0.0.4}
 if [[ $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     docker build -t asia.gcr.io/xr-studio-a9c5e/shooting-manager:$version .
     docker push asia.gcr.io/xr-studio-a9c5e/shooting-manager:$version
