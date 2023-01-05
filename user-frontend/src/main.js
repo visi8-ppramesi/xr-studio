@@ -14,6 +14,8 @@ import { logger } from "./utils/logger.js";
 import "vue-loading-overlay/dist/vue-loading.css";
 import i18n from "./i18n";
 import startCase from "lodash/startCase";
+import ToastPlugin from "vue-toast-notification";
+import "vue-toast-notification/dist/theme-sugar.css";
 import { toRelativeTime, toAbsoluteTime, toLongMonth } from "./utils/time";
 
 const vuePropertySetter = (app, name, instance) => {
@@ -100,6 +102,7 @@ const app = createApp(App).use(i18n);
 app.use(router);
 app.use(injector);
 app.use(VueLoading);
+app.use(ToastPlugin);
 app.use(VueI18n);
 app.use(createPinia());
 const authStore = useAuthStore();
