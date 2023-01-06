@@ -1,6 +1,7 @@
 import {
-    buildCollection, EntityReference,
+    buildCollection, EntityReference
 } from "@camberi/firecms";
+import { rewriteIdUpdate } from "@utils/id"
 
 type UserData = {
     id: EntityReference,
@@ -22,6 +23,9 @@ type Asset = {
 export const assetCollection = buildCollection<Asset>({
     name: "Asset",
     path: "assets",
+    callbacks: {
+        onIdUpdate: rewriteIdUpdate<Asset>()
+    },
     properties: {
         name: {
             name: "Name",
@@ -44,7 +48,10 @@ export const assetCollection = buildCollection<Asset>({
         },
         group: {
             name: "Group",
-            dataType: "string"
+            dataType: "array",
+            of: {
+                dataType: "string"
+            }
         },
         preview_url: {
             name: "Preview URL",

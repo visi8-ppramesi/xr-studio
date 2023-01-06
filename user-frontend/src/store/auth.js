@@ -19,7 +19,7 @@ export const useAuthStore = defineStore("auth", {
     notificationListener: null,
     roles: [],
 
-    temporarySignupInfo: {}
+    temporarySignupInfo: {},
   }),
 
   getters: {},
@@ -27,7 +27,10 @@ export const useAuthStore = defineStore("auth", {
   actions: {
     setTempSignupInfo({ email, username, firstName, lastName }) {
       this.temporarySignupInfo = {
-        email, username, firstName, lastName
+        email,
+        username,
+        firstName,
+        lastName,
       };
     },
     updateDateOfBirth(date) {

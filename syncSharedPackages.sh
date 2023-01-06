@@ -14,6 +14,7 @@ cp ./shared/cryptography/nodejs/crypto.js ./functions/utils/crypto.js
 
 node ./shared/dateRangeHash/buildDateRangeHash.js
 cp ./shared/dateRangeHash/browser/dateRangeHash.js ./user-frontend/src/utils/dateRangeHash.js
+cp ./shared/dateRangeHash/browser/dateRangeHash.js ./admin-firecms/src/utils/dateRangeHash.js
 cp ./shared/dateRangeHash/nodejs/dateRangeHash.js ./factory/utils/dateRangeHash.js
 cp ./shared/dateRangeHash/nodejs/dateRangeHash.js ./cloud-run/shooting-manager/utils/dateRangeHash.js
 

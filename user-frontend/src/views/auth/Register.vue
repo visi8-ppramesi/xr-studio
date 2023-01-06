@@ -3,13 +3,13 @@
     <div class="block rounded-lg shadow-lg bg-white px-6 py-12 md:px-12">
       <form>
         <input
-          name="email"
-          for="email"
-          v-model="email"
-          type="email"
-          id="email"
+          name="username"
+          for="username"
+          v-model="username"
+          type="text"
+          id="username"
           class="form-control block w-full px-3 py-1.5 mb-6 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-          placeholder="Email address"
+          placeholder="Username"
         />
         <input
           name="email"
@@ -67,7 +67,6 @@
 import { useAuthStore } from "../../store/auth.js";
 import { generateKey } from "@/utils/crypto";
 import startCase from "lodash/startCase";
-import isNil from "lodash/isNil";
 
 const i18Texts = {
   messages: {
@@ -88,15 +87,14 @@ export default {
   name: "register",
   i18n: i18Texts,
   mounted() {
-    const { email, username, firstName, lastName } = this.authStore.temporarySignupInfo;
+    const { email, username, firstName, lastName } =
+      this.authStore.temporarySignupInfo;
     this.email = email || "";
     this.username = username || "";
     const myFname = firstName || "";
     const myLname = lastName || "";
     this.fullName = (
-      myFname.length + myLname.length > 0 ?
-      [myFname, myLname] :
-      []
+      myFname.length + myLname.length > 0 ? [myFname, myLname] : []
     ).join(" ");
     this.emitter.on("registerError", () => {
       this.registerFailed = true;
@@ -136,7 +134,7 @@ export default {
         (acc, v) => {
           const innerTest = this[v].length < 1;
           if (innerTest) {
-            message.push(startCase(v));
+            message.push(startCase(v) + " empty");
           }
           acc ||= innerTest;
           return acc;
@@ -157,41 +155,62 @@ export default {
       return test;
     },
     checkPassword() {
-      this.errorMsg.push("password-different");
+      this.errorMsg.push("invalid password");
       return this.confirmPassword != this.password;
     },
     async register() {
       if (this.checkFields() || this.checkPassword()) {
         console.log(this.errorMsg);
+        this.$toast.open({
+          message: "Invalid User Input: " + this.errorMsg.join(", "),
+          type: "error",
+          duration: 5000,
+          dismissible: true,
+          position: "bottom",
+        });
         this.errorMsg = [];
         return;
       }
-      const keyPair = await generateKey(this.password);
-      const publicKey = keyPair[0];
-      const privateKey = keyPair[1];
-      this.authStore.register(
-        this.email,
-        this.password,
-        {
-          username: this.username,
-          full_name: this.fullName,
-          public_key: publicKey,
-          encrypted_private_key: privateKey,
-        },
-        () => {
-          localStorage.setItem("publicKey", publicKey);
-          localStorage.setItem("privateKey", privateKey);
+      try {
+        const keyPair = await generateKey(this.password);
+        const publicKey = keyPair[0];
+        const privateKey = keyPair[1];
 
-          this.$router.push({ name: "Login", query: { registered: 1 } });
-        },
-        () => {
-          this.loginFailed = true;
-          this.email = "";
-          this.password = "";
-          this.name = "";
-          this.fullName = "";
-        }
-      );
+        this.authStore.register(
+          this.email,
+          this.password,
+          {
+            username: this.username,
+            full_name: this.fullName,
+            public_key: publicKey,
+            encrypted_private_key: privateKey,
+          },
+          () => {
+            localStorage.setItem("publicKey", publicKey);
+            localStorage.setItem("privateKey", privateKey);
+
+            this.$router.push({ name: "Login", query: { registered: 1 } });
+          },
+          () => {
+            this.loginFailed = true;
+            this.email = "";
+            this.password = "";
+            this.name = "";
+            this.fullName = "";
+
+            throw new Error("Register failed!");
+          }
+        );
+      } catch (error) {
+        console.error(error);
+        this.$toast.open({
+          message: "Register Failed!",
+          type: "error",
+          duration: 5000,
+          dismissible: true,
+          position: "bottom",
+        });
+      }
       // this.$store.dispatch('register', {
       //     email: this.email,
       //     password: this.password,

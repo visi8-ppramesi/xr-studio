@@ -2,6 +2,7 @@ import {
     buildCollection,
     buildProperty
 } from "@camberi/firecms";
+import { rewriteIdUpdate } from "@utils/id"
 
 type Equipment = {
     name: string,
@@ -17,6 +18,9 @@ type Equipment = {
 export const equipmentCollection = buildCollection<Equipment>({
     name: "Equipment",
     path: "equipments",
+    callbacks: {
+        onIdUpdate: rewriteIdUpdate<Equipment>()
+    },
     properties: {
         name: {
             name: "Name",

@@ -3,6 +3,7 @@ import {
   buildCollection,
   EntityReference,
 } from "@camberi/firecms";
+import { rewriteIdUpdate } from "@utils/id"
 
 type ShootEquipment = {
   created_date: Date,
@@ -16,6 +17,9 @@ type ShootEquipment = {
 export const shootEquipmentCollection = buildCollection<ShootEquipment>({
   name: "Shoot Equipment",
   path: "equipments",
+  callbacks: {
+      onIdUpdate: rewriteIdUpdate<ShootEquipment>()
+  },
   properties: {
     created_date: {
       name: "Created Date",

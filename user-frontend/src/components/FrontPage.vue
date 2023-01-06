@@ -195,7 +195,10 @@ export default {
     register() {
       const { email, username, firstName, lastName } = this;
       this.authStore.setTempSignupInfo({
-        email, username, firstName, lastName
+        email,
+        username,
+        firstName,
+        lastName,
       });
       this.$router.push({ name: "Register" });
       // this.authStore.register(

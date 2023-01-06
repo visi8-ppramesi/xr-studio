@@ -5,6 +5,7 @@ import {
 import { shootAssetCollection } from "./asset/asset"
 import { shootEquipmentCollection } from "./equipment/equipment"
 import { shootProcedureCollection } from "./procedure/procedure"
+import { rewriteIdUpdate } from "@utils/id"
 
 type Shoot = {
   created_by: EntityReference,
@@ -18,6 +19,9 @@ type Shoot = {
 export const shootCollection = buildCollection<Shoot>({
   name: "Shoot",
   path: "shoots",
+  callbacks: {
+      onIdUpdate: rewriteIdUpdate<Shoot>()
+  },
   properties: {
     created_by: {
       name: "Created By",
