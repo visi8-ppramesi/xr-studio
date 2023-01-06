@@ -18,11 +18,18 @@ export const useAuthStore = defineStore("auth", {
     unreadCount: 0,
     notificationListener: null,
     roles: [],
+
+    temporarySignupInfo: {}
   }),
 
   getters: {},
 
   actions: {
+    setTempSignupInfo({ email, username, firstName, lastName }) {
+      this.temporarySignupInfo = {
+        email, username, firstName, lastName
+      };
+    },
     updateDateOfBirth(date) {
       this.userDob = date;
       localStorage.setItem("date_of_birth", date);

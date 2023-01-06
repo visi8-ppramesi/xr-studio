@@ -26,27 +26,36 @@
               class="block rounded-lg shadow-lg bg-white px-6 py-12 md:px-12"
             >
               <form>
+                <input
+                  name="username"
+                  for="username"
+                  v-model="username"
+                  type="text"
+                  id="username"
+                  class="form-control block w-full px-3 py-1.5 mb-6 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                  placeholder="Username"
+                />
                 <div class="grid md:grid-cols-2 md:gap-6">
                   <div class="mb-6">
                     <input
-                      name="username"
-                      for="username"
-                      v-model="username"
-                      type="username"
-                      id="username"
+                      name="firstName"
+                      for="firstName"
+                      v-model="firstName"
+                      type="text"
+                      id="firstName"
                       class="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
                       placeholder="First name"
                     />
                   </div>
                   <div class="mb-6">
                     <input
-                      name="fullName"
-                      for="fullName"
-                      v-model="fullName"
-                      type="fullName"
-                      id="fullName"
+                      name="lastName"
+                      for="lastName"
+                      v-model="lastName"
+                      type="text"
+                      id="lastName"
                       class="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                      placeholder="Full name"
+                      placeholder="Last name"
                     />
                   </div>
                 </div>
@@ -54,7 +63,7 @@
                   name="email"
                   for="email"
                   v-model="email"
-                  type="email"
+                  type="text"
                   id="email"
                   class="form-control block w-full px-3 py-1.5 mb-6 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
                   placeholder="Email address"
@@ -172,7 +181,8 @@ export default {
       email: "",
       password: "",
       username: "",
-      fullName: "",
+      firstName: "",
+      lastName: "",
     };
   },
   setup() {
@@ -183,21 +193,26 @@ export default {
   },
   methods: {
     register() {
-      this.authStore.register(
-        this.email,
-        this.password,
-        { name: this.username, fullName: this.fullName },
-        () => {
-          this.$router.push({ name: "Home", query: { registered: 1 } });
-        },
-        () => {
-          this.loginFailed = true;
-          this.email = "";
-          this.password = "";
-          this.name = "";
-          this.fullName = "";
-        }
-      );
+      const { email, username, firstName, lastName } = this;
+      this.authStore.setTempSignupInfo({
+        email, username, firstName, lastName
+      });
+      this.$router.push({ name: "Register" });
+      // this.authStore.register(
+      //   this.email,
+      //   this.password,
+      //   { name: this.username, fullName: this.fullName },
+      //   () => {
+      //     this.$router.push({ name: "Home", query: { registered: 1 } });
+      //   },
+      //   () => {
+      //     this.loginFailed = true;
+      //     this.email = "";
+      //     this.password = "";
+      //     this.name = "";
+      //     this.fullName = "";
+      //   }
+      // );
     },
   },
 };

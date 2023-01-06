@@ -67,6 +67,7 @@
 import { useAuthStore } from "../../store/auth.js";
 import { generateKey } from "@/utils/crypto";
 import startCase from "lodash/startCase";
+import isNil from "lodash/isNil";
 
 const i18Texts = {
   messages: {
@@ -82,10 +83,21 @@ const i18Texts = {
     },
   },
 };
+
 export default {
   name: "register",
   i18n: i18Texts,
   mounted() {
+    const { email, username, firstName, lastName } = this.authStore.temporarySignupInfo;
+    this.email = email || "";
+    this.username = username || "";
+    const myFname = firstName || "";
+    const myLname = lastName || "";
+    this.fullName = (
+      myFname.length + myLname.length > 0 ?
+      [myFname, myLname] :
+      []
+    ).join(" ");
     this.emitter.on("registerError", () => {
       this.registerFailed = true;
       this.email = "";
