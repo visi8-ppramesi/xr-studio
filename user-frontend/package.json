@@ -35,7 +35,8 @@
     "vue-i18n": "^9.1.0",
     "vue-loading-overlay": "^5.0.3",
     "vue-router": "^4.0.3",
-    "vue-tailwind-datepicker": "^1.2.6"
+    "vue-tailwind-datepicker": "^1.2.6",
+    "vue-toast-notification": "3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
