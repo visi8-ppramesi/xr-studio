@@ -16,7 +16,7 @@
     Add To Cart
   </button>
 
-  <transition class="inset-0 pt-3" name="fade">
+  <!-- <transition class="inset-0 pt-3" name="fade">
     <div class="rounded-xl absolute inset-x-0 bottom-0" v-if="isModalVisible">
       <div
         class="bg-green-400 text-white w-fit p-3 relative mx-auto my-auto rounded-xl shadow-lg bg-white px-5 py-2 flex items-center justify-between"
@@ -41,7 +41,7 @@
         </svg>
       </div>
     </div>
-  </transition>
+  </transition> -->
 </template>
 
 <script>
@@ -49,7 +49,7 @@ import { useCartStore } from "../store/cart";
 export default {
   data() {
     return {
-      isOpen: false,
+      // isOpen: false,
     };
   },
   setup() {
@@ -57,11 +57,11 @@ export default {
 
     return { cartStore };
   },
-  computed: {
-    isModalVisible() {
-      return this.isOpen;
-    },
-  },
+  // computed: {
+  //   isModalVisible() {
+  //     return this.isOpen;
+  //   },
+  // },
   props: {
     itemData: {
       type: Object,
@@ -75,11 +75,18 @@ export default {
   methods: {
     addToCart() {
       this.cartStore.addItem({ ...this.itemData, type: this.itemType });
-      this.isOpen = !this.isOpen;
+      this.$toast.open({
+        message: "Item Added",
+        position: "bottom",
+        type: "success",
+        duration: 5000,
+        dismissible: true,
+      });
+      // this.isOpen = !this.isOpen;
     },
-    closeModal() {
-      this.isOpen = !this.isOpen;
-    },
+    // closeModal() {
+    //   this.isOpen = !this.isOpen;
+    // },
   },
 };
 </script>
