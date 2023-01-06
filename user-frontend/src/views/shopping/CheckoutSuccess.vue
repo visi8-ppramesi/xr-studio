@@ -1,7 +1,8 @@
 <template>
   <div>
     <h2 class="text-3xl font-bold mt-12 text-center">
-      Shoot schedule was submitted. We will get back to you as soon as possible.
+      Shoot schedule was submitted.<br />We will get back to you as soon as
+      possible.<br />
       Thanks!
     </h2>
     <h3 class="text-lg font-bold mt-6 mb-12 text-center">
