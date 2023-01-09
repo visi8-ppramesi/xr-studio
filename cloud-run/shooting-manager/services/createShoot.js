@@ -131,6 +131,7 @@ module.exports = function () {
                 procedures: {},
                 assets: {}
             }
+            const statusCopy = [...status]
 
             retVal.shoot.shoot_id = id
 
@@ -192,6 +193,20 @@ module.exports = function () {
                             diff: stringify(diff({}, procedureDuplicate))
                         })
                     promises.push(changesPromise)
+
+                    const calendarPromises = db
+                        .collection("calendar")
+                        .doc(id)
+                        .set({
+                            start_date: procedure.procedure_start,
+                            end_date: procedure.procedure_end,
+                            event_id: shoot.id,
+                            event: {
+                                location: "main-location",
+                                status: statusCopy
+                            }
+                        })
+                    promises.push(calendarPromises)
 
                     forChanges.procedures[id] = {
                         created_date: rightNow,

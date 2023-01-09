@@ -24,7 +24,7 @@ export default class extends TrackedCollection {
       id: String
     }),
     order: TrackedCollection.resolve("../../orders/orders"),
-    current_statuses: Array,
+    status: Array,
     status_history: Array,
     // procedure_type: TrackedCollection.resolve("../../procedure-types/procedureTypes"),
   };

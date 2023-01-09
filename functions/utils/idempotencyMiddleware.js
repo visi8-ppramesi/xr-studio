@@ -16,13 +16,13 @@ module.exports = (objectIdNames) => async (req, res, next) => {
         })
         next()
     }
-    const event = await db.collection('events').doc(parsedData.eventId).get()
+    const event = await db.collection('proc_events').doc(parsedData.eventId).get()
     if(event.exists){
         const promises = objectIdNames.map(async (objectIdName) => {
             let objectId = event.data(objectIdName)
             if(isNil(objectId)){
                 const newObjectId = uuidv4()
-                objectId = await db.collection('events').doc(parsedData.eventId).set({
+                objectId = await db.collection('proc_events').doc(parsedData.eventId).set({
                     [objectIdName]: objectId
                 }, {merge: true}).then(() => {
                     req.body[objectIdName] = newObjectId

@@ -7,16 +7,17 @@ module.exports = class CalendarFactory extends Factory{
         super('calendar')
     }
 
-    static async createData(startDate, endDate, ev){
+    static async createData(startDate, endDate, eventId, eventObj){
         return {
             start_date: startDate,
             end_date: endDate,
-            event: ev
+            event_id: eventId,
+            event: eventObj
         }
     }
 
-    async createDoc(startDate, endDate, ev, id = null){
-        const data = await this.constructor.createData(startDate, endDate, ev)
+    async createDoc(startDate, endDate, ev, { status, location }){
+        const data = await this.constructor.createData(startDate, endDate, ev, { status, location })
         const hashId = 'ft-' + vedhg.encodeDates(startDate, endDate)
         const {ref, id: newId} = this.buildNewDocRef(hashId)
         this.data = data

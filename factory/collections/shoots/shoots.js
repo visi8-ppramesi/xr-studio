@@ -36,7 +36,7 @@ module.exports = class ShootFactory extends Factory{
             //     await assetFactory.getRandomProjection(['name', 'preview_url']),
             // ],
             order: order,
-            current_statuses: ['go-ahead', 'paid'],
+            status: ['go-ahead', 'paid'],
             status_history: [
                 {
                     note: 'started',
@@ -79,7 +79,11 @@ module.exports = class ShootFactory extends Factory{
         const calPromise = cal.createDoc(
             data.locked_in_start_date,
             data.locked_in_end_date,
-            ref
+            ref,
+            {
+                status: data.status,
+                location: data.location
+            }
         )
 
         const spf = new ShootProcedureFactory(parent)

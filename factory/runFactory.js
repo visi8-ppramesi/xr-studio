@@ -13,6 +13,7 @@ const UserFactory = require("./collections/users/users")
 const EquipmentFactory = require("./collections/equipments/equipments")
 const _ = require('lodash')
 const isNil = require("lodash/isNil")
+const CalendarFactory = require("./collections/calendar/calendar")
 
 const factoryMap = new Map()
 factoryMap.set(UserFactory, {
@@ -184,7 +185,7 @@ const runFactoryFromMap = async (factMap, context = null) => {
 
 const resetCollections = async () => {
     const factories = [EquipmentFactory, UserFactory, ContractTemplateFactory, ProcedureTypeFactory, AssetFactory, AssetContractFactory,
-    ContractFactory, OrderFactory, SubmissionFormFactory, PaymentFactory, ShootFactory]
+    ContractFactory, OrderFactory, SubmissionFormFactory, PaymentFactory, ShootFactory, CalendarFactory]
     const clearPromises = factories.map(factory => {
         const fact = new factory()
         return fact.clearCollections()

@@ -103,6 +103,11 @@ const studioRoutes = [
     component: () => import("@/views/studio/Calendar.vue"),
   },
   {
+    path: "/studio/my-calendar",
+    name: "MyCalendar",
+    component: () => import("@/views/studio/MyCalendar.vue"),
+  },
+  {
     path: "/studio/about-shoot",
     name: "AboutShoot",
     component: () => import("@/views/studio/AboutShoot.vue"),

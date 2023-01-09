@@ -1,4 +1,5 @@
 import Collection from "../../core/collection";
+import { InstanceProjection } from "../../core/types";
 
 export default class extends Collection {
   static collection = "calendar";
@@ -6,6 +7,10 @@ export default class extends Collection {
   static fields = {
     start_date: Date,
     end_date: Date,
-    event: Collection.resolve("../shoots/shoot"),
+    event_id: Collection.resolve("../shoots/shoot"),
+    event: new InstanceProjection({
+      status: Array,
+      location: String,
+    }),
   };
 }

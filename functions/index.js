@@ -1,4 +1,5 @@
-const functions = require("firebase-functions");
+const { onShootChange } = require("./shoots/onShootChange")
+exports.onShootChange = onShootChange
 
 // // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions
