@@ -1,106 +1,110 @@
+import isNil from 'lodash/isNil';
+import every from 'lodash/every';
+import sortBy from 'lodash/sortBy';
 
 
-
-//browser
-import isNil from 'lodash/isNil'
-import every from "lodash/every";
-import sortBy from "lodash/sortBy";
 //browser end
 
-const strDate = new Date("2000-01-01").getTime();
-const endDate = new Date("2100-01-01").getTime();
-const maxLen = endDate - strDate;
-const base64Code =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-";
+const strDate: number = new Date('2000-01-01').getTime();
+const endDate: number = new Date('2100-01-01').getTime();
+const maxLen: number = endDate - strDate;
+const base64Code: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-';
 
-const processHash = function (hash, defaultLen = 14) {
-    if(hash.startsWith('ft-') && hash.length > defaultLen) {
-        hash = hash.substr(3)
+const processHash = function (hash: string, defaultLen: number = 14): string {
+    if (hash.startsWith('ft-') && hash.length > defaultLen) {
+        hash = hash.substring(3);
     }
 
-    const splitted = hash.split('.')
-    if(splitted.length >= 2) {
-        return splitted[1]
-    }else{
-        return hash
+    const splitted = hash.split('.');
+    if (splitted.length >= 2) {
+        return splitted[1];
+    } else {
+        return hash;
     }
-}
-const checkStackable = function(hashA, hashB, masks) {
-    function getStackCode(hash){
+};
+
+const checkStackable = function (hashA: string, hashB: string, masks: number): boolean {
+    function getStackCode(hash: string): number | null {
         const hashArr = hash.split('.');
-        if(hashArr.length > 2){
+        if (hashArr.length > 2) {
             return parseInt(hashArr[hashArr.length - 1]);
-        }else{
+        } else {
+            return null;
+        }
+    }
+    const stackHashA: number | null = getStackCode(hashA);
+    const stackHashB: number | null = getStackCode(hashB);
+    if(isNil(stackHashA) || isNil(stackHashB)){
+        return true;
+    }
+    
+    const p = (2 ** masks) - 1;
+    return stackHashA !== stackHashB && (stackHashA! + stackHashB!) < p && ((stackHashA! | stackHashB!) ^ p) !== 0;
+};
+
+const checkStackableArray = function (hashArr: string[], masks: number): boolean {
+    function getStackCode(hash: string): number | null {
+        const hashArr = hash.split('.');
+        if (hashArr.length > 2) {
+            return parseInt(hashArr[hashArr.length - 1]);
+        } else {
             return null;
         }
     }
 
-    hashA = getStackCode(hashA);
-    hashB = getStackCode(hashB);
-    if(isNil(hashA) || isNil(hashB)){
-        throw new Error('stackable code missing');
+    const hashArrCp: (number|null)[] = hashArr.map(getStackCode);
+
+    const p = (2 ** masks) - 1;
+    let orAcc = true;
+    let andAcc = !isNil(hashArrCp[0]) ? hashArrCp[0]! : 0;
+    for (let i = 1; i < hashArrCp.length; i++) {
+        orAcc &&= !isNil(hashArrCp[i]) && !isNil(hashArrCp[i - 1]) ? (hashArrCp[i]! + hashArrCp[i - 1]!) < p : true;
+        andAcc |= !isNil(hashArrCp[i]) ? hashArrCp[i]! : 0;
     }
-    const p = (2 ** masks) - 1
-    return hashA !== hashB && (hashA + hashB) < p && ((hashA | hashB) ^ p) !== 0;
+
+    return orAcc && (andAcc ^ p) !== 0;
+};
+
+type Encoder = (x: number, y: number) => string;
+type Decoder = (code: string) => [number, number];
+
+type Codec = {
+    encoder: Encoder,
+    decoder: Decoder
 }
 
-const checkStackableArray = function(hashArr, masks) {
-    function getStackCode(hash){
-        const hashArr = hash.split('.');
-        if(hashArr.length > 2){
-            return parseInt(hashArr[hashArr.length - 1]);
-        }else{
-            return null;
-        }
-    }
+const xyEncBuilder = function (self: DateRangeHashGenerator): Codec {//{ encoder: Encoder; decoder: Decoder } {
+    const encoder: Encoder = function (x: number, y: number): string {
+        const index = x + y * self.divisor;
+        return self.base <= 36 ? index.toString(self.base) : base64Code[index];
+    };
+    const decoder: Decoder = function (code: string): [number, number] {
+        const num = self.base <= 36 ? parseInt(code, self.base) : base64Code.indexOf(code);
 
-    hashArr = hashArr.map(v => getStackCode(v))
-
-    if(hashArr.map(isNil).reduce((acc, v) => acc || v, false)){
-        throw new Error('stackable code missing');
-    }
-
-    const p = (2 ** masks) - 1
-    let orAcc = true
-    for(let i = 1; i < hashArr.length; i++){
-        orAcc &&= (hashArr[i] + hashArr[i - 1]) < p
-    }
-    
-    return orAcc && (hashArr.reduce((acc, v) => acc | v, 0) ^ p) !== 0;
-}
-
-const xyEncBuilder = function(self){
-    const encoder = function(x, y){
-        const index = x + y * this.divisor
-        return this.base <= 36 ? index.toString(this.base) : base64Code[index];
-    }.bind(self)
-    const decoder = function(code){
-        const num = this.base <= 36 ? parseInt(code, this.base) : base64Code.indexOf(code);
-    
-        const x = num % this.divisor;
-        const y = Math.floor(num / this.divisor);
+        const x = num % self.divisor;
+        const y = Math.floor(num / self.divisor);
         return [x, y];
-    }.bind(self)
-    return {encoder, decoder}
-}
+    };
+    return { encoder, decoder };
+};
 
-const verticalEncBuilder = function(self){
-    const encoder = function(x, y){
-        const index = y + x * this.divisor
-        return this.base <= 36 ? index.toString(this.base) : base64Code[index];
-    }.bind(self)
-    const decoder = function(code){
-        const num = this.base <= 36 ? parseInt(code, this.base) : base64Code.indexOf(code);
-    
-        const y = num % this.divisor;
-        const x = Math.floor(num / this.divisor);
+const verticalEncBuilder = function (self: DateRangeHashGenerator): Codec {//{ encoder: Encoder; decoder: Decoder } {
+    const encoder: Encoder = function (x: number, y: number): string {
+        const index = y + x * self.divisor;
+        return self.base <= 36 ? index.toString(self.base) : base64Code[index];
+    };
+    const decoder: Decoder = function (code: string): [number, number] {
+        const num = self.base <= 36 ? parseInt(code, self.base) : base64Code.indexOf(code);
+
+        const y = num % self.divisor;
+        const x = Math.floor(num / self.divisor);
         return [x, y];
-    }.bind(self)
-    return {encoder, decoder}
-}
+    };
+    return { encoder, decoder };
+};
 
-const mortonEncBuilder = function (self) {
-    const encoder = function (x, y) {
+const mortonEncBuilder = function (self: DateRangeHashGenerator): Codec {//{ encoder: Encoder; decoder: Decoder } {
+    const encoder: Encoder = function (x: number, y: number): string {
         const B = [0x55555555, 0x33333333, 0x0f0f0f0f, 0x00ff00ff];
         const S = [1, 2, 4, 8];
 
@@ -114,12 +118,12 @@ const mortonEncBuilder = function (self) {
         y = (y | (y << S[1])) & B[1];
         y = (y | (y << S[0])) & B[0];
 
-        let z = x | (y << 1);
+        const z = x | (y << 1);
         return base64Code[z];
-    }.bind(self)
-    const decoder = function (code) {
+    };
+    const decoder: Decoder = function (code: string): [number, number] {
         let v = base64Code.indexOf(code);
-        function deinterleave(x) {
+        function deinterleave(x: number): number {
             x = x & 0x55555555;
             x = (x | (x >> 1)) & 0x33333333;
             x = (x | (x >> 2)) & 0x0f0f0f0f;
@@ -129,17 +133,17 @@ const mortonEncBuilder = function (self) {
         }
 
         return [deinterleave(v), deinterleave(v >> 1)];
-    }.bind(self)
-    return { encoder, decoder }
-}
+    };
+    return { encoder, decoder };
+};
 
 class DateRangeHashGenerator {
     type: string
     depth: number
-    base: number | null = null
+    base: number
     divisor: number = 1
-    encoder: Function
-    decoder: Function
+    encoder: Encoder
+    decoder: Decoder
 
     constructor(type = 'normal', base = 36, depth: number = 14) {
         this.type = type
@@ -157,38 +161,38 @@ class DateRangeHashGenerator {
             this.base = base;
             this.divisor = Math.sqrt(this.base);
             encoding = verticalEncBuilder(this);
+        } else {
+            throw new Error("Encoder type not supported");
         }
         this.encoder = encoding.encoder
         this.decoder = encoding.decoder
     }
 
-    getFreeSpots(datesArray, minLength){
+    getFreeSpots(datesArray: string[], minLength: number) {
         const isSorted = every(datesArray, (v, idx, arr) => {
             return idx === 0 || String(arr[idx - 1]) <= String(v);
         })
-        if(!isSorted){
+        if (!isSorted) {
             datesArray = sortBy(datesArray);
         }
         const availableDates = []
-    
-        for(let i = 1; i < datesArray.length; i++){
+
+        for (let i = 1; i < datesArray.length; i++) {
             let { ya, xb } = this.calculateHashesValues(datesArray[i - 1], datesArray[i]);
             const evDiff = xb - ya
-            if(evDiff > minLength){
+            if (evDiff > minLength) {
                 availableDates.push(this.encodeDates(ya, xb))
             }
         }
-    
+
         return availableDates;
     }
 
-
-
-    getIntervalLength(hash, unit = "unix") {
+    getIntervalLength(hash: string, unit = "unix") {
         hash = processHash(hash);
         const letters = hash.split("");
         let divisor;
-        switch(unit){
+        switch (unit) {
             case "unix":
                 divisor = 1;
                 break;
@@ -219,7 +223,7 @@ class DateRangeHashGenerator {
         ) / divisor;
     }
 
-    getHashLetter(x, y, myMaxLen) {
+    getHashLetter(x: number, y: number, myMaxLen: number): [string, number, [number, number]] {
         const blockSize = myMaxLen / this.divisor;
         const xBucket = Math.floor(x / blockSize);
         const xRemainder = x % blockSize;
@@ -230,7 +234,7 @@ class DateRangeHashGenerator {
         return [map, blockSize, [xRemainder, yRemainder]];
     }
 
-    calculateHashesValues(hashA, hashB){
+    calculateHashesValues(hashA: string, hashB: string) {
         hashA = processHash(hashA);
         hashB = processHash(hashB);
         const lettersA = hashA.split("");
@@ -241,7 +245,7 @@ class DateRangeHashGenerator {
             ya = 0,
             xb = 0,
             yb = 0;
-    
+
         for (let i = 0; i < Math.max(lenA, lenB); i++) {
             if (isNil(lettersA[i])) {
                 if (this.type === "normal" || this.type === "vertical") {
@@ -257,7 +261,7 @@ class DateRangeHashGenerator {
                     lettersB[i] = "A";
                 }
             }
-    
+
             const [mxa, tmya] = this.decoder(lettersA[i]);
             const [mxb, tmyb] = this.decoder(lettersB[i]);
             const mya = tmya + mxa;
@@ -268,44 +272,38 @@ class DateRangeHashGenerator {
             xb += mxb * multiplier;
             yb += myb * multiplier;
         }
-    
+
         [xa, ya, xb, yb] = [
-            parseInt(xa) + strDate,
-            parseInt(ya) + strDate,
-            parseInt(xb) + strDate,
-            parseInt(yb) + strDate,
+            (xa) + strDate,
+            (ya) + strDate,
+            (xb) + strDate,
+            (yb) + strDate,
         ];
-    
+
         return { xa, ya, xb, yb }
     }
-  
-    hashesOverlap(hashA, hashB) {
+
+    hashesOverlap(hashA: string, hashB: string) {
         const { xa, ya, xb, yb } = this.calculateHashesValues(hashA, hashB)
         return !((xa > yb && ya > xb) || (xa < yb && ya < xb));
     }
 
-    decodeHash(hash) {
+    decodeHash(hash: string) {
         hash = processHash(hash);
         const letters = hash.split("");
         const [strStamp, endStamp] = letters.reduce((acc, v, idx) => {
-            if (isNil(acc[0])) {
-                acc[0] = 0;
-            }
-            if (isNil(acc[1])) {
-                acc[1] = 0;
-            }
             const [x, y] = this.decoder(v);
             acc[0] += x * Math.floor(maxLen / this.divisor ** (idx + 1));
             acc[1] += y * Math.floor(maxLen / this.divisor ** (idx + 1));
             return acc;
-        }, []);
+        }, [0, 0]);
         return [
             new Date((strStamp + strDate)),
             new Date((endStamp + strStamp + strDate + 1)),
         ];
     }
 
-    encodeDates(str, end, option = string) {
+    encodeDates(str: Date | string | number, end: Date | string | number, option?:string): string {
         if (typeof str == "string" || typeof str == "number") {
             str = new Date(str);
         }
@@ -327,7 +325,7 @@ class DateRangeHashGenerator {
         let x = strStamp - strDate;
         let y = endStamp - strStamp - 1;
         let letters = "";
-        let localMaxLen = maxLen;
+        let localMaxLen: number = maxLen;
 
         for (let i = 0; i < this.depth; i++) {
             const [letter, newBlockSize, remainders] = this.getHashLetter(
@@ -340,10 +338,10 @@ class DateRangeHashGenerator {
             y = remainders[1];
             localMaxLen = newBlockSize;
         }
-        
+
         const codeArray: any[] = [letters]
-        if(!isNil(option)){
-            switch(option){
+        if (!isNil(option)) {
+            switch (option) {
                 case "rent_non_xr_studio":
                     codeArray.unshift("001");
                     codeArray.push(8)
