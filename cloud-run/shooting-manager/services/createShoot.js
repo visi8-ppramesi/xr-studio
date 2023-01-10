@@ -5,10 +5,10 @@ const { getTokenId } = require('../utils/getTokenId.js')
 // const { vedhg } = require('../utils/dateRangeHash.js')
 const setIdIfNotSet = require("../utils/id.js")
 const { decode: bufferDecoder } = require('../utils/bufferEncoder')
-const { diff } = require("deep-object-diff")
+const { detailedDiff: diff } = require("deep-object-diff")
 const isNil = require('lodash/isNil')
 // const { v4 } = require('uuid')
-const stringify = obj => JSON.stringify(obj, (k, v) => {if(v === undefined){return null}; return v})//require('../utils/betterStableStringify')
+const stringify = require('../utils/betterStableStringify')
 
 // function setIdIfNotSet(obj, isProcedure = false, debug = false) {
 //     if (isNil(obj.id)) {
@@ -131,7 +131,7 @@ module.exports = function () {
                 procedures: {},
                 assets: {}
             }
-            const statusCopy = [...status]
+            // const statusCopy = [...status]
 
             retVal.shoot.shoot_id = id
 
@@ -194,19 +194,19 @@ module.exports = function () {
                         })
                     promises.push(changesPromise)
 
-                    const calendarPromises = db
-                        .collection("calendar")
-                        .doc(id)
-                        .set({
-                            start_date: procedure.procedure_start,
-                            end_date: procedure.procedure_end,
-                            event_id: shoot.id,
-                            event: {
-                                location: "main-location",
-                                status: statusCopy
-                            }
-                        })
-                    promises.push(calendarPromises)
+                    // const calendarPromises = db
+                    //     .collection("calendar")
+                    //     .doc(id)
+                    //     .set({
+                    //         start_date: procedure.procedure_start,
+                    //         end_date: procedure.procedure_end,
+                    //         event_id: shoot.id,
+                    //         event: {
+                    //             location: "main-location",
+                    //             status: statusCopy
+                    //         }
+                    //     })
+                    // promises.push(calendarPromises)
 
                     forChanges.procedures[id] = {
                         created_date: rightNow,

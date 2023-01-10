@@ -3,6 +3,7 @@ process.env.MODE = "development"
 
 const createShoot = require("../services/createShoot")()
 const editShoot = require("../services/editShoot")()
+const editProcedure = require("../services/editProcedure")()
 const { admin } = require('../utils/initializeAdmin.js')
 const cloneDeep = require("lodash/cloneDeep")
 const fs = require("fs")
@@ -96,7 +97,8 @@ describe("Shooting Manager", function () {
                         ],
                         shoot: {
                             
-                        }
+                        },
+                        debug: true
                     }
                 }
             }
@@ -105,98 +107,9 @@ describe("Shooting Manager", function () {
         beforeAfter.push(cloneDeep(db.store.state))
     })
 
-    test("Test Edit", async function(){
+    test("Test Proc Edit", async function(){
         const { result } = returnValue
-        const data = {
-            procedures: {
-                added: [
-                    {
-                        status: ["initialized", "unpaid"],
-                        procedure_type: ("00c33d23-09c2-4f57-9005-982ea114296a"),
-                        procedure_start: new Date(new Date().getTime() + 310),
-                        procedure_end: new Date(new Date().getTime() + 500),
-                        price: 100_000_000
-                    },
-                    {
-                        status: ["initialized", "unpaid"],
-                        procedure_type: ("a2339cee-1d69-4445-a6ef-5f41080c3650"),
-                        procedure_start: new Date(new Date().getTime() + 510),
-                        procedure_end: new Date(new Date().getTime() + 800),
-                        price: 100_000_000
-                    }
-                ],
-                updated: [
-                    {
-                        id: result.procedures[0].procedure_id,
-                        status: ["paid"],
-                        procedure_type: ("00c33d23-09c2-4f57-9005-982ea114296a"),
-                        procedure_start: new Date(new Date().getTime() + (1000 * 60 * 60 * 24 * 7)),
-                        procedure_end: new Date(new Date().getTime() + (1000 * 60 * 60 * 24 * 8)),
-                        price: 100_000_000_00
-                    },
-                    {
-                        id: result.procedures[1].procedure_id,
-                        status: ["paid"],
-                        procedure_type: ("a2339cee-1d69-4445-a6ef-5f41080c3650"),
-                        procedure_start: new Date(new Date().getTime() + (1000 * 60 * 60 * 24 * 7)),
-                        procedure_end: new Date(new Date().getTime() + (1000 * 60 * 60 * 24 * 9)),
-                        price: 100_000_000_00
-                    }
-                ],
-                deleted: [
-
-                ]
-            },
-            equipments: {
-                added: [
-
-                ],
-                updated: [
-                    {
-                        id: result.equipments[0].equipment_id,
-                        equipment: {
-                            id: "652cea79-e9ba-4fbe-8c9f-b10b65ba1be4",
-                            name: "asdfasdf 5"
-                        },
-                        equipment_id: db.collection("equipments").doc("652cea79-e9ba-4fbe-8c9f-b10b65ba1be4"),
-                        quantity: 100,
-                        price_item: 10000000,
-                        total_price: 100 * 10000000
-                    },
-                    {
-                        id: result.equipments[1].equipment_id,
-                        equipment: {
-                            id: "63836b69-01a9-42b0-9ee9-3c1e456c1b46",
-                            name: "asdfasdf 6"
-                        },
-                        equipment_id: db.collection("equipments").doc("63836b69-01a9-42b0-9ee9-3c1e456c1b46"),
-                        quantity: 100,
-                        price_item: 10000000,
-                        total_price: 100 * 10000000
-                    },
-                ],
-                deleted: [
-
-                ]
-            },
-            assets: {
-                added: [
-
-                ],
-                updated: [
-
-                ],
-                deleted: [
-                    result.assets[0].asset_id,
-                    result.assets[1].asset_id
-                ]
-            },
-            shoot: {
-                id: result.shoot.shoot_id,
-                test: "zxcv zxcv",
-                status: "paid"
-            }
-        }
+        console.log(JSON.stringify(returnValue, null, 2))
         const req = {
             header(h){
                 return {
@@ -205,58 +118,173 @@ describe("Shooting Manager", function () {
             },
             body: {
                 message: {
-                    data
+                    data: {
+                        shoot_id: result.shoot.shoot_id,
+                        procedure_id: result.procedures[0].procedure_id,
+                        procedure_data: {notes: 'test'},
+                        procedure_start: new Date(new Date().getTime() + (1000 * 60 * 60 * 24 * 14)),
+                        procedure_end: new Date(new Date().getTime() + (1000 * 60 * 60 * 24 * 30)),
+                        procedure_type: ("00c33d23-09c2-4f57-9005-982ea114296a"),
+                    }
                 }
             }
         }
-        await editShoot(req, res)
-        beforeAfter.push(cloneDeep(db.store.state))
-    })
 
-    test("Test Edit 2", async function(){
-        const { result } = returnValue
-        const data = {
-            procedures: {
-                deleted: [
-                    result.procedures[0].procedure_id,
-                    result.procedures[1].procedure_id,
-                ]
-            },
-            equipments: {
-                deleted: [
-                    result.equipments[0].equipment_id,
-                    result.equipments[1].equipment_id,
-                ]
-            },
-            assets: {
-                deleted: [
-
-                ]
-            },
-            shoot: {
-                id: result.shoot.shoot_id,
-            }
-        }
-        const req = {
-            header(h){
-                return {
-                    'Authorization': 'Bearer ASDFasdfZXCVzxcvQWERqwer'
-                }[h] || {}
-            },
-            body: {
-                message: {
-                    data
-                }
-            }
-        }
-        await editShoot(req, res)
-        beforeAfter.push(cloneDeep(db.store.state))
+        await editProcedure(req, res)
+        console.log(JSON.stringify(returnValue, null, 2))
 
         const pathName = path.resolve('test', 'results', 'generatedData.json')
-        fs.writeFileSync(pathName, JSON.stringify(beforeAfter, null, 2))
+        fs.writeFileSync(pathName, JSON.stringify(db.store.state, null, 2))
     })
 
-    test("Test Express", async function(){
-        
-    })
+    // test("Test Edit", async function(){
+    //     const { result } = returnValue
+    //     const data = {
+    //         procedures: {
+    //             added: [
+    //                 {
+    //                     status: ["initialized", "unpaid"],
+    //                     procedure_type: ("00c33d23-09c2-4f57-9005-982ea114296a"),
+    //                     procedure_start: new Date(new Date().getTime() + 310),
+    //                     procedure_end: new Date(new Date().getTime() + 500),
+    //                     price: 100_000_000
+    //                 },
+    //                 {
+    //                     status: ["initialized", "unpaid"],
+    //                     procedure_type: ("a2339cee-1d69-4445-a6ef-5f41080c3650"),
+    //                     procedure_start: new Date(new Date().getTime() + 510),
+    //                     procedure_end: new Date(new Date().getTime() + 800),
+    //                     price: 100_000_000
+    //                 }
+    //             ],
+    //             updated: [
+    //                 {
+    //                     id: result.procedures[0].procedure_id,
+    //                     status: ["paid"],
+    //                     procedure_type: ("00c33d23-09c2-4f57-9005-982ea114296a"),
+    //                     procedure_start: new Date(new Date().getTime() + (1000 * 60 * 60 * 24 * 7)),
+    //                     procedure_end: new Date(new Date().getTime() + (1000 * 60 * 60 * 24 * 8)),
+    //                     price: 100_000_000_00
+    //                 },
+    //                 {
+    //                     id: result.procedures[1].procedure_id,
+    //                     status: ["paid"],
+    //                     procedure_type: ("a2339cee-1d69-4445-a6ef-5f41080c3650"),
+    //                     procedure_start: new Date(new Date().getTime() + (1000 * 60 * 60 * 24 * 7)),
+    //                     procedure_end: new Date(new Date().getTime() + (1000 * 60 * 60 * 24 * 9)),
+    //                     price: 100_000_000_00
+    //                 }
+    //             ],
+    //             deleted: [
+
+    //             ]
+    //         },
+    //         equipments: {
+    //             added: [
+
+    //             ],
+    //             updated: [
+    //                 {
+    //                     id: result.equipments[0].equipment_id,
+    //                     equipment: {
+    //                         id: "652cea79-e9ba-4fbe-8c9f-b10b65ba1be4",
+    //                         name: "asdfasdf 5"
+    //                     },
+    //                     equipment_id: db.collection("equipments").doc("652cea79-e9ba-4fbe-8c9f-b10b65ba1be4"),
+    //                     quantity: 100,
+    //                     price_item: 10000000,
+    //                     total_price: 100 * 10000000
+    //                 },
+    //                 {
+    //                     id: result.equipments[1].equipment_id,
+    //                     equipment: {
+    //                         id: "63836b69-01a9-42b0-9ee9-3c1e456c1b46",
+    //                         name: "asdfasdf 6"
+    //                     },
+    //                     equipment_id: db.collection("equipments").doc("63836b69-01a9-42b0-9ee9-3c1e456c1b46"),
+    //                     quantity: 100,
+    //                     price_item: 10000000,
+    //                     total_price: 100 * 10000000
+    //                 },
+    //             ],
+    //             deleted: [
+
+    //             ]
+    //         },
+    //         assets: {
+    //             added: [
+
+    //             ],
+    //             updated: [
+
+    //             ],
+    //             deleted: [
+    //                 result.assets[0].asset_id,
+    //                 result.assets[1].asset_id
+    //             ]
+    //         },
+    //         shoot: {
+    //             id: result.shoot.shoot_id,
+    //             test: "zxcv zxcv",
+    //             status: "paid"
+    //         }
+    //     }
+    //     const req = {
+    //         header(h){
+    //             return {
+    //                 'Authorization': 'Bearer ASDFasdfZXCVzxcvQWERqwer'
+    //             }[h] || {}
+    //         },
+    //         body: {
+    //             message: {
+    //                 data
+    //             }
+    //         }
+    //     }
+    //     await editShoot(req, res)
+    //     beforeAfter.push(cloneDeep(db.store.state))
+    // })
+
+    // test("Test Edit 2", async function(){
+    //     const { result } = returnValue
+    //     const data = {
+    //         procedures: {
+    //             deleted: [
+    //                 result.procedures[0].procedure_id,
+    //                 result.procedures[1].procedure_id,
+    //             ]
+    //         },
+    //         equipments: {
+    //             deleted: [
+    //                 result.equipments[0].equipment_id,
+    //                 result.equipments[1].equipment_id,
+    //             ]
+    //         },
+    //         assets: {
+    //             deleted: [
+
+    //             ]
+    //         },
+    //         shoot: {
+    //             id: result.shoot.shoot_id,
+    //         }
+    //     }
+    //     const req = {
+    //         header(h){
+    //             return {
+    //                 'Authorization': 'Bearer ASDFasdfZXCVzxcvQWERqwer'
+    //             }[h] || {}
+    //         },
+    //         body: {
+    //             message: {
+    //                 data
+    //             }
+    //         }
+    //     }
+    //     await editShoot(req, res)
+    //     beforeAfter.push(cloneDeep(db.store.state))
+
+    //     const pathName = path.resolve('test', 'results', 'generatedData.json')
+    //     fs.writeFileSync(pathName, JSON.stringify(beforeAfter, null, 2))
+    // })
 })

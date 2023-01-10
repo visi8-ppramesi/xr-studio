@@ -34,7 +34,7 @@
               <td class="p-3 px-5">
                 <select class="bg-transparent">
                   <option
-                    v-for="items in item.current_statuses"
+                    v-for="items in item.status"
                     :key="items.id"
                     value="user"
                   >

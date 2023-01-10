@@ -11,8 +11,8 @@ const isEmpty = require('lodash/isEmpty')
 const omit = require('lodash/omit')
 // const { v4 } = require('uuid')
 const { FieldValue } = admin.firestore
-const stringify = obj => JSON.stringify(obj, (k, v) => {if(v === undefined){return null}; return v})//require('../utils/betterStableStringify')
-const { diff } = require("deep-object-diff")
+const stringify = require('../utils/betterStableStringify')
+const { detailedDiff: diff } = require("deep-object-diff")
 const { isUserAdmin } = require('../utils/roles')
 const pluralize = require("pluralize")
 

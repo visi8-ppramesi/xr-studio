@@ -1,6 +1,9 @@
 const Factory = require('../../factory')
 const ProcedureTypeFactory = require('../../procedure-types/procedureTypes')
 const { vedhg } = require('../../../utils/dateRangeHash.js')
+const { admin } = require("../../../utils/initializeFirebaseAdmin")
+
+const db = admin.firestore();
 
 module.exports = class ShootProcedureFactory extends Factory{
     static collectionName = 'procedures'
@@ -16,7 +19,7 @@ module.exports = class ShootProcedureFactory extends Factory{
         const end = new Date(new Date().getTime() + future + endFuture)
         return {
             status: ['created'],
-            procedure_type: typeProjection.id,
+            procedure_type: db.collection("procedure_types").doc(typeProjection.id),
             procedure_data: {
                 hello: 'is it me your looking for',
                 ican: 'see it in your eyes',

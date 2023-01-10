@@ -38,3 +38,42 @@ exports.onShootChange = functions
             return Promise.resolve(true)
         }
     });
+
+exports.onProcedureCreate = functions
+    .region("asia-southeast2")
+    .firestore
+    .document("/shoots/{shootId}/procedures/{procedureId}")
+    .onCreate(async (snap, ctx) => {
+        const { procedureId, shootId } = ctx.params
+        const shootRef = db.collection("shoots").doc(shootId)
+        const shootRes = await shootRef.get()
+        const shootStatus = shootRes.get("status") || ["initialized", "unpaid"]
+        const procedure = snap.data()
+        const calendarPromise = db
+            .collection("calendar")
+            .doc(procedureId)
+            .set({
+                start_date: procedure.procedure_start,
+                end_date: procedure.procedure_end,
+                event_id: shootRef,
+                event: {
+                    location: "main-location",
+                    status: shootStatus
+                }
+            })
+        
+        return calendarPromise
+    })
+
+exports.onProcedureDelete = functions
+    .region("asia-souteast2")
+    .firestore
+    .document("/shoots/{shootId}/procedures/{procedureId}")
+    // eslint-disable-next-line no-unused-vars
+    .onDelete((snap, ctx) => {
+        const { procedureId } = ctx.params
+        return db
+            .collection("calendar")
+            .doc(procedureId)
+            .delete()
+    })

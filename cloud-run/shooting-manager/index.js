@@ -5,6 +5,7 @@ const app = express();
 const cors = require('cors')
 const createShoot = require('./services/createShoot')
 const editShoot = require('./services/editShoot')
+const editProcedure = require('./services/editProcedure')
 const testService = require('./services/testService')
 const restructureBody = require('./utils/restructureBody')
 
@@ -17,6 +18,7 @@ const createApp = function(){
     app.post('/test', testService())
     app.post('/create', createShoot())
     app.post('/edit', editShoot())
+    app.post('/edit-procedure', editProcedure())
     
     const port = parseInt(process.env.PORT) || 8080;
     app.listen(port, () => {

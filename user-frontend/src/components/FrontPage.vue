@@ -2,8 +2,15 @@
   <section class="mb-40">
     <div
       class="px-6 py-12 md:px-12 bg-gray-100 text-gray-800 text-center lg:text-left"
+      :style="{
+        'background-image': `url(${require('@/assets/banner-bg-smaller.jpg')})`,
+        'background-size': 'cover',
+      }"
     >
-      <div class="container mx-auto xl:px-32">
+      <div
+        class="container mx-auto xl:px-32 py-7 rounded-xl"
+        style="background-color: #f0f8ffcc"
+      >
         <div class="grid lg:grid-cols-2 gap-12 flex items-center">
           <div class="mt-12 lg:mt-0">
             <h1
