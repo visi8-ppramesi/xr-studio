@@ -25,7 +25,7 @@ const processHash = function (hash, defaultLen = 14) {
         return hash
     }
 }
-
+let string = null
 const checkStackable = function(hashA, hashB, masks) {
     function getStackCode(hash){
         const hashArr = hash.split('.');
@@ -299,7 +299,7 @@ class DateRangeHashGenerator {
         ];
     }
 
-    encodeDates(str, end, type = null) {
+    encodeDates(str, end, option = string) {
         if (typeof str == "string" || typeof str == "number") {
             str = new Date(str);
         }
@@ -336,27 +336,29 @@ class DateRangeHashGenerator {
         }
         
         const codeArray = [letters]
-        switch(type){
-            case "rent_non_xr_studio":
-                codeArray.unshift("001");
-                codeArray.push(8)
-                break;
-            case "rent_xr_studio":
-                codeArray.unshift("002");
-                codeArray.push(8)
-                break;
-            case "rent_studio_art_setup_non_xr":
-                codeArray.unshift("003");
-                codeArray.push(4)
-                break;
-            case "rent_studio_rehearsal":
-                codeArray.unshift("004");
-                codeArray.push(3)
-                break;
-            case "rent_studio_art_setup_xr":
-                codeArray.unshift("005");
-                codeArray.push(4)
-                break;
+        if(!isNil(option)){
+            switch(option){
+                case "rent_non_xr_studio":
+                    codeArray.unshift("001");
+                    codeArray.push(8)
+                    break;
+                case "rent_xr_studio":
+                    codeArray.unshift("002");
+                    codeArray.push(8)
+                    break;
+                case "rent_studio_art_setup_non_xr":
+                    codeArray.unshift("003");
+                    codeArray.push(4)
+                    break;
+                case "rent_studio_rehearsal":
+                    codeArray.unshift("004");
+                    codeArray.push(3)
+                    break;
+                case "rent_studio_art_setup_xr":
+                    codeArray.unshift("005");
+                    codeArray.push(4)
+                    break;
+            }
         }
 
         return codeArray.join(".");

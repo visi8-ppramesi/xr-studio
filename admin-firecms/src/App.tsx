@@ -14,6 +14,8 @@ import { shootCollection } from "./collections/shoot/shoot";
 import { assetCollection } from "./collections/asset/asset";
 import { equipmentCollection } from "./collections/equipment/equipment";
 import { procedureTypeCollection } from "./collections/procedureType/procedureType";
+import { contractTemplatesCollection } from "./collections/contractTemplates/contractTemplates";
+import { submissionFormsCollection } from "./collections/submissionForms/submissionForms";
 
 import "typeface-rubik";
 import "@fontsource/ibm-plex-mono";
@@ -443,7 +445,7 @@ export default function App() {
   return <FirebaseCMSApp
     name={"XR Studio Backend"}
     authentication={myAuthenticator}
-    collections={[shootCollection, userCollection, assetCollection, equipmentCollection, procedureTypeCollection]}
+    collections={[shootCollection, userCollection, assetCollection, equipmentCollection, procedureTypeCollection, contractTemplatesCollection, submissionFormsCollection]}
     firebaseConfig={firebaseConfig}
     signInOptions={["password", "google.com"]}
   />;
