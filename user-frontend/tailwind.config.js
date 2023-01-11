@@ -7,7 +7,11 @@ module.exports = {
     "./node_modules/vue-tailwind-datepicker/**/*.js",
   ],
   theme: {
-    extend: {},
+    extend: {
+      minHeight: {
+        900: "900px",
+      },
+    },
   },
   plugins: [require("tw-elements/dist/plugin")],
 };

@@ -594,9 +594,16 @@ export default class {
         }
     }
 
-    static async getCount() {
+    static async getCount(queries = []) {
         const eventRef = collection(this.db, this.collection);
-        const snapshot = await getCountFromServer(eventRef);
+        let q;
+        if (queries.length > 0) {
+          q = query(eventRef, ...queries);
+        } else {
+          q = eventRef;
+        }
+    
+        const snapshot = await getCountFromServer(q);
         return snapshot.data().count;
     }
 
