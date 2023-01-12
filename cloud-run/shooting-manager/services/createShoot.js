@@ -2,13 +2,13 @@
 
 const { admin } = require('../utils/initializeAdmin.js')
 const { getTokenId } = require('../utils/getTokenId.js')
-// const { vedhg } = require('../utils/dateRangeHash.js')
 const setIdIfNotSet = require("../utils/id.js")
 const { decode: bufferDecoder } = require('../utils/bufferEncoder')
 const { detailedDiff: diff } = require("deep-object-diff")
 const isNil = require('lodash/isNil')
 // const { v4 } = require('uuid')
-const stringify = require('../utils/betterStableStringify')
+const stringify = require('../utils/betterStableStringify');
+const { vedhg } = require('../utils/dateRangeHash.js');
 
 // function setIdIfNotSet(obj, isProcedure = false, debug = false) {
 //     if (isNil(obj.id)) {
@@ -99,6 +99,22 @@ module.exports = function () {
 
             if (isNil(shoot)) {
                 throw new Error("Null shoot")
+            }
+
+            //check procedures overlap
+            if (!isNil(procedures)) {
+                const calendarSnap = await db.collection("calendar").get()
+                if(!calendarSnap.empty){
+                    const calendarDocs = Object.values(calendarSnap.docs).map(k => k.id)
+                    let overlapAcc = false;
+                    for (const procedure of procedures) {
+                        const { id } = setIdIfNotSet(procedure, true, debug)
+                        overlapAcc ||= calendarDocs.reduce((acc, v) => acc || vedhg.hashesOverlap(v, id), false)
+                    }
+                    if(overlapAcc){
+                        throw new Error("Calendar overlap")
+                    }
+                }
             }
 
             const status = ["initialized", "unpaid"]

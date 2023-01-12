@@ -3,7 +3,7 @@
 const { admin } = require('../utils/initializeAdmin.js')
 const { getTokenId } = require('../utils/getTokenId.js')
 const { exportDocument } = require("../utils/documentTraveler")
-// const { vedhg } = require('../utils/dateRangeHash.js')
+const { vedhg } = require('../utils/dateRangeHash.js')
 const setIdIfNotSet = require("../utils/id.js")
 const { decode: bufferDecoder } = require('../utils/bufferEncoder')
 const { detailedDiff: diff } = require("deep-object-diff")
@@ -115,6 +115,16 @@ module.exports = function(){
                 }, true, debug)
                 const myStatus = status || cprocData.status
                 const myData = data || cprocData.data
+
+                //check procedures overlap
+                const calendarSnap = await db.collection("calendar").get()
+                if(!calendarSnap.empty){
+                    const calendarDocs = Object.values(calendarSnap.docs).map(k => k.id)
+                    const overlapAcc = calendarDocs.reduce((acc, v) => acc || vedhg.hashesOverlap(v, newProcId), false)
+                    if(overlapAcc){
+                        throw new Error("Calendar overlap")
+                    }
+                }
 
                 await db
                     .collection("shoots")

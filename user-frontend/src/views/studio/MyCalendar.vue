@@ -94,6 +94,7 @@ export default {
   mounted() {
     if (this.isLoggedIn) {
       this.getCalendarData().then((calendarData) => {
+        console.log(calendarData);
         this.calendarData = calendarData;
       });
     } else {
