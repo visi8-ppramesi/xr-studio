@@ -2,7 +2,7 @@
   <div class="equipments min-h-screen">
     <EquipmentsSidenav @search="search" />
     <EquipmentsContent
-      ref="equipmentsContent"
+      ref="content"
       :equipments="equipments"
       @loadMore="loadMore"
     />
@@ -13,42 +13,24 @@
 import EquipmentsSidenav from "../../components/equipments/EquipmentsSidenav.vue";
 import EquipmentsContent from "../../components/equipments/EquipmentsContent.vue";
 import { Equipments } from "../../firebase/collections/equipments";
-import { paginationQuery } from "@/utils/queries";
-// import isNil from "lodash/isNil";
+import { listFetcher } from "@/composables/listFetcher";
 export default {
   name: "equipments",
   components: {
     EquipmentsSidenav,
     EquipmentsContent,
   },
-  mounted() {
-    this.getEquipments();
-  },
-  methods: {
-    search() {},
-    loadMore() {
-      this.getEquipments(true);
-    },
-    async getEquipments(loadMore = false) {
-      let pQuery;
-      if (!loadMore) {
-        pQuery = paginationQuery(12, "name");
-      } else {
-        const lastDoc = this.equipments[this.equipments.length - 1].doc;
-        pQuery = paginationQuery(12, "name", lastDoc);
-      }
-      const currentCount = await Equipments.getCount(pQuery);
-      if (currentCount < 12) {
-        this.$refs.equipmentsContent.disableLoadMore();
-      }
-      const equipments = await Equipments.getDocuments(pQuery);
-      this.equipments.push(...equipments);
-    },
-  },
-  data() {
-    return {
-      equipments: [],
-    };
+  setup() {
+    const {
+      items: equipments,
+      query,
+      getItems: getEquipments,
+      search,
+      loadMore,
+      content,
+    } = listFetcher(Equipments);
+
+    return { equipments, query, getEquipments, search, loadMore, content };
   },
 };
 </script>

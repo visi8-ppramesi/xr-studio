@@ -1,12 +1,15 @@
 import React, { useCallback } from "react";
 
 import { User as FirebaseUser } from "firebase/auth";
+import { firebaseConfig } from "@utils/firebase"
 import {
   Authenticator,
   // buildCollection,
   // buildProperty,
   // EntityReference,
-  FirebaseCMSApp
+  FirebaseCMSApp,
+  FirebaseLoginView,
+  FirebaseLoginViewProps
 } from "@camberi/firecms";
 
 import { userCollection } from "./collections/user/user";
@@ -30,15 +33,15 @@ import "@fontsource/ibm-plex-mono";
 //   appId: ""
 // };
 
-const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
-};
+// const firebaseConfig = {
+//   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+//   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+//   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+//   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+//   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+//   appId: import.meta.env.VITE_FIREBASE_APP_ID,
+//   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
+// };
 
 // const locales = {
 //   "en-US": "English (United States)",
@@ -423,7 +426,6 @@ const firebaseConfig = {
 // });
 
 export default function App() {
-
   const myAuthenticator: Authenticator<FirebaseUser> = useCallback(async ({
     user,
     authController
@@ -442,11 +444,19 @@ export default function App() {
     return true;
   }, []);
 
+  const ShitFuckLoginView = function({ allowSkipLogin, logo, signInOptions, firebaseApp, authController, noUserComponent, disabled, additionalComponent, notAllowedError }: FirebaseLoginViewProps){
+    return FirebaseLoginView({
+      allowSkipLogin, logo, signInOptions, firebaseApp, authController, noUserComponent, disabled, additionalComponent, notAllowedError,
+      disableSignupScreen: true
+    })
+  }
+
   return <FirebaseCMSApp
     name={"XR Studio Backend"}
     authentication={myAuthenticator}
     collections={[shootCollection, userCollection, assetCollection, equipmentCollection, procedureTypeCollection, contractTemplatesCollection, submissionFormsCollection]}
     firebaseConfig={firebaseConfig}
     signInOptions={["password", "google.com"]}
+    LoginView={ShitFuckLoginView}
   />;
 }

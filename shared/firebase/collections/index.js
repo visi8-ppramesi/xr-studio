@@ -14,6 +14,9 @@ import { UserRoles } from './user-roles';
 import { Users } from './users';
 import { Equipments } from "./equipments";
 import { Calendar } from "./calendar";
+import { AssetCategories } from "./asset-categories";
+import { EquipmentCategories } from "./equipment-categories";
+import { EquipmentTypes } from "./equipment-types";
 
 export default {
     AssetsContracts, Assets,
@@ -30,5 +33,8 @@ export default {
     UserRoles, 
     Users,
     Equipments,
-    Calendar
+    Calendar,
+    AssetCategories,
+    EquipmentCategories,
+    EquipmentTypes
 }

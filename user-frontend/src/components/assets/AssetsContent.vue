@@ -1,6 +1,6 @@
 <template>
   <section
-    class="px-6 py-12 md:px-12 bg-gray-100 text-gray-800 text-center lg:text-left md:ml-60"
+    class="min-h-[900px] px-6 py-12 md:px-12 bg-gray-100 text-gray-800 text-center lg:text-left md:ml-60"
   >
     <h2 id="assets-content-title" class="text-3xl font-bold mb-12 text-center">
       3D XR Scenes
@@ -27,6 +27,20 @@
         </BoxComponentMultipleImages>
       </div>
     </div>
+    <div
+      v-if="loadMoreEnabled"
+      class="w-full flex content-center justify-center"
+    >
+      <div
+        id="equipments-content-more"
+        data-mdb-ripple="true"
+        data-mdb-ripple-color="light"
+        class="inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded-full shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
+        @click="loadMore"
+      >
+        Load more
+      </div>
+    </div>
   </section>
 </template>
 
@@ -44,6 +58,9 @@ export default {
     };
   },
   methods: {
+    enableLoadMore() {
+      this.loadMoreEnabled = true;
+    },
     disableLoadMore() {
       this.loadMoreEnabled = false;
     },

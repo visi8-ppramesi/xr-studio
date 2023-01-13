@@ -1,11 +1,7 @@
 <template>
   <div class="assets min-h-screen">
-    <AssetsSidenav />
-    <AssetsContent
-      ref="equipmentsContent"
-      :assets="assets"
-      @loadMore="loadMore"
-    />
+    <AssetsSidenav @search="search" />
+    <AssetsContent ref="content" :assets="assets" @loadMore="loadMore" />
   </div>
 </template>
 
@@ -13,44 +9,24 @@
 import AssetsSidenav from "../../components/assets/AssetsSidenav.vue";
 import AssetsContent from "../../components/assets/AssetsContent.vue";
 import { Assets } from "../../firebase/collections/assets/";
-import { paginationQuery } from "@/utils/queries";
+import { listFetcher } from "@/composables/listFetcher";
 export default {
   name: "assets",
   components: {
     AssetsSidenav,
     AssetsContent,
   },
-  mounted() {
-    this.getAssets();
-  },
-  methods: {
-    search() {},
-    loadMore() {
-      this.getAssets(true);
-    },
-    // async getAssets() {
-    //   this.assets = await Assets.getDocuments();
-    // },
-    async getAssets(loadMore = false) {
-      let pQuery;
-      if (!loadMore) {
-        pQuery = paginationQuery(12, "name");
-      } else {
-        const lastDoc = this.assets[this.assets.length - 1].doc;
-        pQuery = paginationQuery(12, "name", lastDoc);
-      }
-      const currentCount = await Assets.getCount(pQuery);
-      if (currentCount < 12) {
-        this.$refs.equipmentsContent.disableLoadMore();
-      }
-      const assets = await Assets.getDocuments(pQuery);
-      this.assets.push(...assets);
-    },
-  },
-  data() {
-    return {
-      assets: [],
-    };
+  setup() {
+    const {
+      items: assets,
+      query,
+      getItems: getAssets,
+      search,
+      loadMore,
+      content,
+    } = listFetcher(Assets);
+
+    return { assets, query, getAssets, search, loadMore, content };
   },
 };
 </script>

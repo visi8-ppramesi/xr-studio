@@ -28,12 +28,18 @@ export const shootCalendarCreatedByQuery = (startAtParam, endAtParam) => {
 export const paginationQuery = (
   limitParam,
   orderByParam = "name",
-  startAtParam = null
+  startAtParam = null,
+  extraParams = []
 ) => {
   if (isNil(startAtParam)) {
-    return [orderBy(orderByParam), limit(limitParam)];
+    return [orderBy(orderByParam), limit(limitParam), ...extraParams];
   } else {
-    return [orderBy(orderByParam), startAfter(startAtParam), limit(limitParam)];
+    return [
+      orderBy(orderByParam),
+      startAfter(startAtParam),
+      limit(limitParam),
+      ...extraParams,
+    ];
   }
 };
 

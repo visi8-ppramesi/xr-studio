@@ -387,13 +387,14 @@ export default {
     ...mapState(useAuthStore, ["isLoggedIn"]),
   },
   mounted() {
-    // if (this.isLoggedIn) {
-    //   this.getCalendarData().then((calendarData) => {
-    //     this.calendarData = calendarData;
-    //   });
-    // } else {
-    //   this.$router.push({ name: "Login" });
-    // }
+    if (this.isLoggedIn) {
+      this.getCalendarData().then((calendarData) => {
+        console.log(calendarData);
+        this.calendarData = calendarData;
+      });
+    } else {
+      this.$router.push({ name: "Login" });
+    }
   },
   methods: {
     edit(index, val) {
@@ -414,24 +415,23 @@ export default {
       this.$modal.show("modal-update");
       this.modalData = data;
     },
-    // async getCalendarData() {
-    //   const calendar = await CalendarCollection.getMyCalendar().then((cal) => {
-    //     return cal.map((evDate) => {
-    //       return {
-    //         id: evDate.id,
-    //         calendarId: "0",
-    //         title: "Shoot Scheduled",
-    //         // category: "allday",
-    //         start: new Date(evDate.start_date),
-    //         end: new Date(evDate.end_date),
-    //         isReadOnly: true,
-    //       };
-    //     });
-    //   });
-    //   //process calendar
-
-    //   return calendar;
-    // },
+    async getCalendarData() {
+      const calendar = await CalendarCollection.getMyCalendar().then((cal) => {
+        return cal.map((evDate) => {
+          return {
+            id: evDate.id,
+            calendarId: "0",
+            title: "Shoot Scheduled",
+            // category: "allday",
+            start: new Date(evDate.start_date),
+            end: new Date(evDate.end_date),
+            isReadOnly: true,
+          };
+        });
+      });
+      //process calendar
+      return calendar;
+    },
   },
 };
 </script>

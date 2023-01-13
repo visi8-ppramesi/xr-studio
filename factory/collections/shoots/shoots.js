@@ -24,6 +24,7 @@ module.exports = class ShootFactory extends Factory{
         const lockedStart = new Date(new Date().setDate(new Date().getDate() + randomDays + 7))
         const lockedEnd = new Date(new Date().setDate(new Date().getDate() + randomDays + 14))
         return {
+            created_by: userFactory.buildNewDocRef("GmfvJltNOZdviM9nMW59fhqc3g53").ref,
             created_date: new Date(),
             locked_in_start_date: lockedStart,
             locked_in_end_date: lockedEnd,
@@ -75,16 +76,16 @@ module.exports = class ShootFactory extends Factory{
         this.ref = ref
         this.id = newId
         const retVal = await ref.set(data)
-        const cal = new CalendarFactory()
-        const calPromise = cal.createDoc(
-            data.locked_in_start_date,
-            data.locked_in_end_date,
-            ref,
-            {
-                status: data.status,
-                location: data.location
-            }
-        )
+        // const cal = new CalendarFactory()
+        // const calPromise = cal.createDoc(
+        //     data.locked_in_start_date,
+        //     data.locked_in_end_date,
+        //     ref,
+        //     {
+        //         status: data.status,
+        //         location: data.location
+        //     }
+        // )
 
         const spf = new ShootProcedureFactory(parent)
         const sef = new ShootEquipmentFactory(parent)
@@ -93,7 +94,7 @@ module.exports = class ShootFactory extends Factory{
         const sefPromise = sef.createDoc()
         const safPromise = saf.createDoc()
         await Promise.all([
-            calPromise,
+            // calPromise,
             spfPromise,
             sefPromise,
             safPromise

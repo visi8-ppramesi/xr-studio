@@ -63,6 +63,9 @@ const structureData = function (data) {
       procedure_end: procedureEnd,
       procedure_type: procedureType,
       price,
+      procedure_data: {
+        notes: procedure.extra_data.notes,
+      },
     };
   });
   const retVal = {

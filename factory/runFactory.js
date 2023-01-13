@@ -14,8 +14,23 @@ const EquipmentFactory = require("./collections/equipments/equipments")
 const _ = require('lodash')
 const isNil = require("lodash/isNil")
 const CalendarFactory = require("./collections/calendar/calendar")
+const AssetCategoryFactory = require("./collections/assetCategories")
+const EquipmentCategoryFactory = require("./collections/equipmentCategories")
+const EquipmentTypesFactory = require("./collections/equipmentTypes")
 
 const factoryMap = new Map()
+factoryMap.set(AssetCategoryFactory, {
+    dep: [],
+    buildFunc: ['createDocs', 10]
+})
+factoryMap.set(EquipmentCategoryFactory, {
+    dep: [],
+    buildFunc: ['createDocs', 10]
+})
+factoryMap.set(EquipmentTypesFactory, {
+    dep: [],
+    buildFunc: ['createDocs', 10]
+})
 factoryMap.set(UserFactory, {
     dep: [],
     buildFunc: ['createDocs', 10],
@@ -41,7 +56,7 @@ factoryMap.set(SubmissionFormFactory, {
     buildFunc: async (context) => {
         const submissionForms = []
         const assets = context.get(AssetFactory).passValue
-        for(let i = 0; i < 5; i++){
+        for (let i = 0; i < 5; i++) {
             const submissionForm = new SubmissionFormFactory()
             await submissionForm.createDoc(assets[i].ref)
             submissionForms.push(submissionForm)
@@ -59,10 +74,10 @@ factoryMap.set(ContractVersionFactory, {
         const contracts = context.get(ContractFactory).passValue
         const users = context.get(UserFactory).passValue
         const contractVersions = {}
-        for(let k = 0; k < contracts.length; k++){
+        for (let k = 0; k < contracts.length; k++) {
             const person = contracts[k].subjects[Math.round(Math.random())]
             const foundUser = users.find(v => v.id == person.id)
-            if(!isNil(foundUser)){
+            if (!isNil(foundUser)) {
                 const pkey = foundUser.encryptedPrivateKey
                 contractVersions[contracts[k].id] = await contracts[k].createSubDocs(5, person.id, pkey)
             }
@@ -94,14 +109,14 @@ factoryMap.set(OrderFactory, {
 })
 factoryMap.set(OrderVersionFactory, {
     dep: [UserFactory, OrderFactory],
-    async buildFunc(context){
+    async buildFunc(context) {
         const orders = context.get(OrderFactory).passValue
         const users = context.get(UserFactory).passValue
         const orderVersions = {}
         for (let i = 0; i < orders.length; i++) {
             const person = orders[i].subjects[Math.round(Math.random())]
             const foundUser = users.find(v => v.id == person.id)
-            if(!isNil(foundUser)){
+            if (!isNil(foundUser)) {
                 const pkey = foundUser.encryptedPrivateKey
                 orderVersions[orders[i].id] = await orders[i].createSubDocs(5, person.id, pkey)
             }
@@ -111,7 +126,7 @@ factoryMap.set(OrderVersionFactory, {
 })
 factoryMap.set(ShootFactory, {
     dep: [AssetFactory, OrderFactory, UserFactory, ProcedureTypeFactory, EquipmentFactory],
-    async buildFunc(context){
+    async buildFunc(context) {
         const orders = context.get(OrderFactory).passValue
         const shoots = []
         const promises = []
@@ -127,7 +142,7 @@ factoryMap.set(ShootFactory, {
 })
 factoryMap.set(PaymentFactory, {
     dep: [UserFactory, OrderFactory, ShootFactory, ContractFactory],
-    async buildFunc(context){
+    async buildFunc(context) {
         const users = context.get(UserFactory).passValue
         const contracts = context.get(ContractFactory).passValue
         const payments = []
@@ -147,27 +162,27 @@ factoryMap.set(PaymentFactory, {
 })
 
 const runFactoryFromMap = async (factMap, context = null) => {
-    if(_.isNil(context)){
+    if (_.isNil(context)) {
         context = new Map()
     }
-    for(const fact of factMap.keys()){
+    for (const fact of factMap.keys()) {
         let result
         const { dep, buildFunc } = factMap.get(fact)
         const depCheck = dep.reduce((acc, v) => {
             return acc && context.has(v)
         }, true)
-        if(_.isNil(dep) || dep.length == 0 || depCheck){
-            if(_.isArray(buildFunc)){
+        if (_.isNil(dep) || dep.length == 0 || depCheck) {
+            if (_.isArray(buildFunc)) {
                 const func = buildFunc.shift()
-                if(fact[func][Symbol.toStringTag] === 'AsyncFunction'){
+                if (fact[func][Symbol.toStringTag] === 'AsyncFunction') {
                     result = await fact[func](...buildFunc)
-                }else{
+                } else {
                     result = fact[func](...buildFunc)
                 }
-            }else if(_.isFunction(buildFunc)){
-                if(buildFunc[Symbol.toStringTag] === 'AsyncFunction'){
+            } else if (_.isFunction(buildFunc)) {
+                if (buildFunc[Symbol.toStringTag] === 'AsyncFunction') {
                     result = await buildFunc(context)
-                }else{
+                } else {
                     result = buildFunc(context)
                 }
             }
@@ -177,15 +192,15 @@ const runFactoryFromMap = async (factMap, context = null) => {
             factMap.delete(fact)
         }
     }
-    if(factMap.size > 0){
+    if (factMap.size > 0) {
         await runFactoryFromMap(factMap, context)
     }
     return context
 }
 
 const resetCollections = async () => {
-    const factories = [EquipmentFactory, UserFactory, ContractTemplateFactory, ProcedureTypeFactory, AssetFactory, AssetContractFactory,
-    ContractFactory, OrderFactory, SubmissionFormFactory, PaymentFactory, ShootFactory, CalendarFactory]
+    const factories = [AssetCategoryFactory, EquipmentCategoryFactory, EquipmentTypesFactory, EquipmentFactory, UserFactory, ContractTemplateFactory, ProcedureTypeFactory, AssetFactory, AssetContractFactory,
+        ContractFactory, OrderFactory, SubmissionFormFactory, PaymentFactory, ShootFactory, CalendarFactory]
     const clearPromises = factories.map(factory => {
         const fact = new factory()
         return fact.clearCollections()
@@ -216,7 +231,7 @@ const buildCollections = async () => {
 
     const contracts = await ContractFactory.createDocs(5)
     const contract_versions = {}
-    for(let k = 0; k < contracts.length; k++){
+    for (let k = 0; k < contracts.length; k++) {
         const person = contracts[k].subjects[Math.round(Math.random())]
         const pkey = users.find(v => v.id == person.id).encryptedPrivateKey
         contract_versions[contracts[k].id] = await contracts[k].createSubDocs(5, person.id, pkey)

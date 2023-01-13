@@ -85,7 +85,7 @@
                   >
                     <select class="bg-transparent">
                       <option
-                        v-for="items in shoots.current_statuses"
+                        v-for="items in shoots.status"
                         :key="items.id"
                         value="user"
                       >
