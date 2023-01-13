@@ -38,10 +38,10 @@
         </button>
       </div>
 
-      <div class="py-2">
+      <!-- <div class="py-2">
         <div class="w-full">
           <div class="flex justify-between items-center">
-            <div class="font-bold text-xl">Calendar Data</div>
+            <div class="font-bold text-xl">My Calendar</div>
           </div>
           <div class="flex flex-col">
             <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -278,77 +278,124 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
+
+      <MyCalendarTable :table-data="scheduleData" />
     </section>
   </div>
 </template>
 
 <script>
+import MyCalendarTable from "@/components/studio/MyCalendarTable.vue";
 import Calendar from "../../components/graphs/Calendar.vue";
 import { ref } from "vue";
-// import ModalUpdate from "../../components/ModalUpdate.vue";
-// import CalendarCollection from "../../firebase/collections/calendar/calendar";
+import CalendarCollection from "../../firebase/collections/calendar/calendar";
 import CalendarSidenav from "../../components/studio/CalendarSidenav";
 import { useAuthStore } from "@/store/auth";
 import { mapState } from "pinia";
+import { listFetcher } from "@/composables/listFetcher";
+import { doc, getDoc } from "firebase/firestore";
+import fb from "@/firebase/firebase";
 
 export default {
   components: {
     Calendar,
     CalendarSidenav,
-    // ModalUpdate,
+    MyCalendarTable,
   },
   setup() {
     let isOpen = ref(false);
     return { isOpen };
   },
+  computed: {
+    ...mapState(useAuthStore, ["isLoggedIn"]),
+  },
+  mounted() {
+    if (this.isLoggedIn) {
+      const { getItems: getCalendarData } = listFetcher(
+        CalendarCollection,
+        null,
+        "getMyCalendar",
+        false
+      );
+      getCalendarData().then(async (calendarData) => {
+        const schedulePromise = calendarData.map(async (sched) => {
+          const shootId = sched.event_id.id;
+          const procId = sched.id;
+          const actualProc = await getDoc(
+            doc(fb.db, "shoots", shootId, "procedures", procId)
+          );
+
+          const procedureType = actualProc.get("procedure_type")?.id;
+          console.log(shootId, procId, procedureType);
+          sched.procedure_type = procedureType;
+          return sched;
+        });
+        this.scheduleData = await Promise.all(schedulePromise);
+        this.calendarData = calendarData.map((evDate) => {
+          return {
+            id: evDate.id,
+            calendarId: "0",
+            title: "Shoot Scheduled",
+            // category: "allday",
+            start: new Date(evDate.start_date),
+            end: new Date(evDate.end_date),
+            isReadOnly: true,
+          };
+        });
+      });
+    } else {
+      this.$router.push({ name: "Login" });
+    }
+  },
   data() {
     return {
-      data: [
-        {
-          id: "1",
-          location: "main-location",
-          status: [{ name: "go-ahead" }, { name: "paid" }],
-          event_id: "ft-8d243000-9500-4d33-8d6d-9f158858fc45",
-          start_date: "May 2, 2023",
-          end_date: "May 9, 2023",
-        },
-        {
-          id: "2",
-          location: "main-location",
-          status: [{ name: "go-ahead" }, { name: "paid" }],
-          event_id: "ft-8d243000-9500-4d33-8d6d-9f158858fc45",
-          start_date: "May 5, 2023",
-          end_date: "May 14, 2023",
-        },
-        {
-          id: "3",
-          location: "main-location",
-          status: [{ name: "go-ahead" }],
-          event_id: "ft-8d243000-9500-4d33-8d6d-9f158858fc45",
-          start_date: "May 10, 2023",
-          end_date: "May 22, 2023",
-          dis: "true",
-        },
-        {
-          id: "4",
-          location: "main-location",
-          status: [{ name: "go-ahead" }, { name: "paid" }],
-          event_id: "ft-8d243000-9500-4d33-8d6d-9f158858fc45",
-          start_date: "August 5, 2023",
-          end_date: "August 9, 2023",
-        },
-        {
-          id: "5",
-          location: "main-location",
-          status: [{ name: "go-ahead" }],
-          event_id: "ft-8d243000-9500-4d33-8d6d-9f158858fc45",
-          start_date: "September 20, 2023",
-          end_date: "September 29, 2023",
-        },
-      ],
-      modalData: null,
+      scheduleData: [],
       calendarData: [],
+      // data: [
+      //   {
+      //     id: "1",
+      //     location: "main-location",
+      //     status: [{ name: "go-ahead" }, { name: "paid" }],
+      //     event_id: "ft-8d243000-9500-4d33-8d6d-9f158858fc45",
+      //     start_date: "May 2, 2023",
+      //     end_date: "May 9, 2023",
+      //   },
+      //   {
+      //     id: "2",
+      //     location: "main-location",
+      //     status: [{ name: "go-ahead" }, { name: "paid" }],
+      //     event_id: "ft-8d243000-9500-4d33-8d6d-9f158858fc45",
+      //     start_date: "May 5, 2023",
+      //     end_date: "May 14, 2023",
+      //   },
+      //   {
+      //     id: "3",
+      //     location: "main-location",
+      //     status: [{ name: "go-ahead" }],
+      //     event_id: "ft-8d243000-9500-4d33-8d6d-9f158858fc45",
+      //     start_date: "May 10, 2023",
+      //     end_date: "May 22, 2023",
+      //     dis: "true",
+      //   },
+      //   {
+      //     id: "4",
+      //     location: "main-location",
+      //     status: [{ name: "go-ahead" }, { name: "paid" }],
+      //     event_id: "ft-8d243000-9500-4d33-8d6d-9f158858fc45",
+      //     start_date: "August 5, 2023",
+      //     end_date: "August 9, 2023",
+      //   },
+      //   {
+      //     id: "5",
+      //     location: "main-location",
+      //     status: [{ name: "go-ahead" }],
+      //     event_id: "ft-8d243000-9500-4d33-8d6d-9f158858fc45",
+      //     start_date: "September 20, 2023",
+      //     end_date: "September 29, 2023",
+      //   },
+      // ],
+      modalData: null,
       calendars: [
         {
           id: "0",
@@ -383,19 +430,6 @@ export default {
       dateRangeText: "",
     };
   },
-  computed: {
-    ...mapState(useAuthStore, ["isLoggedIn"]),
-  },
-  mounted() {
-    if (this.isLoggedIn) {
-      this.getCalendarData().then((calendarData) => {
-        console.log(calendarData);
-        this.calendarData = calendarData;
-      });
-    } else {
-      this.$router.push({ name: "Login" });
-    }
-  },
   methods: {
     edit(index, val) {
       if (val == true) {
@@ -414,23 +448,6 @@ export default {
     showDetails(data) {
       this.$modal.show("modal-update");
       this.modalData = data;
-    },
-    async getCalendarData() {
-      const calendar = await CalendarCollection.getMyCalendar().then((cal) => {
-        return cal.map((evDate) => {
-          return {
-            id: evDate.id,
-            calendarId: "0",
-            title: "Shoot Scheduled",
-            // category: "allday",
-            start: new Date(evDate.start_date),
-            end: new Date(evDate.end_date),
-            isReadOnly: true,
-          };
-        });
-      });
-      //process calendar
-      return calendar;
     },
   },
 };

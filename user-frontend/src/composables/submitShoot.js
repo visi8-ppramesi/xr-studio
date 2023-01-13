@@ -2,6 +2,8 @@ import { firebase } from "@/firebase";
 import { vedhg } from "@/utils/dateRangeHash";
 import axios from "axios";
 import isNil from "lodash/isNil";
+import omitBy from "lodash/omitBy";
+import isEmpty from "lodash/isEmpty";
 /*
     procedures: [
         {
@@ -50,10 +52,14 @@ const handleError = (e) => {
 };
 
 const envDev = process.env.VUE_APP_MODE == "development";
-console.log(envDev, process.env);
 
-const structureData = function (data) {
-  let { studio: procedures, asset: assets, equipment: equipments } = data;
+const structureShootData = function (data) {
+  let {
+    shoot,
+    studio: procedures,
+    asset: assets,
+    equipment: equipments,
+  } = data;
   procedures = procedures.map((procedure) => {
     const [procedureStart, procedureEnd] = vedhg.decodeHash(procedure.id);
     const procedureType = procedure.extra_data.schedule_type;
@@ -70,7 +76,7 @@ const structureData = function (data) {
   });
   const retVal = {
     procedures,
-    shoot: {},
+    shoot: shoot || {},
   };
   if (!isNil(assets)) {
     assets = assets.map((asset) => {
@@ -104,56 +110,82 @@ const structureData = function (data) {
   return retVal;
 };
 
-export async function createShoot(data) {
-  try {
-    const { auth } = firebase;
-    const { currentUser } = auth;
-    const managerUrl = new URL(process.env.VUE_APP_SHOOTING_MANAGER_URL);
-    managerUrl.pathname = "create";
-    const headers = {};
-    if (currentUser) {
-      const tokenId = await currentUser.getIdToken();
-      headers.Authorization = `Bearer ${tokenId}`;
-    } else {
-      throw new Error("User not logged in");
-    }
-    const procData = structureData(data);
-    if (envDev) {
-      procData.debug = true;
-    }
+const structureProcedureData = function (data) {
+  let { shoot, procedure } = data;
+  const dataObj = {
+    shoot_id: shoot.id,
+    procedure_id: procedure.id,
+    procedure_data: !isNil(procedure?.extra_data)
+      ? {
+          notes: procedure?.extra_data?.notes,
+        }
+      : null,
+    procedure_start: procedure.procedure_start,
+    procedure_end: procedure.procedure_end,
+    procedure_type: procedure.procedure_type,
+  };
+  return omitBy(dataObj, isEmpty);
+};
 
-    return axios.post(managerUrl.toString(), procData, {
-      headers,
-    });
-  } catch (error) {
-    handleError(error);
-    throw error;
+const createHeaders = async function () {
+  const { auth } = firebase;
+  const { currentUser } = auth;
+  const headers = {};
+  if (currentUser) {
+    const tokenId = await currentUser.getIdToken();
+    headers.Authorization = `Bearer ${tokenId}`;
+  } else {
+    throw new Error("User not logged in");
   }
+  return headers;
+};
+
+const createPostRequest = function (name, pathname, structureFunction) {
+  return async function (data) {
+    try {
+      const managerUrl = new URL(process.env.VUE_APP_SHOOTING_MANAGER_URL);
+      managerUrl.pathname = pathname;
+      const headers = await createHeaders();
+
+      const procData = structureFunction(data);
+      if (envDev) {
+        procData.debug = true;
+      }
+
+      return axios.post(managerUrl.toString(), procData, {
+        headers,
+      });
+    } catch (error) {
+      handleError({ name, error });
+      throw error;
+    }
+  };
+};
+
+const editProcedurePostRequest = createPostRequest(
+  "editProcedure",
+  "edit-procedure",
+  structureProcedureData
+);
+const createShootPostRequest = createPostRequest(
+  "createShoot",
+  "create",
+  structureShootData
+);
+const editShootPostRequest = createPostRequest(
+  "editShoot",
+  "edit",
+  structureShootData
+);
+
+export async function editProcedure(data) {
+  return editProcedurePostRequest(data);
+}
+
+export async function createShoot(data) {
+  return createShootPostRequest(data);
 }
 
 export async function editShoot(data) {
-  try {
-    const { auth } = firebase;
-    const { currentUser } = auth;
-    const managerUrl = new URL(process.env.VUE_APP_SHOOTING_MANAGER_URL);
-    managerUrl.pathname = "edit";
-    const headers = {};
-    if (currentUser) {
-      const tokenId = await currentUser.getIdToken();
-      headers.Authorization = `Bearer ${tokenId}`;
-    } else {
-      throw new Error("User not logged in");
-    }
-    const procData = structureData(data);
-    if (envDev) {
-      procData.debug = true;
-    }
-
-    return axios.post(managerUrl.toString(), procData, {
-      headers,
-    });
-  } catch (error) {
-    handleError(error);
-    throw error;
-  }
+  return editShootPostRequest(data);
 }

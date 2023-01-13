@@ -18,7 +18,7 @@ export default class extends Collection {
     }),
   };
 
-  static async getMyCalendar() {
+  static async getMyCalendar(queries = []) {
     const { currentUser } = fb.auth;
     if (!currentUser) {
       throw new Error("Not Logged In!");
@@ -38,7 +38,10 @@ export default class extends Collection {
 
     const chunkedShootIds = chunk(shootIds, 10);
     const calendarPromisesArray = chunkedShootIds.map((tenShootId) => {
-      return this.getDocuments([where("event_id", "in", tenShootId)]);
+      return this.getDocuments([
+        ...queries,
+        where("event_id", "in", tenShootId),
+      ]);
     });
 
     return Promise.all(calendarPromisesArray).then(flatten);

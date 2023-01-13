@@ -1,30 +1,43 @@
 import { buildQueries, paginationQuery } from "@/composables/queries";
 import { onMounted, ref } from "vue";
+import isNil from "lodash/isNil";
 
-export function listFetcher(collection) {
+export function listFetcher(
+  collection,
+  itemsPerPage = 12,
+  fetcherFunction = "getDocuments",
+  loadOnMounted = true
+) {
   let items = ref([]);
   let query = ref([]);
   let content = ref(null);
   async function getItems(queryParam = [], loadMore = false) {
     let pQuery;
-    if (!loadMore) {
-      items.value = [];
-      pQuery = paginationQuery(12, "name", null, queryParam);
+    if (itemsPerPage > 0) {
+      if (!loadMore) {
+        items.value = [];
+        pQuery = paginationQuery(itemsPerPage, "name", null, queryParam);
+      } else {
+        const lastDoc = items.value[items.value.length - 1].doc;
+        pQuery = paginationQuery(itemsPerPage, "name", lastDoc, queryParam);
+      }
     } else {
-      const lastDoc = items.value[items.value.length - 1].doc;
-      pQuery = paginationQuery(12, "name", lastDoc, queryParam);
+      pQuery = [...queryParam];
     }
 
     const [currentCount, myItems] = await Promise.all([
       collection.getCount(pQuery),
-      collection.getDocuments(pQuery),
+      !isNil(collection[fetcherFunction])
+        ? collection[fetcherFunction](pQuery)
+        : collection.getDocuments(pQuery),
     ]);
     if (currentCount < 12) {
-      content.value.disableLoadMore();
+      content.value?.disableLoadMore();
     } else {
-      content.value.enableLoadMore();
+      content.value?.enableLoadMore();
     }
     items.value.push(...myItems);
+    return myItems;
   }
 
   function search(data) {
@@ -37,9 +50,11 @@ export function listFetcher(collection) {
     getItems(query.value, true);
   }
 
-  onMounted(() => {
-    getItems();
-  });
+  if (loadOnMounted) {
+    onMounted(() => {
+      getItems();
+    });
+  }
 
   return { items, query, getItems, search, loadMore, content };
 }
