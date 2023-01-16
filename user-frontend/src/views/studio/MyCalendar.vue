@@ -327,7 +327,6 @@ export default {
           );
 
           const procedureType = actualProc.get("procedure_type")?.id;
-          console.log(shootId, procId, procedureType);
           sched.procedure_type = procedureType;
           return sched;
         });
@@ -350,6 +349,7 @@ export default {
   },
   data() {
     return {
+      extras: {},
       scheduleData: [],
       calendarData: [],
       // data: [
@@ -440,7 +440,6 @@ export default {
     },
     more(index) {
       this.item = this.data[index];
-      console.log(this.item);
     },
     monthChange({ year, month }) {
       this.$refs.calendar.setDate(year, month);
