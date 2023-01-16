@@ -105,7 +105,7 @@ factoryMap.set(AssetContractFactory, {
 })
 factoryMap.set(OrderFactory, {
     dep: [UserFactory],
-    buildFunc: ['createDocs', 5]
+    buildFunc: ['createDocs', 15]
 })
 factoryMap.set(OrderVersionFactory, {
     dep: [UserFactory, OrderFactory],

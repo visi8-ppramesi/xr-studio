@@ -28,7 +28,7 @@
               facilis sint aliquid ipsum atque?
             </p>
           </div>
-          <div class="mb-12 lg:mb-0">
+          <div v-show="!isLoggedIn" class="mb-12 lg:mb-0">
             <div
               class="block rounded-lg shadow-lg bg-white px-6 py-12 md:px-12"
             >
@@ -181,6 +181,7 @@
 
 <script>
 import { useAuthStore } from "@/store/auth";
+import { mapState } from "pinia";
 export default {
   name: "front-page",
   data() {
@@ -198,6 +199,9 @@ export default {
       authStore,
     };
   },
+  computed: {
+    ...mapState(useAuthStore, ["isLoggedIn"]),
+  },
   methods: {
     register() {
       const { email, username, firstName, lastName } = this;
@@ -208,21 +212,6 @@ export default {
         lastName,
       });
       this.$router.push({ name: "Register" });
-      // this.authStore.register(
-      //   this.email,
-      //   this.password,
-      //   { name: this.username, fullName: this.fullName },
-      //   () => {
-      //     this.$router.push({ name: "Home", query: { registered: 1 } });
-      //   },
-      //   () => {
-      //     this.loginFailed = true;
-      //     this.email = "";
-      //     this.password = "";
-      //     this.name = "";
-      //     this.fullName = "";
-      //   }
-      // );
     },
   },
 };

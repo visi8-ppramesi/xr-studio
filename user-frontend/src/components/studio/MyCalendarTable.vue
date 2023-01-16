@@ -2,46 +2,56 @@
   <div class="py-2">
     <div class="w-full">
       <div class="flex justify-between items-center">
-        <div class="font-bold text-xl">My Calendar</div>
+        <div class="font-bold text-xl">Upcoming Shoots</div>
       </div>
       <div class="flex flex-col">
         <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
           <div class="py-4 inline-block sm:px-6 lg:px-8 min-w-full">
-            <div class="overflow-hidden">
+            <div class="overflow-hidden rounded-md">
               <table class="max-w-screen w-full text-center">
                 <thead class="border-b bg-gray-800">
                   <tr>
-                    <th scope="col" class="text-sm text-white px-6 py-4">Id</th>
-                    <th scope="col" class="text-sm text-white px-6 py-4">
-                      Shoot Type
+                    <th
+                      @click="sortByHeader('id')"
+                      scope="col"
+                      class="text-sm text-white px-6 py-4 cursor-pointer"
+                      :class="{ underline: !!headerSort['id'] }"
+                    >
+                      Id
                     </th>
                     <th
+                      @click="sortByHeader('procedureType')"
                       scope="col"
-                      class="text-sm font-medium text-white px-6 xl:px-8 py-4"
+                      class="text-sm text-white px-6 py-4 cursor-pointer"
+                      :class="{ underline: !!headerSort['procedureType'] }"
                     >
+                      Shoot Type
+                    </th>
+                    <th scope="col" class="text-sm text-white px-6 py-4">
                       Location
                     </th>
                     <th
+                      @click="sortByHeader('startDate')"
                       scope="col"
-                      class="text-sm font-medium text-white px-6 xl:px-8 py-4"
+                      class="text-sm text-white px-6 py-4 cursor-pointer"
+                      :class="{ underline: !!headerSort['startDate'] }"
                     >
                       Start Date
                     </th>
                     <th
+                      @click="sortByHeader('endDate')"
                       scope="col"
-                      class="text-sm font-medium text-white px-6 xl:px-8 py-4"
+                      class="text-sm text-white px-6 py-4 cursor-pointer"
+                      :class="{ underline: !!headerSort['endDate'] }"
                     >
                       End Date
                     </th>
-                    <th
-                      scope="col"
-                      class="text-sm font-medium text-white px-6 xl:px-8 py-4"
-                    >
+                    <th scope="col" class="text-sm text-white px-6 py-4">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody v-if="tableData.length > 0">
+                <tbody v-if="modelValue.length > 0">
                   <template
                     v-for="(item, idx) in paginatedTableData"
                     :key="item.id"
@@ -81,8 +91,8 @@
                         <div id="modal-update" class="container mx-auto">
                           <div class="justify-center">
                             <button
-                              @click="openModal(item.id)"
-                              class="px-6 xl:px-8 py-2 text-white bg-blue-600 rounded shadow"
+                              @click.stop="openModal(item.id)"
+                              class="px-6 xl:px-8 py-2 text-white bg-blue-600 rounded-md shadow"
                               type="button"
                             >
                               Edit
@@ -169,6 +179,21 @@
                             </svg>
                           </button>
                           <button
+                            @click="jumpToPage(idx - 1)"
+                            v-for="idx in tableIdx"
+                            :key="'pagination-' + idx"
+                            :class="{
+                              'border-blue-500 bg-blue-50':
+                                currentPage + 1 === idx,
+                              'border-gray-300 bg-white':
+                                currentPage + 1 !== idx,
+                            }"
+                            class="relative inline-flex items-center border px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20"
+                          >
+                            {{ idx }}
+                          </button>
+
+                          <button
                             :disabled="nextDisabled"
                             @click="loadNext"
                             class="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20"
@@ -203,9 +228,10 @@
   </div>
   <div
     v-if="isOpen"
+    @click="closeModal"
     class="h-full fixed inset-0 flex items-center justify-center bg-gray-700 bg-opacity-50"
   >
-    <div class="bg-white p-5 w-96 rounded-xl">
+    <div @click.stop="" class="bg-white p-5 w-96 rounded-md">
       <div class="py-1">
         <label
           class="pt-2 font-bold block text-left text-gray-700 text-sm font-bold"
@@ -244,7 +270,7 @@
         <div>
           <button
             @click="saveSchedule()"
-            class="px-6 py-2 text-white bg-blue-600 rounded shadow"
+            class="px-6 py-2 text-white bg-blue-600 rounded-md shadow"
             type="button"
           >
             Save
@@ -253,7 +279,7 @@
         <div>
           <button
             @click="closeModal"
-            class="px-6 py-2 text-white bg-red-600 rounded shadow"
+            class="px-6 py-2 text-white bg-red-600 rounded-md shadow"
             type="button"
           >
             Back
@@ -268,6 +294,8 @@
 import { reactive, ref, watch } from "vue";
 import isNil from "lodash/isNil";
 import flattenDeep from "lodash/flattenDeep";
+import orderBy from "lodash/orderBy";
+import snakeCase from "lodash/snakeCase";
 import DatePicker from "vue-tailwind-datepicker";
 import dayjs from "dayjs";
 import { editProcedure } from "@/composables/submitShoot";
@@ -279,7 +307,7 @@ export default {
     DatePicker,
   },
   props: {
-    tableData: {
+    modelValue: {
       default: () => [],
       type: Array,
     },
@@ -290,6 +318,7 @@ export default {
     const paginatedTableData = ref([]);
     const prevDisabled = ref(false);
     const nextDisabled = ref(false);
+    const tableIdx = ref(1);
     const form = reactive({
       location: null,
       startDate: [],
@@ -297,7 +326,7 @@ export default {
     });
 
     const runFunc = () => {
-      paginatedTableData.value = props.tableData.slice(
+      paginatedTableData.value = props.modelValue.slice(
         currentPage.value * itemsPerPage,
         (currentPage.value + 1) * itemsPerPage
       );
@@ -306,14 +335,17 @@ export default {
       } else {
         prevDisabled.value = false;
       }
-      if ((currentPage.value + 1) * itemsPerPage >= props.tableData.length) {
+      if ((currentPage.value + 1) * itemsPerPage >= props.modelValue.length) {
         nextDisabled.value = true;
       } else {
         nextDisabled.value = false;
       }
+      if (tableIdx.value == 1) {
+        tableIdx.value = Math.floor(props.modelValue.length / itemsPerPage);
+      }
     };
 
-    const watchTableData = watch(() => props.tableData, runFunc);
+    const watchTableData = watch(() => props.modelValue, runFunc);
     const watchCurrentPage = watch(currentPage, runFunc);
 
     return {
@@ -325,11 +357,17 @@ export default {
       currentPage,
       prevDisabled,
       nextDisabled,
+      tableIdx,
     };
   },
-  mounted() {},
   data() {
     return {
+      headerSort: {
+        startDate: 1,
+        endDate: 0,
+        procedureType: 0,
+        id: 0,
+      },
       shownExtras: {},
       extraItems: {},
       formatter: {
@@ -339,7 +377,26 @@ export default {
       selectedIdx: null,
     };
   },
+  emits: ["update:modelValue"],
   methods: {
+    sortByHeader(header) {
+      const b4Value = this.headerSort[header];
+      Object.keys(this.headerSort).forEach((h) => {
+        this.headerSort[h] = 0;
+      });
+      if (b4Value === 1) {
+        this.headerSort[header] = -1;
+      } else {
+        this.headerSort[header] = 1;
+      }
+
+      const tableDupe = orderBy(
+        this.modelValue,
+        [snakeCase(header)],
+        this.headerSort[header] > 0 ? "asc" : "desc"
+      );
+      this.$emit("update:modelValue", tableDupe);
+    },
     showExtra(id) {
       let click = id in this.shownExtras;
       let clock = id in this.extraItems;
@@ -348,13 +405,20 @@ export default {
         this.shownExtras[id] = true;
       }
       if (!clock) {
-        const clickedData = this.tableData.find((v) => v.id === id);
+        const clickedData = this.modelValue.find((v) => v.id === id);
         const shoot = clickedData.event_id;
         const equipmentsPromise = getDocs(collection(shoot, "equipments"));
         const assetsPromise = getDocs(collection(shoot, "assets"));
 
-        Promise.all([equipmentsPromise, assetsPromise])
-          .then((v) => v.map((k) => Object.values(k.docs).map((j) => j.data())))
+        const delay = new Promise((resolve) => {
+          setTimeout(resolve, 500);
+        });
+
+        Promise.all([delay, equipmentsPromise, assetsPromise])
+          // eslint-disable-next-line no-unused-vars
+          .then(([d, ...v]) =>
+            v.map((k) => Object.values(k.docs).map((j) => j.data()))
+          )
           .then(flattenDeep)
           .then((items) => {
             this.extraItems[id] = items.map((item) => {
@@ -373,6 +437,9 @@ export default {
           });
       }
     },
+    jumpToPage(pg) {
+      this.currentPage = pg;
+    },
     loadPrev() {
       this.currentPage -= 1;
     },
@@ -383,13 +450,13 @@ export default {
       if (!isNil(this.selectedIdx)) {
         const data = {
           shoot: {
-            id: this.tableData[this.selectedIdx].event_id.id,
+            id: this.modelValue[this.selectedIdx].event_id.id,
           },
           procedure: {
-            id: this.tableData[this.selectedIdx].id,
+            id: this.modelValue[this.selectedIdx].id,
             procedure_start: new Date(this.form.startDate),
             procedure_end: new Date(this.form.endDate),
-            procedure_type: this.tableData[this.selectedIdx].procedure_type,
+            procedure_type: this.modelValue[this.selectedIdx].procedure_type,
           },
         };
         editProcedure(data)
@@ -415,15 +482,15 @@ export default {
       }
     },
     openModal(id) {
-      this.selectedIdx = this.tableData.findIndex((v) => v.id === id);
-      this.form.location = this.tableData[this.selectedIdx].location;
+      this.selectedIdx = this.modelValue.findIndex((v) => v.id === id);
+      this.form.location = this.modelValue[this.selectedIdx].location;
       this.form.startDate = [
-        dayjs(this.tableData[this.selectedIdx].start_date).format(
+        dayjs(this.modelValue[this.selectedIdx].start_date).format(
           this.formatter.date
         ),
       ];
       this.form.endDate = [
-        dayjs(this.tableData[this.selectedIdx].end_date).format(
+        dayjs(this.modelValue[this.selectedIdx].end_date).format(
           this.formatter.date
         ),
       ];

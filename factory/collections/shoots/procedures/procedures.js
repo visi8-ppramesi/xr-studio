@@ -5,6 +5,8 @@ const { admin } = require("../../../utils/initializeFirebaseAdmin")
 
 const db = admin.firestore();
 
+const createdDates = []
+
 module.exports = class ShootProcedureFactory extends Factory{
     static collectionName = 'procedures'
     constructor(parent){
@@ -13,10 +15,21 @@ module.exports = class ShootProcedureFactory extends Factory{
     }
 
     static async createData(typeProjection){
-        const future = Math.round(Math.random() * 150000) * 100000
-        const endFuture = Math.round(Math.random() * 150000) * 100000
-        const start = new Date(new Date().getTime() + future)
-        const end = new Date(new Date().getTime() + future + endFuture)
+        let start, end, encoded
+        let tries = 0
+        do{
+            const future = Math.round(Math.random() * 1000 * 60 * 60) * 24 * 182
+            const endFuture = Math.round(Math.random() * 1000 * 60 * 60) * 24 * 14
+            start = new Date(new Date().getTime() + future)
+            end = new Date(new Date().getTime() + future + endFuture)
+            encoded = vedhg.encodeDates(start, end)
+            tries++
+        }while(createdDates.reduce((acc, v) => {
+            acc ||= vedhg.hashesOverlap(encoded, v)
+            return acc
+        }, false) && tries < 20)
+        createdDates.push(encoded)
+
         return {
             status: ['created'],
             procedure_type: db.collection("procedure_types").doc(typeProjection.id),
