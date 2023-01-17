@@ -8,9 +8,9 @@ import sortBy from 'lodash/sortBy';
 const strDate: number = new Date('2000-01-01').getTime();
 const endDate: number = new Date('2100-01-01').getTime();
 const maxLen: number = endDate - strDate;
-const base64Code: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-';
+const base64Code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-';
 
-const processHash = function (hash: string, defaultLen: number = 14): string {
+const processHash = function (hash: string, defaultLen = 14): string {
     if (hash.startsWith('ft-') && hash.length > defaultLen) {
         hash = hash.substring(3);
     }
@@ -103,6 +103,7 @@ const verticalEncBuilder = function (self: DateRangeHashGenerator): Codec {//{ e
     return { encoder, decoder };
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const mortonEncBuilder = function (self: DateRangeHashGenerator): Codec {//{ encoder: Encoder; decoder: Decoder } {
     const encoder: Encoder = function (x: number, y: number): string {
         const B = [0x55555555, 0x33333333, 0x0f0f0f0f, 0x00ff00ff];
@@ -122,7 +123,7 @@ const mortonEncBuilder = function (self: DateRangeHashGenerator): Codec {//{ enc
         return base64Code[z];
     };
     const decoder: Decoder = function (code: string): [number, number] {
-        let v = base64Code.indexOf(code);
+        const v = base64Code.indexOf(code);
         function deinterleave(x: number): number {
             x = x & 0x55555555;
             x = (x | (x >> 1)) & 0x33333333;
@@ -141,11 +142,11 @@ class DateRangeHashGenerator {
     type: string
     depth: number
     base: number
-    divisor: number = 1
+    divisor = 1
     encoder: Encoder
     decoder: Decoder
 
-    constructor(type = 'normal', base = 36, depth: number = 14) {
+    constructor(type = 'normal', base = 36, depth = 14) {
         this.type = type
         this.depth = depth
         let encoding;
@@ -178,7 +179,7 @@ class DateRangeHashGenerator {
         const availableDates = []
 
         for (let i = 1; i < datesArray.length; i++) {
-            let { ya, xb } = this.calculateHashesValues(datesArray[i - 1], datesArray[i]);
+            const { ya, xb } = this.calculateHashesValues(datesArray[i - 1], datesArray[i]);
             const evDiff = xb - ya
             if (evDiff > minLength) {
                 availableDates.push(this.encodeDates(ya, xb))
@@ -339,7 +340,7 @@ class DateRangeHashGenerator {
             localMaxLen = newBlockSize;
         }
 
-        const codeArray: any[] = [letters]
+        const codeArray: (string | number)[] = [letters]
         if (!isNil(option)) {
             switch (option) {
                 case "rent_non_xr_studio":

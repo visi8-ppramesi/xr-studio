@@ -1,9 +1,9 @@
-import { defineConfig } from 'vite'
+import { defineConfig, UserConfigExport } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from "path"
 
 // https://vitejs.dev/config/
-const config = {
+const config: UserConfigExport = {
   optimizeDeps: {
     exclude: [
       "firebase",

@@ -45,11 +45,11 @@ factoryMap.set(ProcedureTypeFactory, {
 })
 factoryMap.set(AssetFactory, {
     dep: [UserFactory],
-    buildFunc: ['createDocs', 12],
+    buildFunc: ['createDocs', 24],
 })
 factoryMap.set(EquipmentFactory, {
     dep: [],
-    buildFunc: ['createDocs', 12]
+    buildFunc: ['createDocs', 24]
 })
 factoryMap.set(SubmissionFormFactory, {
     dep: [UserFactory, AssetFactory],
@@ -66,7 +66,7 @@ factoryMap.set(SubmissionFormFactory, {
 })
 factoryMap.set(ContractFactory, {
     dep: [UserFactory],
-    buildFunc: ['createDocs', 12]
+    buildFunc: ['createDocs', 24]
 })
 factoryMap.set(ContractVersionFactory, {
     dep: [UserFactory, ContractFactory],
@@ -95,7 +95,6 @@ factoryMap.set(AssetContractFactory, {
 
         const retVal = await Promise.all(shuffledAssets.map((ass, idx) => {
             const acFactory = new AssetContractFactory()
-            shuffledContracts[idx]
             return acFactory.createDoc(ass.id, shuffledContracts[idx].ref).then(v => {
                 return acFactory
             })

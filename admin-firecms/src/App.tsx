@@ -1,27 +1,35 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 
 import { User as FirebaseUser } from "firebase/auth";
 import { firebaseConfig } from "@utils/firebase"
 import {
   Authenticator,
-  // buildCollection,
   // buildProperty,
   // EntityReference,
   FirebaseCMSApp,
   FirebaseLoginView,
-  FirebaseLoginViewProps
+  FirebaseLoginViewProps,
+  EnumValues,
 } from "@camberi/firecms";
 
 import { userCollection } from "./collections/user/user";
 import { shootCollection } from "./collections/shoot/shoot";
-import { assetCollection } from "./collections/asset/asset";
-import { equipmentCollection } from "./collections/equipment/equipment";
+import { buildAssetCollection } from "./collections/asset/asset";
+import { buildEquipmentCollection } from "./collections/equipment/equipment";
 import { procedureTypeCollection } from "./collections/procedureType/procedureType";
 import { contractTemplatesCollection } from "./collections/contractTemplates/contractTemplates";
 import { submissionFormsCollection } from "./collections/submissionForms/submissionForms";
+import { equipmentTypeCollection } from "./collections/equipmentTypes/equipmentTypes";
+import { equipmentCategoryCollection } from "./collections/equipmentCategories/equipmentCategories";
+import { assetCategoryCollection } from "./collections/assetCategories/assetCategories";
+import { buildUserRoleCollection } from "./collections/userRoles/userRoles";
 
 import "typeface-rubik";
 import "@fontsource/ibm-plex-mono";
+
+type UserRoles = {
+    roles: string[]
+}
 
 // TODO: Replace with your config
 // const firebaseConfig = {
@@ -454,9 +462,26 @@ export default function App() {
   return <FirebaseCMSApp
     name={"XR Studio Backend"}
     authentication={myAuthenticator}
-    collections={[shootCollection, userCollection, assetCollection, equipmentCollection, procedureTypeCollection, contractTemplatesCollection, submissionFormsCollection]}
+    collections={[
+      shootCollection, 
+      userCollection, 
+      buildAssetCollection(useState<EnumValues>({})), 
+      buildEquipmentCollection(
+        useState<EnumValues>({}), 
+        useState<EnumValues>({}), 
+        useState<EnumValues>({}),
+        useState({})
+      ), 
+      procedureTypeCollection, 
+      contractTemplatesCollection, 
+      submissionFormsCollection,
+      equipmentTypeCollection,
+      equipmentCategoryCollection,
+      assetCategoryCollection,
+      buildUserRoleCollection(useState<EnumValues>({}))
+    ]}
     firebaseConfig={firebaseConfig}
-    signInOptions={["password", "google.com"]}
+    signInOptions={["password"]}
     LoginView={ShitFuckLoginView}
   />;
 }

@@ -11,11 +11,12 @@ type ShootAsset = {
   price: number,
 }
 
+const debouncedRewriteId = rewriteIdUpdate<ShootAsset>()
 export const shootAssetCollection = buildCollection<ShootAsset>({
   name: "Shoot Asset",
   path: "assets",
   callbacks: {
-      onIdUpdate: rewriteIdUpdate<ShootAsset>()
+      onIdUpdate: debouncedRewriteId
   },
   properties: {
     created_date: {

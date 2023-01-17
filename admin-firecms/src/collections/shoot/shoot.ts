@@ -12,15 +12,15 @@ type Shoot = {
   created_date: Date,
   location: string,
   status: string[],
-  status_history: Object[],
+  status_history: object[],
 }
 
-
+const debouncedRewriteId = rewriteIdUpdate<Shoot>()
 export const shootCollection = buildCollection<Shoot>({
   name: "Shoot",
   path: "shoots",
   callbacks: {
-      onIdUpdate: rewriteIdUpdate<Shoot>()
+      onIdUpdate: debouncedRewriteId
   },
   properties: {
     created_by: {

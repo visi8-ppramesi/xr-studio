@@ -9,7 +9,7 @@ type status_item = {
     status: string
 }
  
-type submissionForms = {
+type SubmissionForm = {
     asset: EntityReference,
     current_status: string[],
     description: string,
@@ -20,7 +20,7 @@ type submissionForms = {
     user: EntityReference,
 }
 
-export const submissionFormsCollection = buildCollection<submissionForms>({
+export const submissionFormsCollection = buildCollection<SubmissionForm>({
     name: "Submission Forms",
     path: "submission_forms",
     customId: true, 
