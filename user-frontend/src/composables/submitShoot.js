@@ -53,6 +53,10 @@ const handleError = (e) => {
 
 const envDev = process.env.VUE_APP_MODE == "development";
 
+const forceToDate = function (date) {
+  return new Date(date);
+};
+
 const structureShootData = function (data) {
   let {
     shoot,
@@ -65,8 +69,8 @@ const structureShootData = function (data) {
     const procedureType = procedure.extra_data.schedule_type;
     const price = procedure.price;
     return {
-      procedure_start: procedureStart,
-      procedure_end: procedureEnd,
+      procedure_start: forceToDate(procedureStart),
+      procedure_end: forceToDate(procedureEnd),
       procedure_type: procedureType,
       price,
       procedure_data: {
@@ -120,8 +124,8 @@ const structureProcedureData = function (data) {
           notes: procedure?.extra_data?.notes,
         }
       : null,
-    procedure_start: procedure.procedure_start,
-    procedure_end: procedure.procedure_end,
+    procedure_start: forceToDate(procedure.procedure_start),
+    procedure_end: forceToDate(procedure.procedure_end),
     procedure_type: procedure.procedure_type,
   };
   return omitBy(dataObj, isEmpty);

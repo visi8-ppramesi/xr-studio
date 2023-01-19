@@ -42,7 +42,7 @@ export default {
       showDatePicker: true,
       myDate: [],
       formatter: {
-        date: "DD MMM YYYY",
+        date: "YYYY-MM-DD HH:mm:ss",
         month: "MMM",
       },
     };
@@ -64,7 +64,13 @@ export default {
             date = this.modelValue;
           }
           this.showDatePicker = false;
-          this.myDate = [dayjs(date).format(this.formatter.date)];
+          this.myDate = [
+            dayjs(date)
+              .set("hour", 9)
+              .set("minute", 0)
+              .set("second", 0)
+              .format(this.formatter.date),
+          ];
           this.$nextTick().then(() => {
             this.showDatePicker = true;
           });

@@ -16,14 +16,13 @@ import { useCartStore } from "@/store/cart";
 export default {
   setup() {
     const cartStore = useCartStore();
-    console.log(cartStore.submissionResult);
     return {
       cartStore,
     };
   },
   mounted() {
     setTimeout(() => {
-      this.$router.push({ name: "Home" });
+      this.$router.push({ name: "MyCalendar" });
     }, 10 * 1000);
   },
 };

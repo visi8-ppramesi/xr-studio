@@ -188,6 +188,13 @@ export default {
         } catch (error) {
           //throw error here
           console.error(error);
+          this.$toast.open({
+            message: "Schedule shoot failed: " + error,
+            position: "bottom",
+            type: "error",
+            duration: 5000,
+            dismissible: true,
+          });
         }
       } else {
         this.$router.push({ name: "Login" });

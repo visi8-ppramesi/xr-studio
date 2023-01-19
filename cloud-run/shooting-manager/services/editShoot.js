@@ -81,23 +81,23 @@ module.exports = function () {
         let uid;
         if (isNil(tokenId)) {
             //token is nil, exit
-            res.send({ status: 401, message: "unauthorized" })
-            throw new Error("unauthorized")
+            res.send({ status: 401, message: "Unauthorized Access" })
+            throw new Error("Unauthorized Access")
         } else {
             try {
                 const decodedToken = await auth.verifyIdToken(tokenId)
                 uid = decodedToken.uid
             } catch (error) {
                 //token is unverifiable, exit
-                res.send({ status: 401, message: "unauthorized" })
-                throw new Error("unauthorized")
+                res.send({ status: 401, message: "Unauthorized Access" })
+                throw new Error("Unauthorized Access")
             }
         }
         let data
         try {
             data = bufferDecoder(req.body.message.data)
         } catch (error) {
-            res.send({ status: 500, message: "shoot edit failed", error })
+            res.send({ status: 500, message: error })
             return
         }
         
@@ -118,8 +118,8 @@ module.exports = function () {
             })
 
         if (!(userAdmin || userCreatedShoot)) {
-            res.send({ status: 402, message: "unauthorized" })
-            throw new Error("unauthorized")
+            res.send({ status: 402, message: "Unauthorized Access" })
+            throw new Error("Unauthorized Access")
         }
         const result = {
             shoot: {},
@@ -406,7 +406,7 @@ module.exports = function () {
             await editShootWithSubcollections(data)
             res.send({ status: 200, message: "shoot edited" })
         } catch (error) {
-            res.send({ status: 500, message: "shoot edit failed", error })
+            res.send({ status: 500, message: error })
         }
 
         // await editShootWithSubcollections(data)

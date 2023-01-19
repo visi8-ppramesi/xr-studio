@@ -52,6 +52,7 @@ import { useAuthStore } from "@/store/auth";
 import { mapState } from "pinia";
 import { listFetcher } from "@/composables/listFetcher";
 import { doc, getDoc, where, orderBy } from "firebase/firestore";
+import sortBy from "lodash/orderBy";
 import fb from "@/firebase/firebase";
 
 export default {
@@ -76,9 +77,14 @@ export default {
         false
       );
       getCalendarData([
-        orderBy("start_date", "asc"),
-        where("start_date", ">=", new Date()),
+        orderBy("end_date", "asc"),
+        where("end_date", ">=", new Date()),
       ]).then(async (calendarData) => {
+        calendarData = sortBy(
+          calendarData,
+          [(v) => new Date(v.start_date)],
+          ["asc"]
+        );
         const schedulePromise = calendarData.map(async (sched) => {
           const shootId = sched.event_id.id;
           const procId = sched.id;

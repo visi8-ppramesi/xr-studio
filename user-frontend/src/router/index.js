@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-import Home from "../views/Home.vue";
+// import Home from "../views/Home.vue";
 import mitt from "mitt";
 
 const emitter = mitt();
@@ -157,8 +157,9 @@ const mineRoutes = [
 const routes = [
   {
     path: "/",
-    name: "Home",
-    component: Home,
+    redirect: "/studio/calendar",
+    // name: "Home",
+    // component: Home,
   },
   {
     path: "/contact-us",

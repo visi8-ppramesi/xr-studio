@@ -36,28 +36,42 @@
             id="navbarSupportedContentY"
           >
             <ul class="navbar-nav mr-auto lg:flex lg:flex-row">
-              <li class="nav-item">
+              <!-- <li class="nav-item">
                 <router-link
                   class="nav-link block pr-2 lg:px-2 py-2 text-gray-600 hover:text-gray-700 focus:text-gray-700 transition duration-150 ease-in-out"
                   to="/"
                   >Home</router-link
                 >
-              </li>
+              </li> -->
               <li class="nav-item">
                 <router-link
                   class="nav-link block pr-2 lg:px-2 py-2 text-gray-600 hover:text-gray-700 focus:text-gray-700 transition duration-150 ease-in-out"
-                  to="/assets"
-                  >XR Assets</router-link
+                  to="/studio/about-shoot"
+                  >Our Studio</router-link
                 >
               </li>
               <li class="nav-item mb-2 lg:mb-0">
                 <router-link
                   class="nav-link block pr-2 lg:px-2 py-2 text-gray-600 hover:text-gray-700 focus:text-gray-700 transition duration-150 ease-in-out"
-                  to="/equipments"
-                  >Equipments</router-link
+                  to="/studio/register-shoot"
+                  >Schedule Shoot</router-link
                 >
               </li>
               <li class="nav-item mb-2 lg:mb-0">
+                <router-link
+                  class="nav-link block pr-2 lg:px-2 py-2 text-gray-600 hover:text-gray-700 focus:text-gray-700 transition duration-150 ease-in-out"
+                  to="/studio/calendar"
+                  >Studio Calendar</router-link
+                >
+              </li>
+              <li v-if="isLoggedIn" class="nav-item mb-2 lg:mb-0">
+                <router-link
+                  class="nav-link block pr-2 lg:px-2 py-2 text-gray-600 hover:text-gray-700 focus:text-gray-700 transition duration-150 ease-in-out"
+                  to="/studio/my-calendar"
+                  >My Calendar</router-link
+                >
+              </li>
+              <!-- <li class="nav-item mb-2 lg:mb-0">
                 <div
                   class="dropdown nav-link block pr-2 lg:px-2 py-2 text-gray-600 hover:text-gray-700 focus:text-gray-700 transition duration-150 ease-in-out"
                 >
@@ -119,7 +133,7 @@
                     </li>
                   </ul>
                 </div>
-              </li>
+              </li> -->
               <li v-if="itemCount > 0" class="nav-item mb-2 lg:mb-0">
                 <router-link
                   class="flex rounded shadow-md pr-4 lg:px-4 py-2 bg-gray-600 text-white hover:bg-gray-700 focus:bg-gray-700 transition duration-150 ease-in-out"
@@ -189,10 +203,10 @@
                     aria-labelledby="dropdownMenuButton1"
                   >
                     <li>
-                      <a
+                      <router-link
                         class="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-gray-700 hover:bg-gray-100"
-                        href="/my-account"
-                        >My Account</a
+                        to="/my-account"
+                        >My Account</router-link
                       >
                     </li>
                     <!-- <li>

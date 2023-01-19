@@ -106,7 +106,8 @@ export default {
             type: "textarea",
             name: "notes",
             label: "Description",
-            placeholder: "How can we help you?",
+            placeholder:
+              "How can we help you? (tell us if you need shoot equipments or XR Assets)",
           },
         ],
         xr: [
@@ -160,7 +161,8 @@ export default {
             type: "textarea",
             name: "notes",
             label: "Description",
-            placeholder: "How can we help you?",
+            placeholder:
+              "How can we help you? (tell us if you need shoot equipments or XR Assets)",
           },
         ],
       },
@@ -183,9 +185,7 @@ export default {
   },
   methods: {
     checkFormData() {
-      console.log(this.formData);
       const shoots = this.cartStore.getShootings();
-      console.log(shoots);
       window.shitSandwich = this.formData;
       window.poopSandwich = shoots;
     },
@@ -215,7 +215,6 @@ export default {
       }
 
       if (rentStudio) {
-        console.log(1);
         this.shootType = shootType;
         this.changeShootType();
         const [shootStartDate, shootEndDate] = vedhg.decodeHash(rentStudio.id);
@@ -224,7 +223,6 @@ export default {
         this.formData.notes = rentStudio.extra_data.notes;
 
         if (rentArtSetup) {
-          console.log(2);
           const [artSetupStartDate, artSetupEndDate] = vedhg.decodeHash(
             rentArtSetup.id
           );
@@ -235,7 +233,6 @@ export default {
         }
 
         if (rentRehearsal) {
-          console.log(3);
           const [rehearsalStartDate, rehearsalEndDate] = vedhg.decodeHash(
             rentRehearsal.id
           );
@@ -247,7 +244,6 @@ export default {
       }
     },
     changeShootType() {
-      console.log("changeShootType");
       if (!isNil(this.shootType)) {
         this.fields = [...this.selectedFields[this.shootType]];
         this.formData = {};
@@ -305,7 +301,6 @@ export default {
     onComponentChange(fieldName, value) {
       const functionName =
         "onChange" + startCase(fieldName).split(" ").join("");
-      console.log(functionName);
       if (!isNil(this[functionName]) && isFunction(this[functionName])) {
         this[functionName](value);
       }

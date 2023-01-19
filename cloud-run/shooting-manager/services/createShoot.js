@@ -81,16 +81,14 @@ module.exports = function () {
         let uid;
         if (isNil(tokenId)) {
             //token is nil, exit
-            res.send({ status: 401, message: "unauthorized" })
-            throw new Error("unauthorized")
+            res.send({ status: 401, message: "Unauthorized Access" })
         } else {
             try {
                 const decodedToken = await auth.verifyIdToken(tokenId)
                 uid = decodedToken.uid
             } catch (error) {
                 //token is unverifiable, exit
-                res.send({ status: 401, message: "unauthorized" })
-                throw new Error("unauthorized")
+                res.send({ status: 401, message: "Unauthorized Access" })
             }
         }
 
@@ -155,27 +153,27 @@ module.exports = function () {
             if (!isNil(equipments)) {
                 status.push("with_equipments")
                 for (const equipment of equipments) {
-                    const { id, ...equipmentDuplicate } = setIdIfNotSet(equipment, null, debug)
-                    const promise = db.collection("shoots").doc(shoot.id).collection("equipments").doc(equipment.id).set({
+                    const { id: equipmentId, ...equipmentDuplicate } = setIdIfNotSet(equipment, null, debug)
+                    const promise = db.collection("shoots").doc(shoot.id).collection("equipments").doc(equipmentId).set({
                         ...equipmentDuplicate,
                         created_date: rightNow,
                         equipment_id: db.collection("equipments").doc(equipment.equipment_id)
                     })
                     promises.push(promise)
-                    retVal.equipments.push({ equipment_id: equipment.id })
+                    retVal.equipments.push({ equipment_id: equipmentId })
 
-                    const changesPromise = db
-                        .collection("shoots")
-                        .doc(shoot.id)
-                        .collection("equipments")
-                        .doc(equipment.id)
-                        .collection("changes")
-                        .doc("0")
-                        .set({
-                            updated_date: new Date(),
-                            diff: stringify(diff({}, equipmentDuplicate))
-                        })
-                    promises.push(changesPromise)
+                    // const changesPromise = db
+                    //     .collection("shoots")
+                    //     .doc(shoot.id)
+                    //     .collection("equipments")
+                    //     .doc(equipment.id)
+                    //     .collection("changes")
+                    //     .doc("0")
+                    //     .set({
+                    //         updated_date: new Date(),
+                    //         diff: stringify(diff({}, equipmentDuplicate))
+                    //     })
+                    // promises.push(changesPromise)
 
                     forChanges.equipments[id] = {
                         created_date: rightNow,
@@ -188,27 +186,29 @@ module.exports = function () {
             if (!isNil(procedures)) {
                 status.push("with_procedures")
                 for (const procedure of procedures) {
-                    const { id, ...procedureDuplicate } = setIdIfNotSet(procedure, true, debug)
-                    const promise = db.collection("shoots").doc(shoot.id).collection("procedures").doc(procedure.id).set({
+                    const { id: procedureId, procedure_start: procedureStart, procedure_end: procedureEnd, ...procedureDuplicate } = setIdIfNotSet(procedure, true, debug)
+                    const promise = db.collection("shoots").doc(shoot.id).collection("procedures").doc(procedureId).set({
                         ...procedureDuplicate,
+                        procedure_start: new Date(procedureStart),
+                        procedure_end: new Date(procedureEnd),
                         created_date: rightNow,
                         procedure_type: db.collection("procedure_types").doc(procedure.procedure_type)
                     })
                     promises.push(promise)
-                    retVal.procedures.push({ procedure_id: procedure.id })
+                    retVal.procedures.push({ procedure_id: procedureId })
 
-                    const changesPromise = db
-                        .collection("shoots")
-                        .doc(shoot.id)
-                        .collection("procedures")
-                        .doc(procedure.id)
-                        .collection("changes")
-                        .doc("0")
-                        .set({
-                            updated_date: new Date(),
-                            diff: stringify(diff({}, procedureDuplicate))
-                        })
-                    promises.push(changesPromise)
+                    // const changesPromise = db
+                    //     .collection("shoots")
+                    //     .doc(shoot.id)
+                    //     .collection("procedures")
+                    //     .doc(procedureId)
+                    //     .collection("changes")
+                    //     .doc("0")
+                    //     .set({
+                    //         updated_date: new Date(),
+                    //         diff: stringify(diff({}, procedureDuplicate))
+                    //     })
+                    // promises.push(changesPromise)
 
                     // const calendarPromises = db
                     //     .collection("calendar")
@@ -235,27 +235,27 @@ module.exports = function () {
             if (!isNil(assets)) {
                 status.push("with_assets")
                 for (const asset of assets) {
-                    const { id, ...assetDuplicate } = setIdIfNotSet(asset, null, debug)
-                    const promise = db.collection("shoots").doc(shoot.id).collection("assets").doc(asset.id).set({
+                    const { id: assetId, ...assetDuplicate } = setIdIfNotSet(asset, null, debug)
+                    const promise = db.collection("shoots").doc(shoot.id).collection("assets").doc(assetId).set({
                         ...assetDuplicate,
                         created_date: rightNow,
                         asset_id: db.collection("assets").doc(asset.asset_id),
                     })
                     promises.push(promise)
-                    retVal.assets.push({ asset_id: asset.id })
+                    retVal.assets.push({ asset_id: assetId })
 
-                    const changesPromise = db
-                        .collection("shoots")
-                        .doc(shoot.id)
-                        .collection("assets")
-                        .doc(asset.id)
-                        .collection("changes")
-                        .doc("0")
-                        .set({
-                            updated_date: new Date(),
-                            diff: stringify(diff({}, assetDuplicate))
-                        })
-                    promises.push(changesPromise)
+                    // const changesPromise = db
+                    //     .collection("shoots")
+                    //     .doc(shoot.id)
+                    //     .collection("assets")
+                    //     .doc(assetId)
+                    //     .collection("changes")
+                    //     .doc("0")
+                    //     .set({
+                    //         updated_date: new Date(),
+                    //         diff: stringify(diff({}, assetDuplicate))
+                    //     })
+                    // promises.push(changesPromise)
 
                     forChanges.assets[id] = {
                         created_date: rightNow,
@@ -295,7 +295,7 @@ module.exports = function () {
             const result = await createShootWithSubcollections(data)
             res.send({ status: 200, message: "shoot created", result })
         } catch (error) {
-            res.send({ status: 500, message: "shoot creation failed", error })
+            res.send({ status: 500, message: error })
         }
     }
 }

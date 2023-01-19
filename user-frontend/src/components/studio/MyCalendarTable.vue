@@ -58,7 +58,6 @@
                   >
                     <tr
                       class="bg-white border-b hover:bg-sky-50 cursor-pointer"
-                      @click="showExtra(item.id)"
                     >
                       <td
                         class="px-6 xl:px-8 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
@@ -371,7 +370,7 @@ export default {
       shownExtras: {},
       extraItems: {},
       formatter: {
-        date: "DD MMM YYYY",
+        date: "YYYY-MM-DD HH:mm:ss",
         month: "MMM",
       },
       selectedIdx: null,
@@ -485,14 +484,18 @@ export default {
       this.selectedIdx = this.modelValue.findIndex((v) => v.id === id);
       this.form.location = this.modelValue[this.selectedIdx].location;
       this.form.startDate = [
-        dayjs(this.modelValue[this.selectedIdx].start_date).format(
-          this.formatter.date
-        ),
+        dayjs(this.modelValue[this.selectedIdx].start_date)
+          .set("hour", 9)
+          .set("minute", 0)
+          .set("second", 0)
+          .format(this.formatter.date),
       ];
       this.form.endDate = [
-        dayjs(this.modelValue[this.selectedIdx].end_date).format(
-          this.formatter.date
-        ),
+        dayjs(this.modelValue[this.selectedIdx].end_date)
+          .set("hour", 9)
+          .set("minute", 0)
+          .set("second", 0)
+          .format(this.formatter.date),
       ];
       this.isOpen = true;
     },

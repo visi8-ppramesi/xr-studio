@@ -35,7 +35,6 @@ const standardizeDate = function(date){
 
 module.exports = function(){
     const db = admin.firestore();
-    // const storage = admin.storage();
     const auth = admin.auth()
 
     return async (req, res) => {
@@ -44,16 +43,14 @@ module.exports = function(){
         let uid;
         if (isNil(tokenId)) {
             //token is nil, exit
-            res.send({ status: 401, message: "unauthorized" })
-            throw new Error("unauthorized")
+            res.send({ status: 401, message: "Unauthorized Access" })
         } else {
             try {
                 const decodedToken = await auth.verifyIdToken(tokenId)
                 uid = decodedToken.uid
             } catch (error) {
                 //token is unverifiable, exit
-                res.send({ status: 401, message: "unauthorized" })
-                throw new Error("unauthorized")
+                res.send({ status: 401, message: "Unauthorized Access" })
             }
         }
 
@@ -84,12 +81,44 @@ module.exports = function(){
                 ]
             ])
 
-            const currentProcedure = await db
-                .collection("shoots")
-                .doc(shootId)
-                .collection("procedures")
-                .doc(procedureId)
-                .get()
+            const [ currentShoot, currentProcedure ] = await Promise.all([
+                db
+                    .collection("shoots")
+                    .doc(shootId)
+                    .get(),
+                db
+                    .collection("shoots")
+                    .doc(shootId)
+                    .collection("procedures")
+                    .doc(procedureId)
+                    .get()
+            ])
+            const createdBy = currentShoot.get("created_by")
+            if(createdBy.id !== uid){
+                const currentUserRoleSnap = await db
+                    .collection("user_roles")
+                    .doc(uid)
+                    .get()
+                if(currentUserRoleSnap.empty){
+                    throw new Error("Unauthorized Access")
+                }
+                const currentRoles = currentUserRoleSnap.get("roles")
+                if(isNil(currentRoles) || !currentRoles.includes("admin")){
+                    throw new Error("Unauthorized Access")
+                }
+            }
+
+            // const currentShoot = await db
+            //     .collection("shoots")
+            //     .doc(shootId)
+            //     .get()
+
+            // const currentProcedure = await db
+            //     .collection("shoots")
+            //     .doc(shootId)
+            //     .collection("procedures")
+            //     .doc(procedureId)
+            //     .get()
             
             const cprocData = currentProcedure.data()
             // handle cases:
@@ -120,7 +149,7 @@ module.exports = function(){
                 const calendarSnap = await db.collection("calendar").get()
                 if(!calendarSnap.empty){
                     const calendarDocs = Object.values(calendarSnap.docs).map(k => k.id)
-                    const overlapAcc = calendarDocs.reduce((acc, v) => acc || vedhg.hashesOverlap(v, newProcId), false)
+                    const overlapAcc = calendarDocs.reduce((acc, v) => acc || (vedhg.hashesOverlap(v, newProcId) && v !== procedureId), false)
                     if(overlapAcc){
                         throw new Error("Calendar overlap")
                     }
@@ -135,8 +164,8 @@ module.exports = function(){
                         status: myStatus,
                         created_date: rightNow,
                         procedure_type: db.collection("procedure_types").doc(procedureType),
-                        procedure_start: procedureStart,
-                        procedure_end: procedureEnd,
+                        procedure_start: new Date(procedureStart),
+                        procedure_end: new Date(procedureEnd),
                         procedure_data: {
                             ...myData
                         }
@@ -194,7 +223,7 @@ module.exports = function(){
             res.send({ status: 200, message: "shoot created", result })
         } catch (error) {
             console.error(error)
-            res.send({ status: 500, message: "shoot edit failed", error })
+            res.send({ status: 500, message: error })
             return
         }
     }

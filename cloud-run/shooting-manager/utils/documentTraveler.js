@@ -36,24 +36,26 @@ async function exportDocument(structure, parentRef = null){
     let values = {}
     if(isArray(structure[0]) || isNil(structure[0])){
         const collData = await parentRef.collection(collection).get()
-        const docs = Object.values(collData.docs)
-        for(let j = 0; j < docs.length; j++){
-            doc = docs[j]
-            let deeperData = {}
-            if(isArray(structure[0])){
-                for(let k = 0; k < structure[0].length; k++){
-                    const result = await exportDocument(structure[0][k], doc.ref)
-                    deeperData = {
-                        ...deeperData,
-                        ...result
+        if(!collData.empty){
+            const docs = Object.values(collData.docs)
+            for(let j = 0; j < docs.length; j++){
+                doc = docs[j]
+                let deeperData = {}
+                if(isArray(structure[0])){
+                    for(let k = 0; k < structure[0].length; k++){
+                        const result = await exportDocument(structure[0][k], doc.ref)
+                        deeperData = {
+                            ...deeperData,
+                            ...result
+                        }
                     }
                 }
-            }
-            values = {
-                ...values,
-                [doc.id]: {
-                    ...doc.data(),
-                    ...deeperData
+                values = {
+                    ...values,
+                    [doc.id]: {
+                        ...doc.data(),
+                        ...deeperData
+                    }
                 }
             }
         }
