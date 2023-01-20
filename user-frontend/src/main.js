@@ -15,7 +15,7 @@ import "vue-loading-overlay/dist/vue-loading.css";
 import i18n from "./i18n";
 import ToastPlugin from "vue-toast-notification";
 import "vue-toast-notification/dist/theme-sugar.css";
-import { formatters, filters } from "@/utils/dataProcessor";
+import { formatters, filters, processors } from "@/utils/dataProcessor";
 
 const vuePropertySetter = (app, name, instance) => {
   app.provide(name, instance);
@@ -28,6 +28,7 @@ const injector = {
     vuePropertySetter(app, "emitter", emitter);
     vuePropertySetter(app, "filters", filters);
     vuePropertySetter(app, "formatters", formatters);
+    vuePropertySetter(app, "processors", processors);
     vuePropertySetter(app, "logger", logger);
   },
 };

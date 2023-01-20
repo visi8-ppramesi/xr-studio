@@ -1,5 +1,17 @@
 {
   "projects": {
     "default": "xr-studio-a9c5e"
+  },
+  "targets": {
+    "xr-studio-a9c5e": {
+      "hosting": {
+        "main": [
+          "xr-studio-a9c5e"
+        ],
+        "admin": [
+          "xr-studio-admin"
+        ]
+      }
+    }
   }
 }

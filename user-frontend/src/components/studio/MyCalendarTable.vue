@@ -237,9 +237,44 @@
     </div>
   </div>
   <div
-    v-if="isOpen"
+    v-if="isConfirmOpen"
     @click="closeModal"
-    class="h-full fixed inset-0 flex items-center justify-center bg-gray-700 bg-opacity-50"
+    class="h-full fixed inset-0 flex items-center justify-center bg-gray-700 bg-opacity-50 z-20"
+  >
+    <div @click.stop="" class="bg-white p-5 w-96 rounded-md">
+      <div>
+        Are you sure you want to edit the schedule? You'd need to get approval
+        for the new schedule from the admin and the estimated price of the shoot
+        will be changed to {{ formatters.currency(newPrice) }}
+      </div>
+      <div class="flex flex-row py-1 justify-evenly">
+        <div>
+          <button
+            :disabled="saveDisabled"
+            @click="saveSchedule()"
+            class="relative inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
+            id="save-edit-button"
+            type="button"
+          >
+            <span class="button__text">Save</span>
+          </button>
+        </div>
+        <div>
+          <button
+            @click="isConfirmOpen = false"
+            class="px-6 py-2 text-white bg-red-600 rounded-md shadow"
+            type="button"
+          >
+            Back
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    v-if="isEditOpen"
+    @click="closeModal"
+    class="h-full fixed inset-0 flex items-center justify-center bg-gray-700 bg-opacity-50 z-10"
   >
     <div @click.stop="" class="bg-white p-5 w-96 rounded-md">
       <div class="py-1">
@@ -279,8 +314,8 @@
       <div class="flex flex-row py-1 justify-evenly">
         <div>
           <button
-            @click="saveSchedule()"
-            class="px-6 py-2 text-white bg-blue-600 rounded-md shadow"
+            @click="openConfirm()"
+            class="inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
             type="button"
           >
             Save
@@ -310,6 +345,8 @@ import DatePicker from "vue-tailwind-datepicker";
 import dayjs from "dayjs";
 import { editProcedure } from "@/composables/submitShoot";
 import { getDocs, collection } from "firebase/firestore";
+import { vedhg } from "@/utils/dateRangeHash";
+import { ProcedureTypes } from "@/firebase/collections/procedure-types";
 
 const itemsPerPage = 5;
 export default {
@@ -323,11 +360,13 @@ export default {
     },
   },
   setup(props) {
-    const isOpen = ref(false);
+    const isEditOpen = ref(false);
+    const isConfirmOpen = ref(false);
     const currentPage = ref(0);
     const paginatedTableData = ref([]);
     const prevDisabled = ref(false);
     const nextDisabled = ref(false);
+    const newPrice = ref(0);
     const tableIdx = ref(1);
     const form = reactive({
       location: null,
@@ -358,16 +397,31 @@ export default {
     const watchTableData = watch(() => props.modelValue, runFunc);
     const watchCurrentPage = watch(currentPage, runFunc);
 
+    const procedurePrices = ref({});
+    ProcedureTypes.getDocuments().then((procTypes) => {
+      const procPrices = procTypes.reduce((acc, v) => {
+        acc[v.id] = v.price;
+        return acc;
+      }, {});
+      procedurePrices.value = procPrices;
+      console.log(procedurePrices.value);
+    });
+    const saveDisabled = ref(false);
+
     return {
-      isOpen,
+      isEditOpen,
+      isConfirmOpen,
       form,
       watchCurrentPage,
       watchTableData,
+      procedurePrices,
+      newPrice,
       paginatedTableData,
       currentPage,
       prevDisabled,
       nextDisabled,
       tableIdx,
+      saveDisabled,
     };
   },
   data() {
@@ -458,6 +512,10 @@ export default {
     },
     saveSchedule() {
       if (!isNil(this.selectedIdx)) {
+        this.saveDisabled = true;
+        document
+          .getElementById("save-edit-button")
+          .classList.toggle("button--loading");
         const data = {
           shoot: {
             id: this.modelValue[this.selectedIdx].event_id.id,
@@ -489,6 +547,12 @@ export default {
               duration: 5000,
               dismissible: true,
             });
+          })
+          .finally(() => {
+            this.saveDisabled = false;
+            document
+              .getElementById("save-edit-button")
+              .classList.toggle("button--loading");
           });
       }
     },
@@ -509,14 +573,35 @@ export default {
           .set("second", 0)
           .format(this.formatter.date),
       ];
-      this.isOpen = true;
+      this.isEditOpen = true;
+    },
+    openConfirm() {
+      const start = new Date(this.form.startDate);
+      const end = new Date(this.form.endDate);
+      const hashCode = vedhg.encodeDates(start, end);
+
+      this.newPrice = this.processors.calculateTotalDailyPrice(
+        start,
+        end,
+        this.formatters.ceil(vedhg.getIntervalLength(hashCode, "days"), 2),
+        this.procedurePrices[this.modelValue[this.selectedIdx].procedure_type]
+      );
+      console.log(
+        start,
+        end,
+        this.formatters.ceil(vedhg.getIntervalLength(hashCode, "days"), 2),
+        this.procedurePrices[this.modelValue[this.selectedIdx].procedure_type],
+        this.newPrice
+      );
+      this.isConfirmOpen = true;
     },
     closeModal() {
+      this.isConfirmOpen = false;
       this.selectedIdx = null;
       this.form.location = null;
       this.form.startDate = null;
       this.form.endDate = null;
-      this.isOpen = false;
+      this.isEditOpen = false;
     },
   },
 };
@@ -557,6 +642,36 @@ export default {
   100% {
     stroke-dasharray: 90, 150;
     stroke-dashoffset: -124;
+  }
+}
+
+.button--loading .button__text {
+  visibility: hidden;
+  opacity: 0;
+}
+.button--loading::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  border: 4px solid transparent;
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: button-loading-spinner 1s ease infinite;
+}
+
+@keyframes button-loading-spinner {
+  from {
+    transform: rotate(0turn);
+  }
+
+  to {
+    transform: rotate(1turn);
   }
 }
 </style>

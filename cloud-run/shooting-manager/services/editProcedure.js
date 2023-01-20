@@ -2,7 +2,7 @@
 
 const { admin } = require('../utils/initializeAdmin.js')
 const { getTokenId } = require('../utils/getTokenId.js')
-const { formatters } = require('../utils/formatters.js')
+const { formatters, processors } = require('../utils/formatters.js')
 const { exportDocument } = require("../utils/documentTraveler")
 const { vedhg } = require('../utils/dateRangeHash.js')
 const setIdIfNotSet = require("../utils/id.js")
@@ -176,8 +176,7 @@ module.exports = function(){
                     }, {})
                 })
 
-                const procLength = formatters.ceil(vedhg.getIntervalLength(newProcId, "days"), 2) - formatters.getWeekendDaysBetweenDates(procedureStart, procedureEnd)
-
+                const newPrice = processors.calculateTotalDailyPrice(procedureStart, procedureEnd, formatters.ceil(vedhg.getIntervalLength(newProcId, "days"), 2), ptypePrice[procedureType])
                 await db
                     .collection("shoots")
                     .doc(shootId)
@@ -185,7 +184,7 @@ module.exports = function(){
                     .doc(newProcId)
                     .set({
                         created_date: rightNow,
-                        price: ptypePrice[procedureType] * procLength,
+                        price: newPrice,
                         procedure_type: db.collection("procedure_types").doc(procedureType),
                         procedure_start: new Date(procedureStart),
                         procedure_end: new Date(procedureEnd),

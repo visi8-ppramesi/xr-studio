@@ -337,17 +337,12 @@ export default {
             shootEndDate,
             "rent_xr_studio"
           );
-          const shootLength =
-            this.formatters.ceil(
-              vedhg.getIntervalLength(shootCode, "days"),
-              2
-            ) -
-            this.formatters.getWeekendDaysBetweenDates(
-              shootStartDate,
-              shootEndDate
-            );
-          prices.shootPrice =
-            this.procTypesPrices["rent_xr_studio"] * shootLength;
+          prices.shootPrice = this.processors.calculateTotalDailyPrice(
+            shootStartDate,
+            shootEndDate,
+            this.formatters.ceil(vedhg.getIntervalLength(shootCode, "days"), 2),
+            this.procTypesPrices["rent_xr_studio"]
+          );
 
           if (!isNil(artSetupStartDate) && !isNil(artSetupEndDate)) {
             artSetupCode = vedhg.encodeDates(
@@ -355,17 +350,16 @@ export default {
               artSetupEndDate,
               "rent_studio_art_setup_xr"
             );
-            const artSetupLength =
+
+            prices.artSetupPrice = this.processors.calculateTotalDailyPrice(
+              artSetupStartDate,
+              artSetupEndDate,
               this.formatters.ceil(
                 vedhg.getIntervalLength(artSetupCode, "days"),
                 2
-              ) -
-              this.formatters.getWeekendDaysBetweenDates(
-                artSetupStartDate,
-                artSetupEndDate
-              );
-            prices.artSetupPrice =
-              this.procTypesPrices["rent_studio_art_setup_xr"] * artSetupLength;
+              ),
+              this.procTypesPrices["rent_studio_art_setup_xr"]
+            );
           }
         } else if (this.shootType == "nonxr") {
           shootCode = vedhg.encodeDates(
@@ -373,17 +367,12 @@ export default {
             shootEndDate,
             "rent_non_xr_studio"
           );
-          const shootLength =
-            this.formatters.ceil(
-              vedhg.getIntervalLength(shootCode, "days"),
-              2
-            ) -
-            this.formatters.getWeekendDaysBetweenDates(
-              shootStartDate,
-              shootEndDate
-            );
-          prices.shootPrice =
-            this.procTypesPrices["rent_non_xr_studio"] * shootLength;
+          prices.shootPrice = this.processors.calculateTotalDailyPrice(
+            shootStartDate,
+            shootEndDate,
+            this.formatters.ceil(vedhg.getIntervalLength(shootCode, "days"), 2),
+            this.procTypesPrices["rent_non_xr_studio"]
+          );
 
           if (!isNil(artSetupStartDate) && !isNil(artSetupEndDate)) {
             artSetupCode = vedhg.encodeDates(
@@ -391,18 +380,16 @@ export default {
               artSetupEndDate,
               "rent_studio_art_setup_non_xr"
             );
-            const artSetupLength =
+
+            prices.artSetupPrice = this.processors.calculateTotalDailyPrice(
+              artSetupStartDate,
+              artSetupEndDate,
               this.formatters.ceil(
                 vedhg.getIntervalLength(artSetupCode, "days"),
                 2
-              ) -
-              this.formatters.getWeekendDaysBetweenDates(
-                artSetupStartDate,
-                artSetupEndDate
-              );
-            prices.artSetupPrice =
-              this.procTypesPrices["rent_studio_art_setup_non_xr"] *
-              artSetupLength;
+              ),
+              this.procTypesPrices["rent_studio_art_setup_non_xr"]
+            );
           }
         } else {
           throw new Error("Shoot type wrong");
@@ -418,17 +405,16 @@ export default {
             rehearsalEndDate,
             "rent_studio_rehearsal"
           );
-          const rehearsalLength =
+
+          prices.rehearsalPrice = this.processors.calculateTotalDailyPrice(
+            rehearsalStartDate,
+            rehearsalEndDate,
             this.formatters.ceil(
               vedhg.getIntervalLength(rehearsalCode, "days"),
               2
-            ) -
-            this.formatters.getWeekendDaysBetweenDates(
-              rehearsalStartDate,
-              rehearsalEndDate
-            );
-          prices.rehearsalPrice =
-            this.procTypesPrices["rent_studio_rehearsal"] * rehearsalLength;
+            ),
+            this.procTypesPrices["rent_studio_rehearsal"]
+          );
           checkB = !vedhg.hashesOverlap(shootCode, rehearsalCode);
         }
 

@@ -2,7 +2,7 @@
 
 const { admin } = require('../utils/initializeAdmin.js')
 const { getTokenId } = require('../utils/getTokenId.js')
-const { formatters } = require('../utils/formatters.js')
+const { formatters, processors } = require('../utils/formatters.js')
 const setIdIfNotSet = require("../utils/id.js")
 const { decode: bufferDecoder } = require('../utils/bufferEncoder')
 const { detailedDiff: diff } = require("deep-object-diff")
@@ -194,14 +194,15 @@ module.exports = function () {
                 })
                 for (const procedure of procedures) {
                     const { id: procedureId, procedure_start: procedureStart, procedure_end: procedureEnd, ...procedureDuplicate } = setIdIfNotSet(procedure, true, debug)
-                    const procLength = formatters.ceil(vedhg.getIntervalLength(procedureId, "days"), 2) - formatters.getWeekendDaysBetweenDates(procedureStart, procedureEnd)
+                    
+                    const procPrice = processors.calculateTotalDailyPrice(procedureStart, procedureEnd, formatters.ceil(vedhg.getIntervalLength(procedureId, "days"), 2), ptypePrice[procedure.procedure_type])
                     const promise = db.collection("shoots").doc(shoot.id).collection("procedures").doc(procedureId).set({
                         ...procedureDuplicate,
                         procedure_start: new Date(procedureStart),
                         procedure_end: new Date(procedureEnd),
                         created_date: rightNow,
                         procedure_type: db.collection("procedure_types").doc(procedure.procedure_type),
-                        price: ptypePrice[procedure.procedure_type] * procLength
+                        price: procPrice
                     })
                     promises.push(promise)
                     retVal.procedures.push({ procedure_id: procedureId })

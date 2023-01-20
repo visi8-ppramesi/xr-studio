@@ -46,10 +46,10 @@
         <router-link
           id="cart-continue"
           to="/studio/register-shoot"
-          class="flex font-semibold text-indigo-600 text-sm mt-10"
+          class="flex font-semibold text-blue-600 text-sm mt-10"
         >
           <svg
-            class="fill-current mr-2 text-indigo-600 w-4"
+            class="fill-current mr-2 text-blue-600 w-4"
             viewBox="0 0 448 512"
           >
             <path
@@ -79,7 +79,7 @@
           <button
             v-if="!shootingScheduled"
             id="cart-go-to-schedule"
-            class="bg-indigo-500 font-semibold hover:bg-indigo-600 py-3 text-sm text-white uppercase w-full"
+            class="inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
             @click="goToSchedule"
           >
             Schedule Shoot
@@ -88,7 +88,7 @@
             v-else
             :disabled="submitted"
             id="cart-submit"
-            class="bg-indigo-500 font-semibold hover:bg-indigo-600 py-3 text-sm text-white uppercase w-full relative"
+            class="relative inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
             @click="submit"
           >
             <span class="button__text">Submit</span>
