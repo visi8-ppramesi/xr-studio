@@ -8,6 +8,7 @@ exports.onShootChange = functions
     .firestore
     .document("/shoots/{shootId}")
     .onUpdate((snap, ctx) => {
+      const isEqual = require("lodash/isEqual");
       const {status, location} = snap.after.data();
       const {status: oldStatus, location: oldLocation} = snap.before.data();
       const shootId = ctx.params.shootId;
@@ -16,21 +17,21 @@ exports.onShootChange = functions
           .collection("shoots")
           .doc(shootId);
 
-      if (status != oldStatus || location != oldLocation) {
+      if (!isEqual(status, oldStatus) || location != oldLocation) {
         return db.runTransaction((t) => {
-          t.get(
+          return t.get(
               db
                   .collection("calendar")
                   .where("event_id", "==", shootRef),
           ).then((innerSnap) => {
             Object.values(innerSnap.docs).forEach((doc) => {
               const myRef = doc.ref;
-              t.update(myRef, {
+              t.set(myRef, {
                 event: {
                   status,
                   location,
                 },
-              });
+              }, {merge: true});
             });
           });
         });

@@ -13,6 +13,9 @@ const beforeAfter = []
 const db = admin.firestore()
 let returnValue
 const res = {
+    status(){
+        return this
+    },
     send(stuff){
         returnValue = stuff
     }

@@ -2,6 +2,7 @@
 
 const { admin } = require('../utils/initializeAdmin.js')
 const { getTokenId } = require('../utils/getTokenId.js')
+const { formatters } = require('../utils/formatters.js')
 const setIdIfNotSet = require("../utils/id.js")
 const { decode: bufferDecoder } = require('../utils/bufferEncoder')
 const { detailedDiff: diff } = require("deep-object-diff")
@@ -81,14 +82,14 @@ module.exports = function () {
         let uid;
         if (isNil(tokenId)) {
             //token is nil, exit
-            res.send({ status: 401, message: "Unauthorized Access" })
+            res.status(401).send({ error: "Unauthorized Access" })
         } else {
             try {
                 const decodedToken = await auth.verifyIdToken(tokenId)
                 uid = decodedToken.uid
             } catch (error) {
                 //token is unverifiable, exit
-                res.send({ status: 401, message: "Unauthorized Access" })
+                res.status(401).send({ error: "Unauthorized Access" })
             }
         }
 
@@ -101,7 +102,7 @@ module.exports = function () {
 
             //check procedures overlap
             if (!isNil(procedures)) {
-                const calendarSnap = await db.collection("calendar").get()
+                const calendarSnap = await db.collection("calendar").where("event.status", "array-contains", "approved").get()
                 if(!calendarSnap.empty){
                     const calendarDocs = Object.values(calendarSnap.docs).map(k => k.id)
                     let overlapAcc = false;
@@ -185,14 +186,22 @@ module.exports = function () {
             //add procedures
             if (!isNil(procedures)) {
                 status.push("with_procedures")
+                const ptypePrice = await db.collection("procedure_types").get().then((ptypeSnap) => {
+                    return ptypeSnap.docs.reduce((acc, ptypeDoc) => {
+                        acc[ptypeDoc.id] = ptypeDoc.get("price")
+                        return acc
+                    }, {})
+                })
                 for (const procedure of procedures) {
                     const { id: procedureId, procedure_start: procedureStart, procedure_end: procedureEnd, ...procedureDuplicate } = setIdIfNotSet(procedure, true, debug)
+                    const procLength = formatters.ceil(vedhg.getIntervalLength(procedureId, "days"), 2) - formatters.getWeekendDaysBetweenDates(procedureStart, procedureEnd)
                     const promise = db.collection("shoots").doc(shoot.id).collection("procedures").doc(procedureId).set({
                         ...procedureDuplicate,
                         procedure_start: new Date(procedureStart),
                         procedure_end: new Date(procedureEnd),
                         created_date: rightNow,
-                        procedure_type: db.collection("procedure_types").doc(procedure.procedure_type)
+                        procedure_type: db.collection("procedure_types").doc(procedure.procedure_type),
+                        price: ptypePrice[procedure.procedure_type] * procLength
                     })
                     promises.push(promise)
                     retVal.procedures.push({ procedure_id: procedureId })
@@ -293,9 +302,9 @@ module.exports = function () {
         try {
             const data = bufferDecoder(req.body.message.data)
             const result = await createShootWithSubcollections(data)
-            res.send({ status: 200, message: "shoot created", result })
+            res.status(200).send({ message: "shoot created", result })
         } catch (error) {
-            res.send({ status: 500, message: error })
+            res.status(400).send({ error: error.message })
         }
     }
 }

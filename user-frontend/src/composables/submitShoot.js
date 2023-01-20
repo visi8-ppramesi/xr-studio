@@ -47,6 +47,14 @@ import isEmpty from "lodash/isEmpty";
         
     }
 */
+const isEmptyOrDate = function (value) {
+  if (value instanceof Date) {
+    return isNaN(value);
+  } else {
+    return isEmpty(value);
+  }
+};
+
 const handleError = (e) => {
   return e;
 };
@@ -128,7 +136,8 @@ const structureProcedureData = function (data) {
     procedure_end: forceToDate(procedure.procedure_end),
     procedure_type: procedure.procedure_type,
   };
-  return omitBy(dataObj, isEmpty);
+
+  return omitBy(dataObj, isEmptyOrDate);
 };
 
 const createHeaders = async function () {
@@ -155,6 +164,8 @@ const createPostRequest = function (name, pathname, structureFunction) {
       if (envDev) {
         procData.debug = true;
       }
+
+      console.log("procData", procData);
 
       return axios.post(managerUrl.toString(), procData, {
         headers,

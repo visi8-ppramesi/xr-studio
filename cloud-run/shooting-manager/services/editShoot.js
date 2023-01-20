@@ -81,23 +81,21 @@ module.exports = function () {
         let uid;
         if (isNil(tokenId)) {
             //token is nil, exit
-            res.send({ status: 401, message: "Unauthorized Access" })
-            throw new Error("Unauthorized Access")
+            res.status(401).send({ error: "Unauthorized Access" })
         } else {
             try {
                 const decodedToken = await auth.verifyIdToken(tokenId)
                 uid = decodedToken.uid
             } catch (error) {
                 //token is unverifiable, exit
-                res.send({ status: 401, message: "Unauthorized Access" })
-                throw new Error("Unauthorized Access")
+                res.status(401).send({ error: "Unauthorized Access" })
             }
         }
         let data
         try {
             data = bufferDecoder(req.body.message.data)
         } catch (error) {
-            res.send({ status: 500, message: error })
+            res.status(400).send({ error: error.message })
             return
         }
         
@@ -118,8 +116,8 @@ module.exports = function () {
             })
 
         if (!(userAdmin || userCreatedShoot)) {
-            res.send({ status: 402, message: "Unauthorized Access" })
-            throw new Error("Unauthorized Access")
+            res.status(401).send({ error: "Unauthorized Access" })
+            return
         }
         const result = {
             shoot: {},
@@ -404,9 +402,9 @@ module.exports = function () {
         }
         try {
             await editShootWithSubcollections(data)
-            res.send({ status: 200, message: "shoot edited" })
+            res.status(200).send({ message: "shoot edited" })
         } catch (error) {
-            res.send({ status: 500, message: error })
+            res.status(400).send({ error: error.message })
         }
 
         // await editShootWithSubcollections(data)

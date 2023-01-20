@@ -23,14 +23,14 @@ module.exports = function(){
         let uid;
         if (isNil(tokenId)) {
             //token is nil, exit
-            res.send({ status: 401, message: "Unauthorized Access" })
+            res.status(401).send({ error: new Error("Unauthorized Access") })
         } else {
             try {
                 const decodedToken = await auth.verifyIdToken(tokenId)
                 uid = decodedToken.uid
             } catch (error) {
                 //token is unverifiable, exit
-                res.send({ status: 401, message: "Unauthorized Access" })
+                res.status(401).send({ error: new Error("Unauthorized Access") })
             }
         }
 
@@ -110,10 +110,10 @@ module.exports = function(){
         try {
             data = bufferDecoder(req.body.message.data)
             await deleteProcedure(data)
-            res.send({ status: 200, message: "procedure deleted" })
+            res.status(200).send({ message: "procedure deleted" })
         } catch (error) {
             console.error(error)
-            res.send({ status: 500, message: error })
+            res.status(400).send({ error: error.message })
         }
     }
 }

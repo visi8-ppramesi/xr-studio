@@ -43,6 +43,7 @@
 import Calendar from "../../components/graphs/Calendar.vue";
 import CalendarCollection from "../../firebase/collections/calendar/calendar";
 import CalendarSidenav from "../../components/studio/CalendarSidenav";
+import { where } from "firebase/firestore";
 
 export default {
   components: {
@@ -96,7 +97,9 @@ export default {
       this.$refs.calendar.setDate(year, month);
     },
     async getCalendarData() {
-      const calendar = await CalendarCollection.getDocuments().then((cal) => {
+      const calendar = await CalendarCollection.getDocuments([
+        where("event.status", "array-contains", "approved"),
+      ]).then((cal) => {
         return cal.map((evDate) => {
           return {
             id: evDate.id,

@@ -215,6 +215,7 @@ export default {
       }
 
       if (rentStudio) {
+        this.showSubmit = true;
         this.shootType = shootType;
         this.changeShootType();
         const [shootStartDate, shootEndDate] = vedhg.decodeHash(rentStudio.id);
@@ -336,12 +337,17 @@ export default {
             shootEndDate,
             "rent_xr_studio"
           );
-          prices.shootPrice =
-            this.procTypesPrices["rent_xr_studio"] *
-            this.formatters.round(
+          const shootLength =
+            this.formatters.ceil(
               vedhg.getIntervalLength(shootCode, "days"),
               2
+            ) -
+            this.formatters.getWeekendDaysBetweenDates(
+              shootStartDate,
+              shootEndDate
             );
+          prices.shootPrice =
+            this.procTypesPrices["rent_xr_studio"] * shootLength;
 
           if (!isNil(artSetupStartDate) && !isNil(artSetupEndDate)) {
             artSetupCode = vedhg.encodeDates(
@@ -349,12 +355,17 @@ export default {
               artSetupEndDate,
               "rent_studio_art_setup_xr"
             );
-            prices.artSetupPrice =
-              this.procTypesPrices["rent_studio_art_setup_xr"] *
-              this.formatters.round(
+            const artSetupLength =
+              this.formatters.ceil(
                 vedhg.getIntervalLength(artSetupCode, "days"),
                 2
+              ) -
+              this.formatters.getWeekendDaysBetweenDates(
+                artSetupStartDate,
+                artSetupEndDate
               );
+            prices.artSetupPrice =
+              this.procTypesPrices["rent_studio_art_setup_xr"] * artSetupLength;
           }
         } else if (this.shootType == "nonxr") {
           shootCode = vedhg.encodeDates(
@@ -362,12 +373,17 @@ export default {
             shootEndDate,
             "rent_non_xr_studio"
           );
-          prices.shootPrice =
-            this.procTypesPrices["rent_non_xr_studio"] *
-            this.formatters.round(
+          const shootLength =
+            this.formatters.ceil(
               vedhg.getIntervalLength(shootCode, "days"),
               2
+            ) -
+            this.formatters.getWeekendDaysBetweenDates(
+              shootStartDate,
+              shootEndDate
             );
+          prices.shootPrice =
+            this.procTypesPrices["rent_non_xr_studio"] * shootLength;
 
           if (!isNil(artSetupStartDate) && !isNil(artSetupEndDate)) {
             artSetupCode = vedhg.encodeDates(
@@ -375,12 +391,18 @@ export default {
               artSetupEndDate,
               "rent_studio_art_setup_non_xr"
             );
-            prices.artSetupPrice =
-              this.procTypesPrices["rent_studio_art_setup_non_xr"] *
-              this.formatters.round(
+            const artSetupLength =
+              this.formatters.ceil(
                 vedhg.getIntervalLength(artSetupCode, "days"),
                 2
+              ) -
+              this.formatters.getWeekendDaysBetweenDates(
+                artSetupStartDate,
+                artSetupEndDate
               );
+            prices.artSetupPrice =
+              this.procTypesPrices["rent_studio_art_setup_non_xr"] *
+              artSetupLength;
           }
         } else {
           throw new Error("Shoot type wrong");
@@ -396,12 +418,17 @@ export default {
             rehearsalEndDate,
             "rent_studio_rehearsal"
           );
-          prices.rehearsalPrice =
-            this.procTypesPrices["rent_studio_rehearsal"] *
-            this.formatters.round(
+          const rehearsalLength =
+            this.formatters.ceil(
               vedhg.getIntervalLength(rehearsalCode, "days"),
               2
+            ) -
+            this.formatters.getWeekendDaysBetweenDates(
+              rehearsalStartDate,
+              rehearsalEndDate
             );
+          prices.rehearsalPrice =
+            this.procTypesPrices["rent_studio_rehearsal"] * rehearsalLength;
           checkB = !vedhg.hashesOverlap(shootCode, rehearsalCode);
         }
 
@@ -475,9 +502,15 @@ export default {
         } else {
           throw new Error("Dates overlap");
         }
-      } catch (err) {
-        console.error(err);
-        alert(err);
+      } catch (error) {
+        console.error(error);
+        this.$toast.open({
+          message: "Schedule shoot failed: " + error.message,
+          position: "bottom",
+          type: "error",
+          duration: 5000,
+          dismissible: true,
+        });
         return;
       }
 

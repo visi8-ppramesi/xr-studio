@@ -2,6 +2,7 @@
 
 const { admin } = require('../utils/initializeAdmin.js')
 const { getTokenId } = require('../utils/getTokenId.js')
+const { formatters } = require('../utils/formatters.js')
 const { exportDocument } = require("../utils/documentTraveler")
 const { vedhg } = require('../utils/dateRangeHash.js')
 const setIdIfNotSet = require("../utils/id.js")
@@ -35,6 +36,7 @@ const standardizeDate = function(date){
 
 module.exports = function(){
     const db = admin.firestore();
+    const FieldValue = admin.firestore.FieldValue;
     const auth = admin.auth()
 
     return async (req, res) => {
@@ -43,14 +45,14 @@ module.exports = function(){
         let uid;
         if (isNil(tokenId)) {
             //token is nil, exit
-            res.send({ status: 401, message: "Unauthorized Access" })
+            res.status(401).send({ error: "Unauthorized Access" })
         } else {
             try {
                 const decodedToken = await auth.verifyIdToken(tokenId)
                 uid = decodedToken.uid
             } catch (error) {
                 //token is unverifiable, exit
-                res.send({ status: 401, message: "Unauthorized Access" })
+                res.status(401).send({ error: "Unauthorized Access" })
             }
         }
 
@@ -107,6 +109,10 @@ module.exports = function(){
                     throw new Error("Unauthorized Access")
                 }
             }
+            const currentStatus = currentShoot.get("status")
+            if(currentStatus.includes("finished")) {
+                throw new Error("shoot has been completed")
+            }
 
             // const currentShoot = await db
             //     .collection("shoots")
@@ -142,11 +148,10 @@ module.exports = function(){
                     procedure_end: procedureEnd,
                     procedure_type: procedureType,
                 }, true, debug)
-                const myStatus = status || cprocData.status
-                const myData = data || cprocData.data
+                const myProcedureData = procedureData || cprocData.procedure_data
 
                 //check procedures overlap
-                const calendarSnap = await db.collection("calendar").get()
+                const calendarSnap = await db.collection("calendar").where("event.status", "array-contains", "approved").get()
                 if(!calendarSnap.empty){
                     const calendarDocs = Object.values(calendarSnap.docs).map(k => k.id)
                     const overlapAcc = calendarDocs.reduce((acc, v) => acc || (vedhg.hashesOverlap(v, newProcId) && v !== procedureId), false)
@@ -155,19 +160,37 @@ module.exports = function(){
                     }
                 }
 
+                if(currentStatus.includes("approved")) {
+                    await db
+                        .collection("shoots")
+                        .doc(shootId)
+                        .update({
+                            status: FieldValue.arrayRemove("approved")
+                        })
+                }
+
+                const ptypePrice = await db.collection("procedure_types").get().then((ptypeSnap) => {
+                    return ptypeSnap.docs.reduce((acc, ptypeDoc) => {
+                        acc[ptypeDoc.id] = ptypeDoc.get("price")
+                        return acc
+                    }, {})
+                })
+
+                const procLength = formatters.ceil(vedhg.getIntervalLength(newProcId, "days"), 2) - formatters.getWeekendDaysBetweenDates(procedureStart, procedureEnd)
+
                 await db
                     .collection("shoots")
                     .doc(shootId)
                     .collection("procedures")
                     .doc(newProcId)
                     .set({
-                        status: myStatus,
                         created_date: rightNow,
+                        price: ptypePrice[procedureType] * procLength,
                         procedure_type: db.collection("procedure_types").doc(procedureType),
                         procedure_start: new Date(procedureStart),
                         procedure_end: new Date(procedureEnd),
                         procedure_data: {
-                            ...myData
+                            ...myProcedureData
                         }
                     })
                     .then(() => {
@@ -220,10 +243,10 @@ module.exports = function(){
         try {
             data = bufferDecoder(req.body.message.data)
             const result = await editProcedure(data)
-            res.send({ status: 200, message: "shoot created", result })
+            res.status(200).send({ message: "shoot created", result })
         } catch (error) {
             console.error(error)
-            res.send({ status: 500, message: error })
+            res.status(400).send({ error: error.message })
             return
         }
     }

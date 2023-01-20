@@ -27,6 +27,12 @@
                     >
                       Shoot Type
                     </th>
+                    <th
+                      scope="col"
+                      class="text-sm text-white px-6 py-4 cursor-pointer"
+                    >
+                      Status
+                    </th>
                     <th scope="col" class="text-sm text-white px-6 py-4">
                       Location
                     </th>
@@ -68,6 +74,11 @@
                         class="text-sm text-gray-900 font-light px-6 xl:px-8 py-4 whitespace-nowrap"
                       >
                         {{ item.procedure_type }}
+                      </td>
+                      <td
+                        class="text-sm text-gray-900 font-light px-6 xl:px-8 py-4 whitespace-nowrap"
+                      >
+                        {{ item.event.status.join(", ") }}
                       </td>
                       <td
                         class="text-sm text-gray-900 font-light px-6 xl:px-8 py-4 whitespace-nowrap"
@@ -468,10 +479,11 @@ export default {
               duration: 5000,
               dismissible: true,
             });
+            this.$emit("reload");
           })
           .catch((err) => {
             this.$toast.open({
-              message: "Edit Fail: " + err,
+              message: "Edit Fail: " + err.response.data.error,
               position: "bottom",
               type: "error",
               duration: 5000,

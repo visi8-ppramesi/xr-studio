@@ -37,7 +37,7 @@
           >
         </button>
       </div>
-      <MyCalendarTable v-model="scheduleData" />
+      <MyCalendarTable v-model="scheduleData" @reload="fetchCalendarData" />
     </section>
   </div>
 </template>
@@ -63,52 +63,20 @@ export default {
   },
   setup() {
     let isOpen = ref(false);
-    return { isOpen };
+    const { getItems: getCalendarData } = listFetcher(
+      CalendarCollection,
+      null,
+      "getMyCalendar",
+      false
+    );
+    return { isOpen, getCalendarData };
   },
   computed: {
     ...mapState(useAuthStore, ["isLoggedIn"]),
   },
   mounted() {
     if (this.isLoggedIn) {
-      const { getItems: getCalendarData } = listFetcher(
-        CalendarCollection,
-        null,
-        "getMyCalendar",
-        false
-      );
-      getCalendarData([
-        orderBy("end_date", "asc"),
-        where("end_date", ">=", new Date()),
-      ]).then(async (calendarData) => {
-        calendarData = sortBy(
-          calendarData,
-          [(v) => new Date(v.start_date)],
-          ["asc"]
-        );
-        const schedulePromise = calendarData.map(async (sched) => {
-          const shootId = sched.event_id.id;
-          const procId = sched.id;
-          const actualProc = await getDoc(
-            doc(fb.db, "shoots", shootId, "procedures", procId)
-          );
-
-          const procedureType = actualProc.get("procedure_type")?.id;
-          sched.procedure_type = procedureType;
-          return sched;
-        });
-        this.scheduleData = await Promise.all(schedulePromise);
-        this.calendarData = calendarData.map((evDate) => {
-          return {
-            id: evDate.id,
-            calendarId: "0",
-            title: "Shoot Scheduled",
-            // category: "allday",
-            start: new Date(evDate.start_date),
-            end: new Date(evDate.end_date),
-            isReadOnly: true,
-          };
-        });
-      });
+      this.fetchCalendarData();
     } else {
       this.$router.push({ name: "Login" });
     }
@@ -154,6 +122,46 @@ export default {
     };
   },
   methods: {
+    fetchCalendarData() {
+      this.getCalendarData([
+        orderBy("end_date", "asc"),
+        where("end_date", ">=", new Date()),
+        // where("event.status", "array-contains", "approved"),
+      ]).then(async (calendarData) => {
+        calendarData = sortBy(
+          calendarData,
+          [(v) => new Date(v.start_date)],
+          ["asc"]
+        );
+        const schedulePromise = calendarData.map(async (sched) => {
+          const shootId = sched.event_id.id;
+          const procId = sched.id;
+          const actualProc = await getDoc(
+            doc(fb.db, "shoots", shootId, "procedures", procId)
+          );
+
+          const procedureType = actualProc.get("procedure_type")?.id;
+          sched.procedure_type = procedureType;
+          return sched;
+        });
+        this.scheduleData = await Promise.all(schedulePromise);
+        this.calendarData = calendarData
+          .filter((v) => {
+            return v.event.status.includes("approved");
+          })
+          .map((evDate) => {
+            return {
+              id: evDate.id,
+              calendarId: "0",
+              title: "Shoot Scheduled",
+              // category: "allday",
+              start: new Date(evDate.start_date),
+              end: new Date(evDate.end_date),
+              isReadOnly: true,
+            };
+          });
+      });
+    },
     edit(index, val) {
       if (val == true) {
         this.data[index] = false;
