@@ -74,6 +74,24 @@ export default {
       shootType: null,
       selectedFields: {
         nonxr: [
+          //rehearsal
+          {
+            type: "checkbox",
+            name: "toggleRehearsal",
+            label: "Rehearsal Required?",
+          },
+          {
+            type: "datepicker",
+            name: "rehearsalStartDate",
+            label: "Rehearsal Start Date",
+            show: false,
+          },
+          {
+            type: "datepicker",
+            name: "rehearsalEndDate",
+            label: "Rehearsal End Date",
+            show: false,
+          },
           //art setup
           {
             type: "checkbox",
@@ -94,12 +112,12 @@ export default {
           },
           {
             type: "datepicker",
-            name: "start_date",
+            name: "shootStartDate",
             label: "Shoot Start Date (Tentative)",
           },
           {
             type: "datepicker",
-            name: "end_date",
+            name: "shootEndDate",
             label: "Shoot End Date",
           },
           {

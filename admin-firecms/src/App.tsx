@@ -27,12 +27,22 @@ import { buildUserRoleCollection } from "./collections/userRoles/userRoles";
 import "typeface-rubik";
 import "@fontsource/ibm-plex-mono";
 
+import { db } from "@utils/firebase"
+import { collection, doc, getDoc } from "firebase/firestore"
+
 export default function App() {
   const myAuthenticator: Authenticator<FirebaseUser> = useCallback(async ({
     user,
     authController
   }) => {
-    console.log("Allowing access to", user?.email);
+    const uid = user?.uid;
+    const userRolesColl = collection(db, "user_roles");
+    const userRolesRef = doc(userRolesColl, uid);
+    const userRoles = await getDoc(userRolesRef);
+    const roles = userRoles.get("roles") as Array<string>
+    if(!roles.includes("admin")) {
+      return false;
+    }
     // This is an example of retrieving async data related to the user
     // and storing it in the user extra field.
     const sampleUserRoles = await Promise.resolve(["admin"]);

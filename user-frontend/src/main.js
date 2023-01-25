@@ -17,6 +17,13 @@ import ToastPlugin from "vue-toast-notification";
 import "vue-toast-notification/dist/theme-sugar.css";
 import { formatters, filters, processors } from "@/utils/dataProcessor";
 
+const envVars = Object.keys(process.env)
+  .filter((v) => v.startsWith("VUE_APP"))
+  .reduce((acc, v) => {
+    acc[v] = process.env[v];
+    return acc;
+  }, {});
+
 const vuePropertySetter = (app, name, instance) => {
   app.provide(name, instance);
   app.config.globalProperties[name] = instance;
@@ -30,6 +37,7 @@ const injector = {
     vuePropertySetter(app, "formatters", formatters);
     vuePropertySetter(app, "processors", processors);
     vuePropertySetter(app, "logger", logger);
+    vuePropertySetter(app, "envVars", envVars);
   },
 };
 

@@ -22,7 +22,10 @@ export default {
   },
   mounted() {
     setTimeout(() => {
-      this.$router.push({ name: "MyCalendar" });
+      this.$router.push({
+        name:
+          this.envVars.VUE_APP_SHOW_HOMEPAGE === "true" ? "Home" : "MyCalendar",
+      });
     }, 10 * 1000);
   },
 };

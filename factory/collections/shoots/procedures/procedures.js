@@ -18,7 +18,7 @@ module.exports = class ShootProcedureFactory extends Factory{
         let start, end, encoded
         let tries = 0
         do{
-            const future = Math.round(Math.random() * 1000 * 60 * 60) * 24 * 182
+            const future = Math.round((0.2 + Math.random()) * 1000 * 60 * 60) * 24 * 182
             const endFuture = Math.round(Math.random() * 1000 * 60 * 60) * 24 * 14
             start = new Date(new Date().getTime() + future)
             end = new Date(new Date().getTime() + future + endFuture)

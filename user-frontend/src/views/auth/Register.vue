@@ -155,10 +155,17 @@ export default {
       return test;
     },
     checkPassword() {
-      this.errorMsg.push("invalid password");
-      return this.confirmPassword != this.password;
+      const passValid = this.confirmPassword != this.password;
+      if (passValid) {
+        this.errorMsg.push("invalid password");
+        return true;
+      }
+      return false;
     },
     async register() {
+      const loadingComponent = this.$loading.show({
+        loader: "dots",
+      });
       if (this.checkFields() || this.checkPassword()) {
         console.log(this.errorMsg);
         this.$toast.open({
@@ -169,6 +176,7 @@ export default {
           position: "bottom",
         });
         this.errorMsg = [];
+        loadingComponent.hide();
         return;
       }
       try {
@@ -210,6 +218,8 @@ export default {
           dismissible: true,
           position: "bottom",
         });
+      } finally {
+        loadingComponent.hide();
       }
       // this.$store.dispatch('register', {
       //     email: this.email,

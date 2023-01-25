@@ -37,7 +37,7 @@ module.exports = class ShootFactory extends Factory{
             //     await assetFactory.getRandomProjection(['name', 'preview_url']),
             // ],
             order: order,
-            status: ['go-ahead', 'paid'],
+            status: ['go-ahead', 'paid', 'approved'],
             status_history: [
                 {
                     note: 'started',
@@ -60,6 +60,12 @@ module.exports = class ShootFactory extends Factory{
                 {
                     note: 'greenlit',
                     status: 'go-ahead',
+                    date: new Date(new Date().setDate(new Date().getDate() - 50)),
+                    processed_by: await userFactory.getRandomReference()
+                },
+                {
+                    note: 'greenlit',
+                    status: 'approved',
                     date: new Date(new Date().setDate(new Date().getDate() - 50)),
                     processed_by: await userFactory.getRandomReference()
                 },

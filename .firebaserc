@@ -8,6 +8,9 @@
         "main": [
           "xr-studio-a9c5e"
         ],
+        "preview": [
+          "xr-studio-preview"
+        ],
         "admin": [
           "xr-studio-admin"
         ]

@@ -2,10 +2,12 @@
 node_modules
 /dist
 /tasks
+/preview-dist
 
 
 # local env files
 .env
+.env.preview
 .env.local
 .env.*.local
 

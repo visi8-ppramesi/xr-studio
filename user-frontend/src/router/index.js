@@ -155,12 +155,16 @@ const mineRoutes = [
 ];
 
 const routes = [
-  {
-    path: "/",
-    redirect: "/studio/calendar",
-    // name: "Home",
-    // component: Home,
-  },
+  process.env.VUE_APP_SHOW_HOMEPAGE == "true"
+    ? {
+        path: "/",
+        name: "Home",
+        component: () => import("../views/Home.vue"),
+      }
+    : {
+        path: "/",
+        redirect: "/studio/calendar",
+      },
   {
     path: "/contact-us",
     name: "contact",

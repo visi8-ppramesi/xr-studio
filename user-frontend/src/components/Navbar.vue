@@ -35,43 +35,38 @@
             class="navbar-collapse collapse grow items-center"
             id="navbarSupportedContentY"
           >
-            <ul class="navbar-nav mr-auto lg:flex lg:flex-row">
-              <!-- <li class="nav-item">
+            <ul
+              v-if="envVars.VUE_APP_SHOW_HOMEPAGE === 'true'"
+              class="navbar-nav mr-auto lg:flex lg:flex-row"
+            >
+              <li class="nav-item">
                 <router-link
                   class="nav-link block pr-2 lg:px-2 py-2 text-gray-600 hover:text-gray-700 focus:text-gray-700 transition duration-150 ease-in-out"
                   to="/"
                   >Home</router-link
                 >
-              </li> -->
-              <li class="nav-item">
+              </li>
+              <li
+                v-if="envVars.VUE_APP_SHOW_ASSETS === 'true'"
+                class="nav-item"
+              >
                 <router-link
                   class="nav-link block pr-2 lg:px-2 py-2 text-gray-600 hover:text-gray-700 focus:text-gray-700 transition duration-150 ease-in-out"
-                  to="/studio/about-shoot"
-                  >Our Studio</router-link
+                  to="/assets"
+                  >XR Assets</router-link
+                >
+              </li>
+              <li
+                v-if="envVars.VUE_APP_SHOW_ASSETS === 'true'"
+                class="nav-item mb-2 lg:mb-0"
+              >
+                <router-link
+                  class="nav-link block pr-2 lg:px-2 py-2 text-gray-600 hover:text-gray-700 focus:text-gray-700 transition duration-150 ease-in-out"
+                  to="/equipments"
+                  >Equipments</router-link
                 >
               </li>
               <li class="nav-item mb-2 lg:mb-0">
-                <router-link
-                  class="nav-link block pr-2 lg:px-2 py-2 text-gray-600 hover:text-gray-700 focus:text-gray-700 transition duration-150 ease-in-out"
-                  to="/studio/register-shoot"
-                  >Schedule Shoot</router-link
-                >
-              </li>
-              <li class="nav-item mb-2 lg:mb-0">
-                <router-link
-                  class="nav-link block pr-2 lg:px-2 py-2 text-gray-600 hover:text-gray-700 focus:text-gray-700 transition duration-150 ease-in-out"
-                  to="/studio/calendar"
-                  >Studio Calendar</router-link
-                >
-              </li>
-              <li v-if="isLoggedIn" class="nav-item mb-2 lg:mb-0">
-                <router-link
-                  class="nav-link block pr-2 lg:px-2 py-2 text-gray-600 hover:text-gray-700 focus:text-gray-700 transition duration-150 ease-in-out"
-                  to="/studio/my-calendar"
-                  >My Calendar</router-link
-                >
-              </li>
-              <!-- <li class="nav-item mb-2 lg:mb-0">
                 <div
                   class="dropdown nav-link block pr-2 lg:px-2 py-2 text-gray-600 hover:text-gray-700 focus:text-gray-700 transition duration-150 ease-in-out"
                 >
@@ -133,7 +128,64 @@
                     </li>
                   </ul>
                 </div>
-              </li> -->
+              </li>
+              <li v-if="itemCount > 0" class="nav-item mb-2 lg:mb-0">
+                <router-link
+                  class="flex rounded shadow-md pr-4 lg:px-4 py-2 bg-gray-600 text-white hover:bg-gray-700 focus:bg-gray-700 transition duration-150 ease-in-out"
+                  to="/shopping/cart"
+                >
+                  Cart
+                  <svg
+                    aria-hidden="true"
+                    focusable="false"
+                    data-prefix="fas"
+                    data-icon="caret-down"
+                    class="w-4 ml-1"
+                    role="img"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 576 512"
+                  >
+                    <path
+                      fill="currentColor"
+                      d="M24 0C10.7 0 0 10.7 0 24S10.7 48 24 48H76.1l60.3 316.5c2.2 11.3 12.1 19.5 23.6 19.5H488c13.3 0 24-10.7 24-24s-10.7-24-24-24H179.9l-9.1-48h317c14.3 0 26.9-9.5 30.8-23.3l54-192C578.3 52.3 563 32 541.8 32H122l-2.4-12.5C117.4 8.2 107.5 0 96 0H24zM176 512c26.5 0 48-21.5 48-48s-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48zm336-48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48z"
+                    />
+                  </svg>
+                  <span
+                    class="inline-block py-1 px-1.5 leading-none text-center whitespace-nowrap align-baseline font-bold bg-red-600 text-white rounded ml-2"
+                    >{{ itemCount }}</span
+                  >
+                </router-link>
+              </li>
+            </ul>
+            <ul v-else class="navbar-nav mr-auto lg:flex lg:flex-row">
+              <li class="nav-item">
+                <router-link
+                  class="nav-link block pr-2 lg:px-2 py-2 text-gray-600 hover:text-gray-700 focus:text-gray-700 transition duration-150 ease-in-out"
+                  to="/studio/about-shoot"
+                  >Our Studio</router-link
+                >
+              </li>
+              <li class="nav-item mb-2 lg:mb-0">
+                <router-link
+                  class="nav-link block pr-2 lg:px-2 py-2 text-gray-600 hover:text-gray-700 focus:text-gray-700 transition duration-150 ease-in-out"
+                  to="/studio/register-shoot"
+                  >Schedule Shoot</router-link
+                >
+              </li>
+              <li class="nav-item mb-2 lg:mb-0">
+                <router-link
+                  class="nav-link block pr-2 lg:px-2 py-2 text-gray-600 hover:text-gray-700 focus:text-gray-700 transition duration-150 ease-in-out"
+                  to="/studio/calendar"
+                  >Studio Calendar</router-link
+                >
+              </li>
+              <li v-if="isLoggedIn" class="nav-item mb-2 lg:mb-0">
+                <router-link
+                  class="nav-link block pr-2 lg:px-2 py-2 text-gray-600 hover:text-gray-700 focus:text-gray-700 transition duration-150 ease-in-out"
+                  to="/studio/my-calendar"
+                  >My Calendar</router-link
+                >
+              </li>
               <li v-if="itemCount > 0" class="nav-item mb-2 lg:mb-0">
                 <router-link
                   class="flex rounded shadow-md pr-4 lg:px-4 py-2 bg-gray-600 text-white hover:bg-gray-700 focus:bg-gray-700 transition duration-150 ease-in-out"
@@ -209,20 +261,6 @@
                         >My Account</router-link
                       >
                     </li>
-                    <!-- <li>
-                      <a
-                        class="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-gray-700 hover:bg-gray-100"
-                        href="#"
-                        >Another action</a
-                      >
-                    </li>
-                    <li>
-                      <a
-                        class="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-gray-700 hover:bg-gray-100"
-                        href="#"
-                        >Something else here</a
-                      >
-                    </li> -->
                     <li>
                       <router-link
                         class="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-gray-700 hover:bg-gray-100"

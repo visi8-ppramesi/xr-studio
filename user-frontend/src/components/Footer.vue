@@ -146,17 +146,17 @@
             Products
           </h6>
           <p class="mb-4">
-            <a href="#!" class="text-gray-600">Angular</a>
+            <a href="#!" class="text-gray-600">XR Assets</a>
           </p>
           <p class="mb-4">
-            <a href="#!" class="text-gray-600">React</a>
+            <a href="#!" class="text-gray-600">Equipments</a>
           </p>
           <p class="mb-4">
-            <a href="#!" class="text-gray-600">Vue</a>
+            <a href="#!" class="text-gray-600">Studio Scheduling</a>
           </p>
-          <p>
-            <a href="#!" class="text-gray-600">Laravel</a>
-          </p>
+          <!-- <p>
+            <a href="#!" class="text-gray-600">Some</a>
+          </p> -->
         </div>
         <div class="">
           <h6
