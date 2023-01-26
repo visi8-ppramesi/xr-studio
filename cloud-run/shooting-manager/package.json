@@ -20,6 +20,7 @@
     "fast-json-stable-stringify": "^2.1.0",
     "firebase-admin": "^11.3.0",
     "lodash": "^4.17.21",
+    "mitt": "^3.0.0",
     "pluralize": "^8.0.0",
     "uuid": "^9.0.0"
   },
