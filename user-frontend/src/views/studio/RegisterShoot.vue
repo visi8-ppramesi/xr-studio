@@ -3,6 +3,57 @@
     <h2 class="text-3xl font-bold mb-12 text-center" @click="checkFormData">
       Schedule Shoot
     </h2>
+    <div class="mb-12">
+      <label class="block text-gray-700 text-sm font-bold mb-2">
+        Current Prices
+      </label>
+      <table
+        v-if="procTypes.length > 0"
+        class="max-w-screen w-full text-center"
+      >
+        <thead class="border-b bg-gray-800">
+          <tr>
+            <th class="text-sm text-white px-6 py-4 cursor-pointer">Name</th>
+            <th class="text-sm text-white px-6 py-4 cursor-pointer">
+              Description
+            </th>
+            <th class="text-sm text-white px-6 py-4 cursor-pointer">Price</th>
+            <th class="text-sm text-white px-6 py-4 cursor-pointer">
+              Price Unit
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="procType in procTypes"
+            class="bg-white border-b hover:bg-sky-50 cursor-pointer"
+            :key="procType.id"
+          >
+            <td
+              class="px-6 xl:px-8 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+            >
+              {{ procType.name }}
+            </td>
+            <td
+              class="px-6 xl:px-8 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+            >
+              {{ procType.description }}
+            </td>
+            <td
+              class="px-6 xl:px-8 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+            >
+              {{ formatters.currency(procType.price) }}
+            </td>
+            <td
+              class="px-6 xl:px-8 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+            >
+              {{ procType.price_unit }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div v-else></div>
+    </div>
     <div class="relative block text-gray-700 text-sm font-bold mb-2">
       Select Shoot Type:
     </div>
@@ -57,6 +108,7 @@ import { markRaw } from "vue";
 import isNil from "lodash/isNil";
 import isFunction from "lodash/isFunction";
 import startCase from "lodash/startCase";
+import pick from "lodash/pick";
 import { vedhg } from "@/utils/dateRangeHash";
 import { useCartStore } from "@/store/cart";
 // import dayjs from "dayjs";
@@ -202,6 +254,12 @@ export default {
     this.checkCartForSchedule();
   },
   methods: {
+    showField(fieldName) {
+      (this.fields.find((v) => v.name === fieldName) || {}).show = true;
+    },
+    hideField(fieldName) {
+      (this.fields.find((v) => v.name === fieldName) || {}).show = false;
+    },
     checkFormData() {
       const shoots = this.cartStore.getShootings();
       window.shitSandwich = this.formData;
@@ -285,36 +343,20 @@ export default {
     },
     onChangeToggleArtSetup(val) {
       if (val) {
-        (
-          this.fields.find((v) => v.name === "artSetupStartDate") || {}
-        ).show = true;
-        (
-          this.fields.find((v) => v.name === "artSetupEndDate") || {}
-        ).show = true;
+        this.showField("artSetupStartDate");
+        this.showField("artSetupEndDate");
       } else {
-        (
-          this.fields.find((v) => v.name === "artSetupStartDate") || {}
-        ).show = false;
-        (
-          this.fields.find((v) => v.name === "artSetupEndDate") || {}
-        ).show = false;
+        this.hideField("artSetupStartDate");
+        this.hideField("artSetupEndDate");
       }
     },
     onChangeToggleRehearsal(val) {
       if (val) {
-        (
-          this.fields.find((v) => v.name === "rehearsalStartDate") || {}
-        ).show = true;
-        (
-          this.fields.find((v) => v.name === "rehearsalEndDate") || {}
-        ).show = true;
+        this.showField("rehearsalStartDate");
+        this.showField("rehearsalEndDate");
       } else {
-        (
-          this.fields.find((v) => v.name === "rehearsalStartDate") || {}
-        ).show = false;
-        (
-          this.fields.find((v) => v.name === "rehearsalEndDate") || {}
-        ).show = false;
+        this.hideField("rehearsalStartDate");
+        this.hideField("rehearsalEndDate");
       }
     },
     onComponentChange(fieldName, value) {
@@ -331,15 +373,22 @@ export default {
       return shown;
     },
     async getProcTypes() {
-      this.procTypesPrices = await ProcedureTypes.getDocuments().then(
-        (procTypes) => {
-          const prices = procTypes.reduce((acc, v) => {
-            acc[v.id] = v.price;
-            return acc;
-          }, {});
+      const [procTypePrices, myProcTypes] =
+        await ProcedureTypes.getDocuments().then((procTypes) => {
+          const prices = procTypes.reduce(
+            (acc, v) => {
+              acc[0][v.id] = v.price;
+              acc[1].push(
+                pick(v, ["id", "name", "description", "price", "price_unit"])
+              );
+              return acc;
+            },
+            [{}, []]
+          );
           return prices;
-        }
-      );
+        });
+      this.procTypesPrices = procTypePrices;
+      this.procTypes = myProcTypes;
     },
     submit() {
       const { shootStartDate, shootEndDate } = this.formData;
