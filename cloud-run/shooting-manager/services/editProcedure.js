@@ -13,6 +13,7 @@ const omitBy = require("lodash/omitBy")
 const isEmpty = require("lodash/isEmpty")
 // const { v4 } = require('uuid')
 const stringify = require('../utils/betterStableStringify')
+const createChangesPusher = require("./utils/changesPusher.js")
 /*
     data structure: {
         shoot_id: string,
@@ -57,6 +58,7 @@ module.exports = function(){
         }
 
         const editProcedure = async function(data){
+            const batch = db.batch()
             const rightNow = new Date()
             const { 
                 shoot_id: shootId, 
@@ -73,15 +75,18 @@ module.exports = function(){
                 throw new Error("shoot id or procedure id is empty")
             }
 
-            const currentCompleteData = await exportDocument([
-                "shoots",
-                shootId,
-                [
-                    ["assets"],
-                    ["equipments"],
-                    ["procedures"]
-                ]
-            ])
+            
+            const changesPusher = await createChangesPusher(shootId)
+
+            // const currentCompleteData = await exportDocument([
+            //     "shoots",
+            //     shootId,
+            //     [
+            //         ["assets"],
+            //         ["equipments"],
+            //         ["procedures"]
+            //     ]
+            // ])
 
             const [ currentShoot, currentProcedure ] = await Promise.all([
                 db
@@ -113,18 +118,6 @@ module.exports = function(){
             if(currentStatus.includes("finished")) {
                 throw new Error("shoot has been completed")
             }
-
-            // const currentShoot = await db
-            //     .collection("shoots")
-            //     .doc(shootId)
-            //     .get()
-
-            // const currentProcedure = await db
-            //     .collection("shoots")
-            //     .doc(shootId)
-            //     .collection("procedures")
-            //     .doc(procedureId)
-            //     .get()
             
             const cprocData = currentProcedure.data()
             // handle cases:
@@ -137,6 +130,7 @@ module.exports = function(){
             //      - update procedure data
 
             // 1st case
+            let deleteProcedure = false
             if(
                 !isNil(procedureStart) && !isNil(procedureEnd) && (
                     standardizeDate(procedureStart) !== standardizeDate(cprocData.procedure_start) || 
@@ -161,12 +155,9 @@ module.exports = function(){
                 }
 
                 if(currentStatus.includes("approved")) {
-                    await db
-                        .collection("shoots")
-                        .doc(shootId)
-                        .update({
-                            status: FieldValue.arrayRemove("approved")
-                        })
+                    batch.update(db.collection("shoots").doc(shootId), {
+                        status: FieldValue.arrayRemove("approved")
+                    })
                 }
 
                 const ptypePrice = await db.collection("procedure_types").get().then((ptypeSnap) => {
@@ -177,65 +168,39 @@ module.exports = function(){
                 })
 
                 const newPrice = processors.calculateTotalDailyPrice(procedureStart, procedureEnd, formatters.ceil(vedhg.getIntervalLength(newProcId, "days"), 2), ptypePrice[procedureType])
-                await db
-                    .collection("shoots")
-                    .doc(shootId)
-                    .collection("procedures")
-                    .doc(newProcId)
-                    .set({
-                        created_date: rightNow,
-                        price: newPrice,
-                        procedure_type: db.collection("procedure_types").doc(procedureType),
-                        procedure_start: new Date(procedureStart),
-                        procedure_end: new Date(procedureEnd),
-                        procedure_data: {
-                            ...myProcedureData
-                        }
-                    })
-                    .then(() => {
-                        return db
-                            .collection("shoots")
-                            .doc(shootId)
-                            .collection("procedures")
-                            .doc(procedureId)
-                            .delete()
-                    })
-            }else{//2nd case
-                await db
-                    .collection("shoots")
-                    .doc(shootId)
-                    .collection("procedures")
-                    .doc(procedureId)
-                    .set({
-                        ...omitBy({
-                            procedure_data: procedureData,
-                            status,
-                        }, isEmpty)
-                    }, { merge: true })
-            }
-            const changedCompleteData = await exportDocument([
-                "shoots",
-                shootId,
-                [
-                    ["assets"],
-                    ["equipments"],
-                    ["procedures"]
-                ]
-            ])
-
-            const shootDiff = diff(currentCompleteData, changedCompleteData)
-            
-            const shootChangesCount = (await db.collection("shoots").doc(shootId).collection("changes").count().get()).data().count
-
-            await db
-                .collection("shoots")
-                .doc(shootId)
-                .collection("changes")
-                .doc(shootChangesCount.toString())
-                .set({
-                    updated_date: new Date(),
-                    diff: stringify(shootDiff)
+                batch.set(db.collection("shoots").doc(shootId).collection("procedures").doc(newProcId), {
+                    created_date: rightNow,
+                    price: newPrice,
+                    procedure_type: db.collection("procedure_types").doc(procedureType),
+                    procedure_start: new Date(procedureStart),
+                    procedure_end: new Date(procedureEnd),
+                    procedure_data: {
+                        ...myProcedureData
+                    }
                 })
+                deleteProcedure = true
+            }else{//2nd case
+                batch.set(db.collection("shoots").doc(shootId).collection("procedures").doc(procedureId), {
+                    ...omitBy({
+                        procedure_data: procedureData,
+                        status,
+                    }, isEmpty)
+                })
+            }
+
+            return await batch.commit().then(() => {
+                let deletePromise = Promise.resolve(true)
+                if(deleteProcedure){
+                    deletePromise = db
+                        .collection("shoots")
+                        .doc(shootId)
+                        .collection("procedures")
+                        .doc(procedureId)
+                        .delete()
+                }
+                const changes = changesPusher()
+                return Promise.all([deletePromise, changes])
+            })
         }
 
         let data

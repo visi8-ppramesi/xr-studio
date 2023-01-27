@@ -1,7 +1,6 @@
 
 import {
   buildCollection,
-  EntityReference,
   EntityIdUpdateProps,
   EntityOnSaveProps
 } from "@camberi/firecms";
@@ -9,15 +8,7 @@ import { db } from "@utils/firebase"
 import { collection, getDocs } from "firebase/firestore"
 import { vedhg } from "@utils/dateRangeHash"
 import isNil from "lodash/isNil"
-
-
-type ShootProcedure = {
-  created_date: Date,
-  price: number,
-  procedure_end: Date,
-  procedure_start: Date,
-  procedure_type: EntityReference
-}
+import { ShootProcedure } from "@/types";
 
 export const shootProcedureCollection = buildCollection<ShootProcedure>({
   name: "Shoot Procedure",

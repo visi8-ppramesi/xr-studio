@@ -12,22 +12,7 @@ import { collection, getDocs } from "firebase/firestore";
 import debounce from "lodash/debounce"
 import isNil from "lodash/isNil"
 import { Dispatch, SetStateAction } from "react"
-
-
-type Equipment = {
-    name: string,
-    category: string[],
-    price: number,
-    model: string,
-    manufacturer: string,
-    description: string,
-    on_inventory: number,
-    preview_url: string,
-}
-
-type ManufacturerModels = {
-    [manufacturer: string]: string[]
-}
+import { Equipment, ManufacturerModels } from "@/types";
 
 export const buildEquipmentCollection = function(
         categoryState: [ EnumValues, Dispatch<SetStateAction<EnumValues>> ], 

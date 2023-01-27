@@ -1,15 +1,10 @@
 import {
     buildCollection,
 } from "@camberi/firecms";
- 
-type contractTemplates = {
-    name: string,
-    contract_data_fields: string[],
-    contract_file_url: string,
-    contract_text: string
-}
+import { ContractTemplates } from "@/types";
 
-export const contractTemplatesCollection = buildCollection<contractTemplates>({
+
+export const contractTemplatesCollection = buildCollection<ContractTemplates>({
     name: "Contract Templates",
     path: "contract_templates",
     customId: true,

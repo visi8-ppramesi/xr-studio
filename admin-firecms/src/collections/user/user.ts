@@ -2,15 +2,7 @@
 import {
     buildCollection,
 } from "@camberi/firecms";
-
-type User = {
-    username: string,
-    email: string,
-    full_name: string,
-    profile_image_url: string,
-    public_key: string,
-    encrypted_private_key: string,
-  }
+import { User } from "@/types";
 
 export const userCollection = buildCollection<User>({
     name: "User",

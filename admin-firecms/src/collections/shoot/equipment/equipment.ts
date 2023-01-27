@@ -1,18 +1,9 @@
 
 import {
   buildCollection,
-  EntityReference,
 } from "@camberi/firecms";
 import { rewriteIdUpdate } from "@utils/id"
-
-type ShootEquipment = {
-  created_date: Date,
-  equipment: object,
-  equipment_id: EntityReference,
-  price_item: number,
-  quantity: number,
-  total_price: number,
-}
+import { ShootEquipment } from "@/types";
 
 const debouncedRewriteId = rewriteIdUpdate<ShootEquipment>()
 export const shootEquipmentCollection = buildCollection<ShootEquipment>({

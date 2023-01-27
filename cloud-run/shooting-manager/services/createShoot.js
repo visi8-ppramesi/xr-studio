@@ -5,25 +5,10 @@ const { getTokenId } = require('../utils/getTokenId.js')
 const { formatters, processors } = require('../utils/formatters.js')
 const setIdIfNotSet = require("../utils/id.js")
 const { decode: bufferDecoder } = require('../utils/bufferEncoder')
-const { detailedDiff: diff } = require("deep-object-diff")
 const isNil = require('lodash/isNil')
-// const { v4 } = require('uuid')
 const stringify = require('../utils/betterStableStringify');
 const { vedhg } = require('../utils/dateRangeHash.js');
-
-// function setIdIfNotSet(obj, isProcedure = false, debug = false) {
-//     if (isNil(obj.id)) {
-//         if(isProcedure){
-//             let { procedure_code: procedureCode, procedure_start: procedureStart, procedure_end: procedureEnd } = obj
-//             procedureCode = procedureCode || '000'
-//             const encoded = vedhg.encodeDates(procedureStart, procedureEnd)
-//             obj.id = [procedureCode, encoded].join('.')
-//         }else{
-//             obj.id = (debug ? "ft-" : "") + v4()
-//         }
-//     }
-//     return obj
-// }
+const createChangesPusher = require("./utils/changesPusher.js")
 
 /*
     data structure: {
@@ -94,6 +79,7 @@ module.exports = function () {
         }
 
         const createShootWithSubcollections = async function (data) {
+            const batch = db.batch();
             const { procedures, equipments, assets, shoot, debug } = data
 
             if (isNil(shoot)) {
@@ -117,7 +103,6 @@ module.exports = function () {
             }
 
             const status = ["initialized", "unpaid"]
-            const promises = []
             const retVal = {
                 shoot: {},
                 equipments: [],
@@ -127,26 +112,14 @@ module.exports = function () {
 
             //create shoot first
             const { id, ...shootDuplicate } = setIdIfNotSet(shoot, null, debug)
+            const changesPusher = await createChangesPusher(shoot.id)
             const rightNow = new Date()
-            await db.collection("shoots").doc(shoot.id).set({
+            batch.set(db.collection("shoots").doc(shoot.id), {
                 location: 'main-location',
                 created_date: rightNow,
                 created_by: db.collection('users').doc(uid),
                 ...shootDuplicate
             })
-            const forChanges = {
-                shoot: {
-                    created_date: rightNow,
-                    location: 'main-location',
-                    created_by: db.collection('users').doc(uid),
-                    ...shootDuplicate,
-                    status,
-                },
-                equipments: {},
-                procedures: {},
-                assets: {}
-            }
-            // const statusCopy = [...status]
 
             retVal.shoot.shoot_id = id
 
@@ -155,31 +128,12 @@ module.exports = function () {
                 status.push("with_equipments")
                 for (const equipment of equipments) {
                     const { id: equipmentId, ...equipmentDuplicate } = setIdIfNotSet(equipment, null, debug)
-                    const promise = db.collection("shoots").doc(shoot.id).collection("equipments").doc(equipmentId).set({
+                    batch.set(db.collection("shoots").doc(shoot.id).collection("equipments").doc(equipmentId), {
                         ...equipmentDuplicate,
                         created_date: rightNow,
                         equipment_id: db.collection("equipments").doc(equipment.equipment_id)
                     })
-                    promises.push(promise)
                     retVal.equipments.push({ equipment_id: equipmentId })
-
-                    // const changesPromise = db
-                    //     .collection("shoots")
-                    //     .doc(shoot.id)
-                    //     .collection("equipments")
-                    //     .doc(equipment.id)
-                    //     .collection("changes")
-                    //     .doc("0")
-                    //     .set({
-                    //         updated_date: new Date(),
-                    //         diff: stringify(diff({}, equipmentDuplicate))
-                    //     })
-                    // promises.push(changesPromise)
-
-                    forChanges.equipments[id] = {
-                        created_date: rightNow,
-                        ...equipmentDuplicate
-                    }
                 }
             }
 
@@ -196,7 +150,7 @@ module.exports = function () {
                     const { id: procedureId, procedure_start: procedureStart, procedure_end: procedureEnd, ...procedureDuplicate } = setIdIfNotSet(procedure, true, debug)
                     
                     const procPrice = processors.calculateTotalDailyPrice(procedureStart, procedureEnd, formatters.ceil(vedhg.getIntervalLength(procedureId, "days"), 2), ptypePrice[procedure.procedure_type])
-                    const promise = db.collection("shoots").doc(shoot.id).collection("procedures").doc(procedureId).set({
+                    batch.set(db.collection("shoots").doc(shoot.id).collection("procedures").doc(procedureId), {
                         ...procedureDuplicate,
                         procedure_start: new Date(procedureStart),
                         procedure_end: new Date(procedureEnd),
@@ -204,40 +158,7 @@ module.exports = function () {
                         procedure_type: db.collection("procedure_types").doc(procedure.procedure_type),
                         price: procPrice
                     })
-                    promises.push(promise)
                     retVal.procedures.push({ procedure_id: procedureId })
-
-                    // const changesPromise = db
-                    //     .collection("shoots")
-                    //     .doc(shoot.id)
-                    //     .collection("procedures")
-                    //     .doc(procedureId)
-                    //     .collection("changes")
-                    //     .doc("0")
-                    //     .set({
-                    //         updated_date: new Date(),
-                    //         diff: stringify(diff({}, procedureDuplicate))
-                    //     })
-                    // promises.push(changesPromise)
-
-                    // const calendarPromises = db
-                    //     .collection("calendar")
-                    //     .doc(id)
-                    //     .set({
-                    //         start_date: procedure.procedure_start,
-                    //         end_date: procedure.procedure_end,
-                    //         event_id: shoot.id,
-                    //         event: {
-                    //             location: "main-location",
-                    //             status: statusCopy
-                    //         }
-                    //     })
-                    // promises.push(calendarPromises)
-
-                    forChanges.procedures[id] = {
-                        created_date: rightNow,
-                        ...procedureDuplicate
-                    }
                 }
             }
 
@@ -246,58 +167,30 @@ module.exports = function () {
                 status.push("with_assets")
                 for (const asset of assets) {
                     const { id: assetId, ...assetDuplicate } = setIdIfNotSet(asset, null, debug)
-                    const promise = db.collection("shoots").doc(shoot.id).collection("assets").doc(assetId).set({
+                    batch.set(db.collection("shoots").doc(shoot.id).collection("assets").doc(assetId), {
                         ...assetDuplicate,
                         created_date: rightNow,
                         asset_id: db.collection("assets").doc(asset.asset_id),
                     })
-                    promises.push(promise)
                     retVal.assets.push({ asset_id: assetId })
-
-                    // const changesPromise = db
-                    //     .collection("shoots")
-                    //     .doc(shoot.id)
-                    //     .collection("assets")
-                    //     .doc(assetId)
-                    //     .collection("changes")
-                    //     .doc("0")
-                    //     .set({
-                    //         updated_date: new Date(),
-                    //         diff: stringify(diff({}, assetDuplicate))
-                    //     })
-                    // promises.push(changesPromise)
-
-                    forChanges.assets[id] = {
-                        created_date: rightNow,
-                        ...assetDuplicate
-                    }
                 }
             }
 
-            const statusPromise = db.collection("shoots").doc(shoot.id).set({
-                status,
-                status_history: [
-                    {
-                        note: "Shoot initialized",
-                        status: 'initialized',
-                        date: new Date(),
-                        processed_by: db.collection("users").doc(uid)
-                    }
-                ]
-            }, { merge: true }).then(() => {
-                return db
-                    .collection("shoots")
-                    .doc(shoot.id)
-                    .collection("changes")
-                    .doc("0")
-                    .set({
-                        updated_date: new Date(),
-                        diff: stringify(diff({}, forChanges))
-                    })
+            await batch.commit().then(() => {
+                const statusPromise = db.collection("shoots").doc(shoot.id).set({
+                    status,
+                    status_history: [
+                        {
+                            note: "Shoot initialized",
+                            status: 'initialized',
+                            date: new Date(),
+                            processed_by: db.collection("users").doc(uid)
+                        }
+                    ]
+                }, { merge: true })
+                const changes = changesPusher()
+                return Promise.all([statusPromise, changes])
             })
-            promises.push(statusPromise)
-
-            await Promise.all(promises)
             return retVal
         }
         try {

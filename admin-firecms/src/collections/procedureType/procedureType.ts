@@ -1,35 +1,7 @@
 import {
     buildCollection,
 } from "@camberi/firecms";
-
-type ProcedureField = {
-    label: string,
-    name: string,
-    type: string
-}
-
-type ProcedureItem = {
-    name: string,
-    optional_fields: ProcedureField[],
-    required_fields: ProcedureField[],
-}
-
-type ProcedureIncluded = {
-    description: string,
-    name: string,
-    price: number
-}
-
-type ProcedureType = {
-    name: string,
-    description: string,
-    items_included: ProcedureIncluded[],
-    procedure_code: string,
-    procedures: ProcedureItem[],
-    stackable: number,
-    price: number,
-    price_unit: string
-}
+import { ProcedureType } from "@/types";
 
 export const procedureTypeCollection = buildCollection<ProcedureType>({
     name: "Procedure Type",

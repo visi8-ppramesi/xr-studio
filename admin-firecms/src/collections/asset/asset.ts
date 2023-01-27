@@ -5,28 +5,14 @@ import {
     EntityReference,
     EnumValues
 } from "@camberi/firecms";
-import { rewriteIdUpdate } from "@utils/id"
+import { rewriteIdUpdate } from "@utils/id";
 import { db } from "@utils/firebase";
 import { collection, getDocs } from "firebase/firestore";
-import debounce from "lodash/debounce"
-import { Dispatch, SetStateAction } from "react"
-
-type UserData = {
-    id: EntityReference,
-    name?: string
-}
-
-type Asset = {
-    name: string,
-    description: string,
-    created_date: Date,
-    categories: string[],
-    group?: string,
-    preview_url: string[],
-    user_data: UserData,
-    assets_url: string,
-    price: number,
-}
+import debounce from "lodash/debounce";
+import { Dispatch, SetStateAction } from "react";
+import { Asset } from "@/types";
+import { SampleAssetsView } from "../../views/test"
+import { SampleCollectionActions } from "../../actions/SampleCollectionActions"
 
 export const buildAssetCollection = function([customId, setCustomId]: [EnumValues, Dispatch<SetStateAction<EnumValues>>]){
     const letsGoCategories = debounce(async function(){
@@ -55,6 +41,14 @@ export const buildAssetCollection = function([customId, setCustomId]: [EnumValue
             },
             onIdUpdate: debouncedRewriteId
         },
+        Actions: SampleCollectionActions,
+        views: [
+            {
+                path: "sample_custom_view",
+                name: "Custom view",
+                builder: SampleAssetsView
+            }
+        ],
         properties: {
             name: {
                 name: "Name",

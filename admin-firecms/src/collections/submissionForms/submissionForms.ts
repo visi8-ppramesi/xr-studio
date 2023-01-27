@@ -1,24 +1,7 @@
 import {
     buildCollection, EntityReference
 } from "@camberi/firecms";
-
-type status_item = {
-    date: Date,
-    note: string, 
-    processed_by: null,
-    status: string
-}
- 
-type SubmissionForm = {
-    asset: EntityReference,
-    current_status: string[],
-    description: string,
-    preview_urls: string,
-    status_history: status_item[],
-    submission_date: Date,
-    updated_date: Date,
-    user: EntityReference,
-}
+import { SubmissionForm } from "@/types";
 
 export const submissionFormsCollection = buildCollection<SubmissionForm>({
     name: "Submission Forms",

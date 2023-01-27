@@ -6,12 +6,13 @@ import {
   Authenticator,
   // buildProperty,
   // EntityReference,
-  FirebaseCMSApp,
+  // FirebaseCMSApp,
   FirebaseLoginView,
   FirebaseLoginViewProps,
   EnumValues,
 } from "@camberi/firecms";
 
+import { CustomCMSApp } from "./CustomCMSApp";
 import { userCollection } from "./collections/user/user";
 import { shootCollection } from "./collections/shoot/shoot";
 import { buildAssetCollection } from "./collections/asset/asset";
@@ -66,7 +67,7 @@ export default function App() {
     })
   }
 
-  return <FirebaseCMSApp
+  return <CustomCMSApp
     name={"XR Studio Backend"}
     authentication={myAuthenticator}
     collections={[

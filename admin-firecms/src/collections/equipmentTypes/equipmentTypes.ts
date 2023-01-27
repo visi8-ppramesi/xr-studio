@@ -1,11 +1,7 @@
 import {
     buildCollection,
 } from "@camberi/firecms";
-
-type EquipmentType = {
-    manufacturer_name: string,
-    models: string[]
-}
+import { EquipmentType } from "@/types";
 
 export const equipmentTypeCollection = buildCollection<EquipmentType>({
     name: "Asset Types",

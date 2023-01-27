@@ -8,10 +8,7 @@ import { db } from "@utils/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import debounce from "lodash/debounce"
 import { Dispatch, SetStateAction } from "react"
-
-type UserRoles = {
-    roles: string[]
-}
+import { UserRoles } from "@/types";
 
 export const buildUserRoleCollection = function([customId, setCustomId]: [EnumValues, Dispatch<SetStateAction<EnumValues>>]){
     const letsGo = debounce(async function(){
