@@ -1,7 +1,7 @@
 
 import {
     buildCollection,
-} from "@camberi/firecms";
+} from "ppramesi-firecms";
 import { User } from "@/types";
 
 export const userCollection = buildCollection<User>({

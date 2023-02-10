@@ -15,16 +15,16 @@ import {
     SnackbarProvider,
     useBuildLocalConfigurationPersistence,
     useBuildModeController,
-    FirebaseCMSAppProps, 
-    useFirebaseAuthController, 
-    // useFirestoreDataSource, 
-    useFirebaseStorageSource, 
-    useInitialiseFirebase, 
-    FirebaseLoginView, 
-    FirebaseAuthController, 
+    FirebaseCMSAppProps,
+    useFirebaseAuthController,
+    useFirestoreDataSource,
+    useFirebaseStorageSource,
+    useInitialiseFirebase,
+    FirebaseLoginView,
+    FirebaseAuthController,
     useValidateAuthenticator,
-    useBrowserTitleAndIcon, 
-} from "@camberi/firecms";
+    useBrowserTitleAndIcon,
+} from "ppramesi-firecms";
 import { useCustomDatasource } from "./useCustomDataSource";
 
 const DEFAULT_SIGN_IN_OPTIONS = [
@@ -49,30 +49,30 @@ const DEFAULT_SIGN_IN_OPTIONS = [
  * @category Firebase
  */
 export function CustomCMSApp({
-                                   name,
-                                   logo,
-                                   logoDark,
-                                   toolbarExtraWidget,
-                                   authentication,
-                                   collectionOverrideHandler,
-                                   collections,
-                                   views,
-                                   textSearchController,
-                                   allowSkipLogin,
-                                   signInOptions = DEFAULT_SIGN_IN_OPTIONS,
-                                   firebaseConfig,
-                                   onFirebaseInit,
-                                   primaryColor,
-                                   secondaryColor,
-                                   fontFamily,
-                                   dateTimeFormat,
-                                   locale,
-                                   HomePage,
-                                   basePath,
-                                   baseCollectionPath,
-                                   LoginView,
-                                   onAnalyticsEvent
-                               }: FirebaseCMSAppProps) {
+    name,
+    logo,
+    logoDark,
+    toolbarExtraWidget,
+    authentication,
+    collectionOverrideHandler,
+    collections,
+    views,
+    textSearchController,
+    allowSkipLogin,
+    signInOptions = DEFAULT_SIGN_IN_OPTIONS,
+    firebaseConfig,
+    onFirebaseInit,
+    primaryColor,
+    secondaryColor,
+    fontFamily,
+    dateTimeFormat,
+    locale,
+    HomePage,
+    basePath,
+    baseCollectionPath,
+    LoginView,
+    onAnalyticsEvent
+}: FirebaseCMSAppProps) {
 
     /**
      * Update the browser title and icon
@@ -152,8 +152,8 @@ export function CustomCMSApp({
 
     if (firebaseConfigLoading || !firebaseApp) {
         return <>
-            <CssBaseline/>
-            <CircularProgressCenter/>
+            <CssBaseline />
+            <CircularProgressCenter />
         </>;
     }
 
@@ -180,7 +180,7 @@ export function CustomCMSApp({
 
                             let component;
                             if (loading || authLoading) {
-                                component = <CircularProgressCenter/>;
+                                component = <CircularProgressCenter />;
                             } else {
                                 const usedLogo = modeController.mode === "dark" && logoDark ? logoDark : logo;
                                 if (!canAccessMainView) {
@@ -192,7 +192,7 @@ export function CustomCMSApp({
                                             signInOptions={signInOptions ?? DEFAULT_SIGN_IN_OPTIONS}
                                             firebaseApp={firebaseApp}
                                             authController={authController}
-                                            notAllowedError={notAllowedError}/>
+                                            notAllowedError={notAllowedError} />
                                     );
                                 } else {
                                     component = (
@@ -201,8 +201,8 @@ export function CustomCMSApp({
                                             logo={usedLogo}
                                             toolbarExtraWidget={toolbarExtraWidget}>
                                             <NavigationRoutes
-                                                HomePage={HomePage}/>
-                                            <SideDialogs/>
+                                                HomePage={HomePage} />
+                                            <SideDialogs />
                                         </Scaffold>
                                     );
                                 }
@@ -210,7 +210,7 @@ export function CustomCMSApp({
 
                             return (
                                 <ThemeProvider theme={theme}>
-                                    <CssBaseline/>
+                                    <CssBaseline />
                                     {component}
                                 </ThemeProvider>
                             );

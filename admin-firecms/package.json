@@ -10,7 +10,6 @@
     "lint": "eslint ./src --fix"
   },
   "dependencies": {
-    "@camberi/firecms": "^2.0.0-alpha.56",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@mui/icons-material": "^5.11.0",
@@ -20,6 +19,7 @@
     "axios": "^1.2.5",
     "firebase": "^9.15.0",
     "lodash": "^4.17.21",
+    "ppramesi-firecms": "github:visi8-ppramesi/ppramesi-firecms",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router": "^6.6.1",

@@ -1,6 +1,6 @@
 import {
     buildCollection, EntityReference
-} from "@camberi/firecms";
+} from "ppramesi-firecms";
 import { SubmissionForm } from "@/types";
 
 export const submissionFormsCollection = buildCollection<SubmissionForm>({

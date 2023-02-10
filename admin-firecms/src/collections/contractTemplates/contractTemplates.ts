@@ -1,6 +1,6 @@
 import {
     buildCollection,
-} from "@camberi/firecms";
+} from "ppramesi-firecms";
 import { ContractTemplates } from "@/types";
 
 

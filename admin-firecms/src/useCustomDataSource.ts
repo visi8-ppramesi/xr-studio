@@ -16,7 +16,7 @@ import {
     ResolvedProperties,
     cmsToFirestoreModel,
     updateDateAutoValues
-} from "@camberi/firecms";
+} from "ppramesi-firecms";
 import { FirebaseApp } from "firebase/app";
 import { setDoc, Timestamp, DocumentReference, getDoc, getFirestore, doc, collection as collectionClause, CollectionReference, serverTimestamp } from "firebase/firestore";
 import axios from "axios";
@@ -39,7 +39,6 @@ export function useCustomDatasource({ firebaseApp, textSearchController }: Custo
         firebaseApp,
         textSearchController
     });
-    if (!firebaseApp) throw Error("useFirestoreDataSource Firebase not initialised");
 
     function buildSaveEntityFunction<M>(managerPath: string, dataObj: DataManagerObject): <M extends Record<string, any>>(props: SaveEntityProps<M>) => Promise<Entity<M>>{
         return useCallback(<M extends Record<string, any>>(

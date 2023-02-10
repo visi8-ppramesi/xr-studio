@@ -6,11 +6,11 @@ import {
   Authenticator,
   // buildProperty,
   // EntityReference,
-  // FirebaseCMSApp,
+  FirebaseCMSApp,
   FirebaseLoginView,
   FirebaseLoginViewProps,
   EnumValues,
-} from "@camberi/firecms";
+} from "ppramesi-firecms";
 
 import { CustomCMSApp } from "./CustomCMSApp";
 import { userCollection } from "./collections/user/user";
@@ -30,6 +30,7 @@ import "@fontsource/ibm-plex-mono";
 
 import { db } from "@utils/firebase"
 import { collection, doc, getDoc } from "firebase/firestore"
+import { testCollection, buildTestCollection } from "./collections/test/test";
 
 export default function App() {
   const myAuthenticator: Authenticator<FirebaseUser> = useCallback(async ({
@@ -71,6 +72,7 @@ export default function App() {
     name={"XR Studio Backend"}
     authentication={myAuthenticator}
     collections={[
+      buildTestCollection(),
       shootCollection, 
       userCollection, 
       buildAssetCollection(useState<EnumValues>({})), 

@@ -3,7 +3,7 @@ import {
     EntityOnFetchProps,
     EnumValueConfig,
     EnumValues
-} from "@camberi/firecms";
+} from "ppramesi-firecms";
 import { db } from "@utils/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import debounce from "lodash/debounce"

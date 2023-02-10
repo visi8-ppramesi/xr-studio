@@ -1,6 +1,6 @@
 import {
   buildCollection,
-} from "@camberi/firecms";
+} from "ppramesi-firecms";
 import { shootAssetCollection } from "./asset/asset"
 import { shootEquipmentCollection } from "./equipment/equipment"
 import { shootProcedureCollection } from "./procedure/procedure"

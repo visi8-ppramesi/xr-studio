@@ -1,6 +1,6 @@
 import {
     buildCollection,
-} from "@camberi/firecms";
+} from "ppramesi-firecms";
 import { ProcedureType } from "@/types";
 
 export const procedureTypeCollection = buildCollection<ProcedureType>({

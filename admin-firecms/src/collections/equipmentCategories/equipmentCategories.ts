@@ -1,6 +1,6 @@
 import {
     buildCollection,
-} from "@camberi/firecms";
+} from "ppramesi-firecms";
 import { EquipmentCategory } from "@/types";
 
 export const equipmentCategoryCollection = buildCollection<EquipmentCategory>({

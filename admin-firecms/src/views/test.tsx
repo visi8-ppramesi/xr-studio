@@ -1,24 +1,10 @@
 import React from "react";
 import { Box, Button } from "@mui/material";
-import { Entity, EntityValues, useSnackbarController } from "@camberi/firecms";
-import { Asset } from "../types";
+import { Entity, EntityValues, useSnackbarController } from "ppramesi-firecms";
+import { Test } from "../types";
 
-export function SampleAssetsView({ entity, modifiedValues }: {
-    entity?: Entity<Asset>;
-    modifiedValues?: EntityValues<Asset>;
-}) {
-
-    const snackbarController = useSnackbarController();
-
-    const onClick = (event: React.MouseEvent) => {
-        snackbarController.open({
-            type: "success",
-            message: `Custom action for ${modifiedValues?.name}`
-        });
-    };
-
-    const values = modifiedValues ?? {};
-
+export function SampleTestsView() {
+    const values = {test:"test"}
     return (
         <Box
             display="flex"
@@ -52,11 +38,6 @@ export function SampleAssetsView({ entity, modifiedValues }: {
                     </p>}
 
                 </Box>
-
-                <Button onClick={onClick} color="primary">
-                    Your action
-                </Button>
-
             </Box>
         </Box>
     );

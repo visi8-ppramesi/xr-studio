@@ -5,7 +5,7 @@ import {
     EntityReference,
     EntityIdUpdateProps,
     EnumValues
-} from "@camberi/firecms";
+} from "ppramesi-firecms";
 import { rewriteIdUpdate } from "@utils/id"
 import { db } from "@utils/firebase";
 import { collection, getDocs } from "firebase/firestore";

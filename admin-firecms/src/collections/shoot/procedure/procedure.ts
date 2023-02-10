@@ -3,7 +3,7 @@ import {
   buildCollection,
   EntityIdUpdateProps,
   EntityOnSaveProps
-} from "@camberi/firecms";
+} from "ppramesi-firecms";
 import { db } from "@utils/firebase"
 import { collection, getDocs } from "firebase/firestore"
 import { vedhg } from "@utils/dateRangeHash"
