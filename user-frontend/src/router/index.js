@@ -127,6 +127,14 @@ const studioRoutes = [
     name: "ConfirmShoot",
     component: () => import("@/views/studio/ConfirmShoot.vue"),
   },
+  {
+    path: "/studio/request-tour",
+    name: "RequestTour",
+    component: () => import("@/views/tour/RequestTour.vue"),
+    meta: {
+      class: "ContactUs",
+    },
+  },
 ];
 
 const shopRoutes = [
@@ -154,6 +162,8 @@ const mineRoutes = [
   },
 ];
 
+const contactUsRoutes = [];
+
 const routes = [
   process.env.VUE_APP_SHOW_HOMEPAGE == "true"
     ? {
@@ -178,6 +188,7 @@ const routes = [
   ...studioRoutes,
   ...shopRoutes,
   ...mineRoutes,
+  ...contactUsRoutes,
   {
     path: "/:catchAll(.*)",
     name: "NotFound",

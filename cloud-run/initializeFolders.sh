@@ -26,5 +26,7 @@ do
     touch ./.env
     npm init -y
     npm install cors dotenv express firebase-admin lodash uuid
+    mkdir utils
+    cp -a ../../shared/cloudRunUtils/ ./utils/
     cd ..
 done

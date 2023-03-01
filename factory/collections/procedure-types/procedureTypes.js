@@ -203,6 +203,22 @@ const procedures = {
         stackable: 4,
         price: 1.5e7,
         price_unit: 'per day'
+    },
+    "studio_tour": {
+        name: "Studio Tour",
+        description: "Studio tour for checking out XR studio equipments",
+        items_included: [
+            {
+                name: "studio_tour",
+                description: "Studio tour for checking out XR studio equipments",
+                price: 0
+            }
+        ],
+        procedure_code: "006",
+        stackable: 8,
+        price: 0,
+        price_unit: 'per hour'
+
     }
 }
 

@@ -1,8 +1,9 @@
 import { defineStore } from "pinia";
 import { collections } from "../firebase/index";
 import { getDoc, doc } from "firebase/firestore";
+import deferred from "@/utils/deferred";
 // import handleError from "@/utils/handleError";
-
+const deferrer = deferred();
 const User = collections.Users;
 
 export const useAuthStore = defineStore("auth", {
@@ -20,6 +21,7 @@ export const useAuthStore = defineStore("auth", {
     roles: [],
 
     temporarySignupInfo: {},
+    loginPromise: deferrer,
   }),
 
   getters: {},
@@ -96,12 +98,14 @@ export const useAuthStore = defineStore("auth", {
           this.status.loggingIn = false;
           this.isLoggedIn = true;
           successFunc(user);
+          this.loginPromise.resolve();
         })
         .catch((error) => {
           // handleError(error, 'loginError')
           this.status.loggingIn = false;
           this.error = error.message;
           errorFunc(error);
+          this.loginPromise.reject();
         });
     },
     async logout(successFunc = () => {}, errorFunc = () => {}) {
@@ -157,12 +161,14 @@ export const useAuthStore = defineStore("auth", {
           this.status.loggingIn = false;
           this.isLoggedIn = true;
           successFunc();
+          this.loginPromise.resolve();
         })
         .catch((error) => {
           // handleError(error, 'registerError')
           this.error = error.message;
           this.status.loggingIn = false;
           errorFunc(error);
+          this.loginPromise.reject();
         });
     },
     async loginWithGoogle(successFunc = () => {}, errorFunc = () => {}) {
@@ -195,12 +201,14 @@ export const useAuthStore = defineStore("auth", {
           this.status.loggingIn = false;
           this.isLoggedIn = true;
           successFunc();
+          this.loginPromise.resolve();
         })
         .catch((error) => {
           // handleError(error, 'loginError')
           this.status.loggingIn = false;
           this.error = error.message;
           errorFunc(error);
+          this.loginPromise.reject();
         });
     },
     authAction() {
@@ -241,6 +249,7 @@ export const useAuthStore = defineStore("auth", {
                 }
                 this.isLoggedIn = true;
                 localStorage.setItem("uid", this.uid);
+                this.loginPromise.resolve();
               });
           });
           // const newUser = new User()
@@ -252,6 +261,7 @@ export const useAuthStore = defineStore("auth", {
           // this.user = user.toJSON()
           // localStorage.setItem('uid', user.uid)
         } else {
+          this.loginPromise.reject();
           this.$reset();
           localStorage.removeItem("uid");
         }

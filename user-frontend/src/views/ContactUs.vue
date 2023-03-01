@@ -7,17 +7,65 @@
         </div>
       </div>
 
-      <div class="flex flex-wrap">
+      <div class="flex justify-center">
+        <div
+          class="mb-12 grow-0 shrink-0 basis-auto w-full lg:w-5/12 px-3 lg:px-6"
+        >
+          <div class="flex items-start">
+            <div class="shrink-0">
+              <div
+                class="p-4 bg-blue-600 rounded-md shadow-md w-20 h-20 flex items-center justify-center"
+              >
+                <svg
+                  aria-hidden="true"
+                  focusable="false"
+                  data-prefix="fas"
+                  data-icon="headset"
+                  class="w-10 text-white"
+                  role="img"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="40 40 100 100"
+                >
+                  <path
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="#fff"
+                    fill-rule="evenodd"
+                    d="M68.772 55.603c-1.378-3.061-2.828-3.123-4.137-3.176l-3.524-.043c-1.226 0-3.218.46-4.902 2.3s-6.435 6.287-6.435 15.332 6.588 17.785 7.506 19.013 12.718 20.381 31.405 27.75c15.529 6.124 18.689 4.906 22.061 4.6s10.877-4.447 12.408-8.74 1.532-7.971 1.073-8.74-1.685-1.226-3.525-2.146-10.877-5.367-12.562-5.981-2.91-.919-4.137.921-4.746 5.979-5.819 7.206-2.144 1.381-3.984.462-7.76-2.861-14.784-9.124c-5.465-4.873-9.154-10.891-10.228-12.73s-.114-2.835.808-3.751c.825-.824 1.838-2.147 2.759-3.22s1.224-1.84 1.836-3.065.307-2.301-.153-3.22-4.032-10.011-5.666-13.647"
+                  />
+                </svg>
+              </div>
+            </div>
+            <div class="grow ml-6">
+              <p
+                class="font-bold mb-1 no-underline hover:underline text-blue-600 cursor-pointer"
+              >
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://wa.me/6281485596321?text=hello%20how%20can%20i%20help%20you"
+                  >Whatsapp</a
+                >
+              </p>
+              <p class="text-gray-500">test@test.com</p>
+              <p class="text-gray-500">+6281485596321</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-center">
         <div
           class="grow-0 shrink-0 basis-auto mb-12 lg:mb-0 w-full lg:w-5/12 px-3 lg:px-6"
         >
-          <form>
+          <form @submit.prevent="submit">
             <div class="form-group mb-6">
               <input
                 type="text"
                 class="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
                 id="exampleInput7"
                 placeholder="Name"
+                :disabled="isLoggedIn"
+                v-model="name"
               />
             </div>
             <div class="form-group mb-6">
@@ -26,6 +74,8 @@
                 class="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
                 id="exampleInput8"
                 placeholder="Email address"
+                :disabled="isLoggedIn"
+                v-model="email"
               />
             </div>
             <div class="form-group mb-6">
@@ -34,9 +84,10 @@
                 id="exampleFormControlTextarea13"
                 rows="3"
                 placeholder="Message"
+                v-model="message"
               ></textarea>
             </div>
-            <div class="form-group form-check text-center mb-6">
+            <!-- <div class="form-group form-check text-center mb-6">
               <input
                 type="checkbox"
                 class="form-check-input appearance-none h-4 w-4 border border-gray-300 rounded-sm bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain mr-2 cursor-pointer"
@@ -48,16 +99,16 @@
                 for="exampleCheck87"
                 >Send me a copy of this message</label
               >
-            </div>
+            </div> -->
             <button
               type="submit"
-              class="w-full px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
+              class="mb-8 inline-block px-20 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
             >
-              Send
+              Submit
             </button>
           </form>
         </div>
-        <div class="grow-0 shrink-0 basis-auto w-full lg:w-7/12">
+        <!-- <div class="grow-0 shrink-0 basis-auto w-full lg:w-7/12">
           <div class="flex flex-wrap">
             <div
               class="mb-12 grow-0 shrink-0 basis-auto w-full lg:w-6/12 px-3 lg:px-6"
@@ -75,19 +126,26 @@
                       class="w-5 text-white"
                       role="img"
                       xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 512 512"
+                      viewBox="40 40 90 90"
                     >
                       <path
-                        fill="currentColor"
-                        d="M192 208c0-17.67-14.33-32-32-32h-16c-35.35 0-64 28.65-64 64v48c0 35.35 28.65 64 64 64h16c17.67 0 32-14.33 32-32V208zm176 144c35.35 0 64-28.65 64-64v-48c0-35.35-28.65-64-64-64h-16c-17.67 0-32 14.33-32 32v112c0 17.67 14.33 32 32 32h16zM256 0C113.18 0 4.58 118.83 0 256v16c0 8.84 7.16 16 16 16h16c8.84 0 16-7.16 16-16v-16c0-114.69 93.31-208 208-208s208 93.31 208 208h-.12c.08 2.43.12 165.72.12 165.72 0 23.35-18.93 42.28-42.28 42.28H320c0-26.51-21.49-48-48-48h-32c-26.51 0-48 21.49-48 48s21.49 48 48 48h181.72c49.86 0 90.28-40.42 90.28-90.28V256C507.42 118.83 398.82 0 256 0z"
-                      ></path>
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="#fff"
+                        fill-rule="evenodd"
+                        d="M68.772 55.603c-1.378-3.061-2.828-3.123-4.137-3.176l-3.524-.043c-1.226 0-3.218.46-4.902 2.3s-6.435 6.287-6.435 15.332 6.588 17.785 7.506 19.013 12.718 20.381 31.405 27.75c15.529 6.124 18.689 4.906 22.061 4.6s10.877-4.447 12.408-8.74 1.532-7.971 1.073-8.74-1.685-1.226-3.525-2.146-10.877-5.367-12.562-5.981-2.91-.919-4.137.921-4.746 5.979-5.819 7.206-2.144 1.381-3.984.462-7.76-2.861-14.784-9.124c-5.465-4.873-9.154-10.891-10.228-12.73s-.114-2.835.808-3.751c.825-.824 1.838-2.147 2.759-3.22s1.224-1.84 1.836-3.065.307-2.301-.153-3.22-4.032-10.011-5.666-13.647"
+                      />
                     </svg>
                   </div>
                 </div>
                 <div class="grow ml-6">
-                  <p class="font-bold mb-1">Technical Issue</p>
-                  <p class="text-gray-500">technical@gmail.com</p>
-                  <p class="text-gray-500">+8228192749</p>
+                  <p class="font-bold mb-1">
+                    <a
+                      href="https://wa.me/6281485596321?text=hello%20how%20can%20i%20help%20you"
+                    ></a
+                    >Whatsapp
+                  </p>
+                  <p class="text-gray-500">ppramesi@visi8.com</p>
+                  <p class="text-gray-500">+6281485596321</p>
                 </div>
               </div>
             </div>
@@ -188,14 +246,42 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
     </section>
   </div>
 </template>
 
 <script>
+import { useAuthStore } from "@/store/auth";
+import { ref } from "vue";
+
 export default {
+  setup() {
+    const message = ref("");
+    const email = ref("");
+    const name = ref("");
+    const isLoggedIn = ref(false);
+
+    const authStore = useAuthStore();
+    authStore.loginPromise.then(() => {
+      email.value = authStore.userInstance.email;
+      name.value = authStore.userInstance.full_name;
+      isLoggedIn.value = authStore.isLoggedIn;
+    });
+
+    return {
+      isLoggedIn,
+      name,
+      message,
+      email,
+    };
+  },
   name: "contact-us",
+  methods: {
+    submit() {
+      console.log(this.name, this.message, this.email);
+    },
+  },
 };
 </script>

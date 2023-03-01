@@ -8,6 +8,11 @@ const {onDeleteUser} = require("./auth/onDeleteUser");
 exports.onCreateUser = onCreateUser;
 exports.onDeleteUser = onDeleteUser;
 
+const {processQueue} = require("./mailer/mailListener");
+const {mailSender} = require("./mailer/mailSender");
+exports.processQueue = processQueue;
+exports.mailSender = mailSender;
+
 // // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions
 //

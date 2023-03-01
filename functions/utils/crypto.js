@@ -70,7 +70,7 @@ const decrypt = async (encryptedData, password) => {
     );
     return dec.decode(decryptedContent);
   } catch (e) {
-    console.log(`Error - ${e}`);
+    console.error(`Error - ${e}`);
     return "";
   }
 };
@@ -100,7 +100,7 @@ const encrypt = async (secretData, password) => {
     const base64Buff = buffToBase64(buff);
     return base64Buff;
   } catch (e) {
-    console.log(`Error - ${e}`);
+    console.error(`Error - ${e}`);
     return "";
   }
 };

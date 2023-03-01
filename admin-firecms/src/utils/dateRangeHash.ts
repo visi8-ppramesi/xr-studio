@@ -363,6 +363,10 @@ class DateRangeHashGenerator {
                     codeArray.unshift("005");
                     codeArray.push(4)
                     break;
+                case "studio_tour":
+                    codeArray.unshift("006");
+                    codeArray.push(8)
+                    break;
             }
         }
 

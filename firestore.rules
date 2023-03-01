@@ -1,6 +1,16 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    match /studio_tours/{studio_tour} {
+      allow read: if isAdmin() || requestedByUser();
+      allow write: if isAdmin();
+
+      function requestedByUser(){
+        let requestor = get(/databases/$(database)/documents/studio_tours/$(studio_tour)).data.requested_by.id;
+        return request.auth.uid == requestor;
+      }
+    }
+
     match /equipments/{equipment} {
       allow read: if true;//!isDraft() || isAdmin() || equipmentOwnedByUser();
       allow write: if equipmentOwnedByUser() || isAdmin();

@@ -28,6 +28,7 @@ import { Calendar } from "./calendar";
 import { AssetCategories } from "./asset-categories";
 import { EquipmentCategories } from "./equipment-categories";
 import { EquipmentTypes } from "./equipment-types";
+import { StudioTours } from "./studio-tours";
 
 export default {
   AssetsContracts,
@@ -58,4 +59,5 @@ export default {
   AssetCategories,
   EquipmentCategories,
   EquipmentTypes,
+  StudioTours,
 };

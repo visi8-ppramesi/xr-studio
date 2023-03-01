@@ -17,6 +17,8 @@ cp ./shared/dateRangeHash/browser/dateRangeHash.js ./user-frontend/src/utils/dat
 cp ./shared/dateRangeHash/browser/dateRangeHash.js ./admin-firecms/src/utils/dateRangeHash.js
 cp ./shared/dateRangeHash/nodejs/dateRangeHash.js ./factory/utils/dateRangeHash.js
 cp ./shared/dateRangeHash/nodejs/dateRangeHash.js ./cloud-run/shooting-manager/utils/dateRangeHash.js
+cp ./shared/dateRangeHash/nodejs/dateRangeHash.js ./cloud-run/studio-tour-manager/utils/dateRangeHash.js
+cp ./shared/dateRangeHash/nodejs/dateRangeHash.js ./shared/cloudRunUtils/dateRangeHash.js
 
 node ./shared/betterStableStringify/buildBetterStableStringify.js
 cp ./shared/betterStableStringify/nodejs/betterStableStringify.js ./cloud-run/shooting-manager/utils/betterStableStringify.js

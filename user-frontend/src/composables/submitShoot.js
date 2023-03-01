@@ -1,9 +1,10 @@
-import { firebase } from "@/firebase";
+// import { firebase } from "@/firebase";
 import { vedhg } from "@/utils/dateRangeHash";
-import axios from "axios";
+// import axios from "axios";
 import isNil from "lodash/isNil";
 import omitBy from "lodash/omitBy";
 import isEmpty from "lodash/isEmpty";
+import { createPostRequest } from "./utils/postRequestUtils";
 /*
     procedures: [
         {
@@ -58,8 +59,6 @@ const isEmptyOrDate = function (value) {
 const handleError = (e) => {
   return e;
 };
-
-const envDev = process.env.VUE_APP_MODE == "development";
 
 const forceToDate = function (date) {
   return new Date(date);
@@ -140,57 +139,26 @@ const structureProcedureData = function (data) {
   return omitBy(dataObj, isEmptyOrDate);
 };
 
-const createHeaders = async function () {
-  const { auth } = firebase;
-  const { currentUser } = auth;
-  const headers = {};
-  if (currentUser) {
-    const tokenId = await currentUser.getIdToken();
-    headers.Authorization = `Bearer ${tokenId}`;
-  } else {
-    throw new Error("User not logged in");
-  }
-  return headers;
-};
-
-const createPostRequest = function (name, pathname, structureFunction) {
-  return async function (data) {
-    try {
-      const managerUrl = new URL(process.env.VUE_APP_SHOOTING_MANAGER_URL);
-      managerUrl.pathname = pathname;
-      const headers = await createHeaders();
-
-      const procData = structureFunction(data);
-      if (envDev) {
-        procData.debug = true;
-      }
-
-      console.log("procData", procData);
-
-      return axios.post(managerUrl.toString(), procData, {
-        headers,
-      });
-    } catch (error) {
-      handleError({ name, error });
-      throw error;
-    }
-  };
-};
-
 const editProcedurePostRequest = createPostRequest(
+  process.env.VUE_APP_SHOOTING_MANAGER_URL,
   "editProcedure",
   "edit-procedure",
-  structureProcedureData
+  structureProcedureData,
+  handleError
 );
 const createShootPostRequest = createPostRequest(
+  process.env.VUE_APP_SHOOTING_MANAGER_URL,
   "createShoot",
   "create",
-  structureShootData
+  structureShootData,
+  handleError
 );
 const editShootPostRequest = createPostRequest(
+  process.env.VUE_APP_SHOOTING_MANAGER_URL,
   "editShoot",
   "edit",
-  structureShootData
+  structureShootData,
+  handleError
 );
 
 export async function editProcedure(data) {
