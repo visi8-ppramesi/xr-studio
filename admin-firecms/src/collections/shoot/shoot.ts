@@ -1,11 +1,12 @@
 import {
   buildCollection,
+  EnumValueConfig
 } from "ppramesi-firecms";
 import { shootAssetCollection } from "./asset/asset"
 import { shootEquipmentCollection } from "./equipment/equipment"
 import { shootProcedureCollection } from "./procedure/procedure"
 import { rewriteIdUpdate } from "@utils/id"
-import { Shoot } from "@/types";
+import { Shoot, statusTypes } from "@/types";
 
 const debouncedRewriteId = rewriteIdUpdate<Shoot>()
 export const shootCollection = buildCollection<Shoot>({
@@ -32,7 +33,8 @@ export const shootCollection = buildCollection<Shoot>({
       name: "Status",
       dataType: "array",
       of: {
-        dataType: "string"
+        dataType: "string",
+        enumValues: statusTypes
       }
     },
     status_history: {

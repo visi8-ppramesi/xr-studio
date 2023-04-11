@@ -35,11 +35,11 @@ export const userCollection = buildCollection<User>({
         }
       },
       public_key: {
-        name: "Username",
+        name: "Public Key",
         dataType: "string"
       },
       encrypted_private_key: {
-        name: "Username",
+        name: "Encrypted Private Key",
         dataType: "string"
       }
     }

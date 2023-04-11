@@ -24,6 +24,7 @@ import { equipmentTypeCollection } from "./collections/equipmentTypes/equipmentT
 import { equipmentCategoryCollection } from "./collections/equipmentCategories/equipmentCategories";
 import { assetCategoryCollection } from "./collections/assetCategories/assetCategories";
 import { buildUserRoleCollection } from "./collections/userRoles/userRoles";
+import { calendarCollection } from "./collections/calendar/calendar";
 
 import "typeface-rubik";
 import "@fontsource/ibm-plex-mono";
@@ -88,7 +89,8 @@ export default function App() {
       equipmentTypeCollection,
       equipmentCategoryCollection,
       assetCategoryCollection,
-      buildUserRoleCollection(useState<EnumValues>({}))
+      buildUserRoleCollection(useState<EnumValues>({})),
+      calendarCollection
     ]}
     firebaseConfig={firebaseConfig}
     signInOptions={["password"]}

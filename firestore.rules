@@ -183,12 +183,23 @@ service cloud.firestore {
       }
     }
 
+    match /equipment_types/{equipment_type} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /equipment_categories/{equipment_category} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     match /calendar/{calendar} {
       allow read: if true;
       allow write: if isAdmin();
     }
 
     match /{document=**} {
+      // allow read: if true;
       allow read, write: if isAdmin();
     }
 

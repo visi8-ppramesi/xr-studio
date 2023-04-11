@@ -1,5 +1,5 @@
 import {
-    EntityReference,
+    EntityReference, EnumValueConfig,
 } from "ppramesi-firecms";
 
 export type UserData = {
@@ -150,3 +150,27 @@ export type Test = {
     test_string: string,
     test_test: string
 }
+
+export type CalendarEvent = {
+    location: string,
+    status: string[],
+}
+
+export type Calendar = {
+    end_date: Date,
+    event: CalendarEvent,
+    event_id: EntityReference,
+    start_date: Date,
+}
+
+export const statusTypes: EnumValueConfig[] = [
+    { id: "initialized", label: "Initialized" },
+    { id: "approved", label: "Approved" },
+    { id: "unpaid", label: "Unpaid" },
+    { id: "paid", label: "Paid" },
+    { id: "with_procedures", label: "With Procedures" },
+    { id: "with_equipments", label: "With Equipments" },
+    { id: "with_assets", label: "With Assets" },
+    { id: "go-ahead", label: "Go Ahead" },
+    { id: "canceled", label: "Canceled" },
+  ]
